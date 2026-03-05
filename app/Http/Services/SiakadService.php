@@ -188,7 +188,7 @@ class SiakadService
                     // Extract major from format "2F (TI - 2F)"
                     if (preg_match('/\(([^-]+)\s*-/', $classFull, $majorMatch)) {
                         $major = trim($majorMatch[1]);
-                    }
+                    }   
                 }
             }
 
