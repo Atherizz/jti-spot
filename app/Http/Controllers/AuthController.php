@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\SiakadService;
+use App\Models\ClassGroup;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -21,59 +24,84 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
-        $validate = $request->validate([
-            'username' => 'required',
-            'email' => 'required|unique:users|email',
+        $request->validate([
+            'reg_number' => 'required',
             'password' => 'required',
         ]);
 
         try {
-
-            // $isRegistered = User::where('username')
-
+            // Check if user already registered
+            $existingUser = User::where('reg_number', $request->reg_number)->first();
             
-
-            $isLoggedIn = $this->siakadService->login([
-                'username' => $validate['username'],
-                'password' => $validate['password'],
-            ]);
-
-            if ($isLoggedIn) {
-                // Scrape the bio immediately after successful login
-                $studentBio = $this->siakadService->getStudentBio();
-
-
+            if ($existingUser) {
+                // User exists, attempt login with reg_number
+                if (Auth::attempt(['reg_number' => $request->reg_number, 'password' => $request->password], true)) {
+                    $request->session()->regenerate();
+                    return $this->redirectBasedOnRole(Auth::user());
+                }
                 
-                // Flash data to session for the welcome page
-                return redirect()->route('welcome')->with('studentBio', $studentBio);
+                return back()->with('error', 'Login failed. Check your credentials.');
             }
 
-            return back()->with('error', 'Login fails. Check your credentials.');
+            // New user - scrape from Siakad
+            $isLoggedIn = $this->siakadService->login([
+                'username' => $request->reg_number,
+                'password' => $request->password,
+            ]);
+
+            if (!$isLoggedIn) {
+                return back()->with('error', 'Login failed. Check your credentials.');
+            }
+
+            // Scrape student bio
+            $studentBio = $this->siakadService->getStudentBio();
+
+            // Find class group
+            $classGroup = ClassGroup::where('name', $studentBio['class'])
+                ->where('major', $studentBio['major'])
+                ->first();
+
+            if (!$classGroup) {
+                return back()->with('error', 'Class group not found: ' . $studentBio['class'] . ' - ' . $studentBio['major']);
+            }
+
+            // Create new user
+            $user = User::create([
+                'name' => $studentBio['fullname'],
+                'email' => $studentBio['email'],
+                'email_verified_at' => now(),
+                'reg_number' => $request->reg_number,
+                'role' => 'student',
+                'class_group_id' => $classGroup->id,
+                'password' => Hash::make($request->password),
+            ]);
+
+            Auth::login($user, true); 
+            event(new Registered($user));
+
+            return $this->redirectBasedOnRole($user);
+
         } catch (\Exception $e) {
-            return back()->with('error', 'Scraping error: ' . $e->getMessage());
+            return back()->with('error', 'Error: ' . $e->getMessage());
         }
+    }
+
+    private function redirectBasedOnRole(User $user): RedirectResponse
+    {
+        return in_array($user->role, ['student', 'class_rep'])
+            ? redirect()->route('dashboard.student.home')
+            : redirect()->route('dashboard.admin.home');
     }
 
     public function logout(Request $request): RedirectResponse
-{
-    Auth::logout();
- 
-    $request->session()->invalidate();
- 
-    $request->session()->regenerateToken();
- 
-    return redirect('/');
-}
-
-    public function welcome()
     {
-        // Avoid error if the user accesses /welcome directly without logging in
-        if (!session()->has('studentBio')) {
-            return redirect()->route('login')->with('error', 'Please login first.');
-        }
+        Auth::logout();
 
-        return view('welcome', [
-            'studentBio' => session('studentBio')
-        ]);
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
+
+    
 }
