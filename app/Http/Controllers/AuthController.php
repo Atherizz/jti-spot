@@ -37,7 +37,7 @@ class AuthController extends Controller
                 // User exists, attempt login with reg_number
                 if (Auth::attempt(['reg_number' => $request->reg_number, 'password' => $request->password], true)) {
                     $request->session()->regenerate();
-                    return redirect()->route('dashboard.home');
+                    return $this->redirectBasedOnRole(Auth::user());
                 }
                 
                 return back()->with('error', 'Login failed. Check your credentials.');
@@ -71,6 +71,7 @@ class AuthController extends Controller
                 'email' => $studentBio['email'],
                 'email_verified_at' => now(),
                 'reg_number' => $request->reg_number,
+                'role' => 'student',
                 'class_group_id' => $classGroup->id,
                 'password' => Hash::make($request->password),
             ]);
@@ -78,11 +79,18 @@ class AuthController extends Controller
             Auth::login($user, true); 
             event(new Registered($user));
 
-            return redirect()->route('dashboard.home');
+            return $this->redirectBasedOnRole($user);
 
         } catch (\Exception $e) {
             return back()->with('error', 'Error: ' . $e->getMessage());
         }
+    }
+
+    private function redirectBasedOnRole(User $user): RedirectResponse
+    {
+        return in_array($user->role, ['student', 'class_rep'])
+            ? redirect()->route('dashboard.student.home')
+            : redirect()->route('dashboard.admin.home');
     }
 
     public function logout(Request $request): RedirectResponse
