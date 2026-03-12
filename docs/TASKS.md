@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
 
 ```
 
-## 2. Fikar (Student Hub & Class Rep Actions)
+## 2. Adi (Student Hub & Class Rep Actions)
 
 **Fokus:** Integrasi UI Dashboard Mahasiswa dan formulir aksi Ketua Kelas.
 
@@ -115,7 +115,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
 ```
 
-## 4. Adi (Public Facing & Live Map)
+## 4. Fikar (Public Facing & Live Map)
 
 **Fokus:** Penyediaan data metrik publik dan ketersediaan ruangan secara visual.
 
