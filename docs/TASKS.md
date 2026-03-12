@@ -1,15 +1,18 @@
+Sudah saya sesuaikan. Semua penjelasan fitur sekarang menggunakan Bahasa Indonesia yang lugas agar tim langsung paham tanggung jawabnya, tanpa menghilangkan istilah teknis Laravel (seperti *Controller*, *Middleware*, atau *Service*) agar mereka tetap familiar dengan struktur kodenya.
 
 ---
 
-# Pembagian Tugas JTISpot
+# Pembagian Tugas JTISpot - Sprint 1
 
 Dokumen ini memuat spesifikasi teknis pengerjaan JTISpot. Pendekatan yang digunakan adalah *Feature-Based/Domain-Driven*. Setiap anggota bertanggung jawab atas satu siklus MVC (Model-View-Controller) penuh untuk fiturnya masing-masing.
+
+**Aturan Main:** Dilarang mengubah struktur file Blade/UI HTML yang sudah ada kecuali untuk kebutuhan integrasi variabel PHP (`{{ $variable }}`) dan *state* interaktif.
 
 ---
 
 ## ⚠️ SOP Wajib Sebelum Mulai Ngoding (BACA INI!)
 
-Urutan perintah di bawah ini wajib dijalankan setiap kali memulai sesi pengerjaan untuk memastikan sinkronisasi kode dan *dependencies*:
+Urutan perintah di bawah ini wajib dijalankan setiap kali memulai sesi pengerjaan untuk memastikan sinkronisasi kode dan data:
 
 1. **Pastikan berada di branch masing-masing**, dilarang melakukan *commit* langsung ke `main`.
 ```bash
@@ -46,17 +49,15 @@ php artisan serve
 
 ```
 
-
-
 ---
 
 ## 1. Savero (Tech Lead & Core Security)
 
-**Fokus:** Validasi keamanan, otorisasi, dan *business logic* utama sistem.
+**Fokus:** Keamanan validasi, otorisasi, dan logika bisnis inti sistem.
 
-* **Action Services:** Implementasi `RoomActionService` (PHP *class*) untuk logika Klaim dan Batal Ruangan. Mencakup algoritma validasi koordinat GPS, pengecekan IP WiFi kampus, dan verifikasi kuorum.
-* **QR Security Logic:** Fitur `Rotate Token` untuk regenerasi token QR Code ruangan agar data lama kedaluwarsa (*expired*).
-* **Auth Middleware:** Konfigurasi *middleware* untuk pemisahan hak akses: `admin`, `student`, dan `class_rep`.
+* **Action Services:** Membuat `RoomActionService` (PHP *class*) untuk logika **Klaim dan Pembatalan Ruangan**. Di sini tempat algoritma validasi koordinat GPS, pengecekan IP WiFi kampus, dan verifikasi kuorum mahasiswa.
+* **QR Security Logic:** Membuat fitur **Reset Token QR** untuk memperbarui token QR Code ruangan agar foto QR yang lama tidak bisa digunakan lagi (*expired*).
+* **Auth Middleware:** Mengatur dan mendaftarkan *middleware* untuk membatasi hak akses antar peran: `admin`, `student`, dan `class_rep`.
 
 **Target Routes (`routes/web.php`):**
 
@@ -74,11 +75,11 @@ Route::middleware('auth')->group(function () {
 
 ## 2. Adi (Student Hub & Class Rep Actions)
 
-**Fokus:** Integrasi UI Dashboard Mahasiswa dan formulir aksi Ketua Kelas.
+**Fokus:** Integrasi Dashboard Mahasiswa dan formulir aksi Ketua Kelas.
 
-* **Claim Reservation Form:** Implementasi `ReservationController`. Menyediakan data dinamis untuk *dropdown* "Room Selection" (filter ruang tersedia) dan "Original Schedule" berdasarkan ID kelas user.
-* **Cancel Action Trigger:** Menghubungkan tombol "Batalkan Jadwal" pada UI ke *service* yang tersedia.
-* **Live Quorum Tracker:** *Query* data dari tabel `scans` untuk menampilkan status kuorum secara *real-time* pada dashboard mahasiswa saat proses klaim berlangsung.
+* **Formulir Reservasi:** Membuat `ReservationController`. Menampilkan data pilihan ruangan (hanya yang kosong) dan jadwal asli berdasarkan kelas mahasiswa yang sedang *login*.
+* **Tombol Batal Kelas:** Menghubungkan tombol "Batalkan Jadwal" di tampilan UI ke sistem *backend* pembatalan.
+* **Pantauan Live quorum:** Mengambil data dari tabel `scans` untuk menampilkan status jumlah mahasiswa yang sudah *scan* secara *real-time* di dashboard.
 
 **Target Routes (`routes/web.php`):**
 
@@ -98,11 +99,11 @@ Route::middleware('auth')->group(function () {
 
 ## 3. Zuhdi (Admin Room Operations & Data Logistics)
 
-**Fokus:** Monitoring ruangan, log aktivitas scan, dan manajemen jadwal massal.
+**Fokus:** Pemantauan ruangan, log aktivitas scan, dan manajemen jadwal massal.
 
-* **Room Monitoring List:** Implementasi `AdminRoomController@index`. Menampilkan tabel manajemen ruangan beserta *Live Status* dan fitur *Search*.
-* **Room Detail & Live Scan Log:** Implementasi `AdminRoomController@show` untuk menampilkan histori *scan* mahasiswa beserta status validasi (WIFI/GPS/Mismatch).
-* **Schedule Import Engine:** Implementasi fitur *import* Excel jadwal menggunakan `Laravel-Excel` untuk *bulk insert* ke tabel `schedules`.
+* **Daftar Pantauan Ruangan:** Membuat `AdminRoomController@index`. Menampilkan tabel semua ruangan beserta **Status Langsung** (Tersedia/Terpakai) dan fitur pencarian.
+* **Detail Ruang & Log Scan:** Membuat `AdminRoomController@show` untuk menampilkan siapa saja mahasiswa yang sudah *scan* di ruangan tersebut beserta status validasinya (Sukses WiFi/GPS atau Gagal Lokasi).
+* **Fitur Impor Jadwal:** Membuat sistem unggah file Excel jadwal kuliah menggunakan `Laravel-Excel` untuk dimasukkan ke database secara massal.
 
 **Target Routes (`routes/web.php`):**
 
@@ -117,11 +118,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
 ## 4. Fikar (Public Facing & Live Map)
 
-**Fokus:** Penyediaan data metrik publik dan ketersediaan ruangan secara visual.
+**Fokus:** Penyediaan data angka publik dan peta ruangan interaktif.
 
-* **Guest Controller:** Mengelola tampilan data sebelum user melakukan *login*.
-* **Live Status Fetching:** Mengirimkan data ketersediaan ruang ke Blade untuk memperbarui warna pada Peta Interaktif secara dinamis.
-* **Landing Page Metrics:** Agregasi data untuk menampilkan angka "Tersedia Sekarang", "Terpakai", dan "Kosong < 15 menit" pada halaman depan.
+* **Guest Controller:** Mengelola semua data yang muncul di halaman depan sebelum pengguna masuk (*login*).
+* **Update Status pada LiveMap:** Mengirimkan data status ruangan terbaru agar warna di **Peta Interaktif** bisa berubah secara otomatis (Hijau/Merah).
+* **Statistik Landing Page:** Menghitung jumlah ruangan "Tersedia", "Terpakai", dan "Kosong sebentar lagi" untuk ditampilkan di kotak informasi halaman utama.
 
 **Target Routes (`routes/web.php`):**
 
@@ -136,8 +137,8 @@ Route::get('/rooms/live-status', [GuestController::class, 'liveStatus']);
 
 **Fokus:** Penanganan laporan pengguna dan manajemen data akun.
 
-* **Report System:** Implementasi `ReportController` untuk menangani aksi "Lapor Ruang Kosong" dan menampilkan daftar laporan di panel Admin.
-* **User Management:** Implementasi `UserController` untuk manajemen daftar mahasiswa, *reset password*, dan pemutakhiran *role* user.
+* **Sistem Laporan:** Membuat fungsi "Lapor Ruang Kosong" bagi mahasiswa dan menampilkan daftar laporan tersebut di panel Admin untuk diperiksa.
+* **Manajemen User:** Membuat fitur untuk melihat daftar mahasiswa, melakukan reset kata sandi, dan mengubah peran (*role*) pengguna (misal: Mahasiswa biasa menjadi Ketua Kelas).
 
 **Target Routes (`routes/web.php`):**
 
