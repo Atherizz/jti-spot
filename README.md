@@ -5,7 +5,7 @@
 
 ---
 
-## 👥 Tim Pengembang (Grup X)
+## 👥 Tim Pengembang
 
 Berikut adalah anggota tim pengembang proyek JTISpot:
 * **Savero Athallah H. P.** / 244107020116 
