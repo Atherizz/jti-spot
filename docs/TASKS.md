@@ -76,10 +76,10 @@ Route::middleware('auth')->group(function () {
 ## 2. Adi (Student Hub & Class Rep Actions)
 
 **Fokus:** Integrasi Dashboard Mahasiswa dan formulir aksi Ketua Kelas.
-
+* **Monitoring Jadwal Harian:** Menampilkan daftar jadwal kelas milik mahasiswa pada hari ini dan esok hari.
 * **Formulir Reservasi:** Membuat `ReservationController`. Menampilkan data pilihan ruangan (hanya yang kosong) dan jadwal asli berdasarkan kelas mahasiswa yang sedang *login*.
-* **Tombol Batal Kelas:** Menghubungkan tombol "Batalkan Jadwal" di tampilan UI ke sistem *backend* pembatalan.
-* **Pantauan Live quorum:** Mengambil data dari tabel `scans` untuk menampilkan status jumlah mahasiswa yang sudah *scan* secara *real-time* di dashboard.
+* **Aksi Pembatalan Kelas:** Menyediakan daftar jadwal aktif milik Ketua Kelas, di mana user dapat memilih satu jadwal spesifik untuk dibatalkan melalui sistem.
+* **Progress Kuorum:** Menampilkan jumlah mahasiswa yang sudah melakukan scan untuk jadwal aktif saat ini (menggunakan simple count query).
 
 **Target Routes (`routes/web.php`):**
 
@@ -101,7 +101,7 @@ Route::middleware('auth')->group(function () {
 
 **Fokus:** Pemantauan ruangan, log aktivitas scan, dan manajemen jadwal massal.
 
-* **Daftar Pantauan Ruangan:** Membuat `AdminRoomController@index`. Menampilkan tabel semua ruangan beserta **Status Langsung** (Tersedia/Terpakai) dan fitur pencarian.
+* **Daftar Monitoring Ruangan:** Membuat `AdminRoomController@index`. Menampilkan tabel semua ruangan beserta **Status Langsung** (Tersedia/Terpakai) dan fitur pencarian.
 * **Detail Ruang & Log Scan:** Membuat `AdminRoomController@show` untuk menampilkan siapa saja mahasiswa yang sudah *scan* di ruangan tersebut beserta status validasinya (Sukses WiFi/GPS atau Gagal Lokasi).
 * **Fitur Impor Jadwal:** Membuat sistem unggah file Excel jadwal kuliah menggunakan `Laravel-Excel` untuk dimasukkan ke database secara massal.
 
@@ -121,7 +121,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 **Fokus:** Penyediaan data angka publik dan peta ruangan interaktif.
 
 * **Guest Controller:** Mengelola semua data yang muncul di halaman depan sebelum pengguna masuk (*login*).
-* **Update Status pada LiveMap:** Mengirimkan data status ruangan terbaru agar warna di **Peta Interaktif** bisa berubah secara otomatis (Hijau/Merah).
+* **Status pada LiveMap:** Mengirimkan data ketersediaan ruang terbaru agar warna ruangan pada peta berubah (Hijau/Merah) saat halaman di-refresh.
 * **Statistik Landing Page:** Menghitung jumlah ruangan "Tersedia", "Terpakai", dan "Kosong sebentar lagi" untuk ditampilkan di kotak informasi halaman utama.
 
 **Target Routes (`routes/web.php`):**
@@ -137,8 +137,9 @@ Route::get('/rooms/live-status', [GuestController::class, 'liveStatus']);
 
 **Fokus:** Penanganan laporan pengguna dan manajemen data akun.
 
-* **Sistem Laporan:** Membuat fungsi "Lapor Ruang Kosong" bagi mahasiswa dan menampilkan daftar laporan tersebut di panel Admin untuk diperiksa.
-* **Manajemen User:** Membuat fitur untuk melihat daftar mahasiswa, melakukan reset kata sandi, dan mengubah peran (*role*) pengguna (misal: Mahasiswa biasa menjadi Ketua Kelas).
+* **Sistem Laporan:** Membuat fitur bagi mahasiswa untuk melaporkan ruangan yang aslinya kosong tapi di sistem tertera penuh. Admin dapat melihat daftar laporan ini untuk validasi manual.
+* **Manajemen User:** MMembuat tabel daftar mahasiswa dengan Pagination dan Filtering berdasarkan kelas. Admin dapat mengubah role user dari student menjadi class_rep secara manual.
+* **Halaman Profil:** Membuat halaman profil user untuk menampilkan informasi dasar akun (Nama, NIM, Kelas, Role).
 
 **Target Routes (`routes/web.php`):**
 
@@ -150,6 +151,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports', [ReportController::class, 'index']);
         Route::get('/users', [UserController::class, 'index']);
         Route::put('/users/{user}/role', [UserController::class, 'updateRole']);
+        Route::get('/users/{user}/profile', [UserController::class, 'profile']);
     });
 });
 
