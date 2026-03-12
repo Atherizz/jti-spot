@@ -89,8 +89,8 @@ class AuthController extends Controller
     private function redirectBasedOnRole(User $user): RedirectResponse
     {
         return in_array($user->role, ['student', 'class_rep'])
-            ? redirect()->route('dashboard.student.home')
-            : redirect()->route('dashboard.admin.home');
+            ? redirect()->route('student.dashboard.home')
+            : redirect()->route('admin.dashboard.home');
     }
 
     public function logout(Request $request): RedirectResponse

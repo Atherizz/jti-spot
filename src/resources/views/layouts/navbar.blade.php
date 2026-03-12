@@ -32,7 +32,7 @@
             <div class="hidden sm:flex sm:items-center sm:ml-6 gap-4">
                 <a href="{{ route('login') }}">
                     <button class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                        Check In
+                        Login
                     </button>
                 </a>
                 

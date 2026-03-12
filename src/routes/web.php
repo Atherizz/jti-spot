@@ -12,14 +12,14 @@ Route::post('/login', [AuthController::class, 'authenticate']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth', 'can:student'])->group(function () {
-    Route::get('/dashboard/student', function () {
-        return view('dashboard.student.home');
-    })->name('dashboard.student.home');
+    Route::get('/student/dashboard', function () {
+        return view('student.dashboard.home');
+    })->name('student.dashboard.home');
 });
 
 Route::middleware(['auth', 'can:admin'])->group(function () {
-    Route::get('/dashboard/admin', function () {
-        return view('dashboard.admin.home');
-    })->name('dashboard.admin.home');
+    Route::get('/admin/dashboard', function () {
+        return view('admin.dashboard.home');
+    })->name('admin.dashboard.home');
 });
 
