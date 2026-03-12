@@ -38,6 +38,17 @@ class ClassGroupSeeder extends Seeder
             }
         }
 
+        $specialClasses = [
+            ['name' => 'AJ', 'major' => 'TI'],
+        ];
+
+        foreach ($specialClasses as $class) {
+            $classGroups[] = array_merge($class, [
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
+
         DB::table('class_groups')->insert($classGroups);
     }
 }

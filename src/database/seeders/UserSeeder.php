@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
          User::insert([
             [
                 'name' => 'Admin User',
+                'reg_number' => '12345678',
                 'email' => 'admin@example.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
