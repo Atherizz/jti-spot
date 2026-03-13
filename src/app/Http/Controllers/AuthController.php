@@ -35,7 +35,8 @@ class AuthController extends Controller
             
             if ($existingUser) {
                 // User exists, attempt login with reg_number
-                if (Auth::attempt(['reg_number' => $request->reg_number, 'password' => $request->password], true)) {
+                $remember = $request->boolean('remember');
+                if (Auth::attempt(['reg_number' => $request->reg_number, 'password' => $request->password], $remember)) {
                     $request->session()->regenerate();
                     return $this->redirectBasedOnRole(Auth::user());
                 }
@@ -76,7 +77,8 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            Auth::login($user, true); 
+            $remember = $request->boolean('remember');
+            Auth::login($user, $remember);
             event(new Registered($user));
 
             return $this->redirectBasedOnRole($user);
@@ -88,9 +90,12 @@ class AuthController extends Controller
 
     private function redirectBasedOnRole(User $user): RedirectResponse
     {
-        return in_array($user->role, ['student', 'class_rep'])
-            ? redirect()->route('student.dashboard.home')
-            : redirect()->route('admin.dashboard.home');
+        // Get intended URL or fallback to dashboard based on role
+        $defaultRoute = in_array($user->role, ['student', 'class_rep'])
+            ? route('student.dashboard.home')
+            : route('admin.dashboard.home');
+
+        return redirect()->intended($defaultRoute);
     }
 
     public function logout(Request $request): RedirectResponse

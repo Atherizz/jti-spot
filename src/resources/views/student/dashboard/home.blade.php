@@ -4,6 +4,45 @@
 
 @section('content')
 
+    {{-- Flash Messages --}}
+    @if(session('error'))
+    <div id="flashMessage" class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 shadow-sm">
+        <div class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-red-900">Error</p>
+            <p class="text-sm text-red-700 mt-0.5">{{ session('error') }}</p>
+        </div>
+        <button onclick="document.getElementById('flashMessage').remove()" class="text-red-400 hover:text-red-600 transition-colors shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    @endif
+
+    @if(session('success'))
+    <div id="flashMessage" class="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3 shadow-sm">
+        <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
+            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-emerald-900">Berhasil</p>
+            <p class="text-sm text-emerald-700 mt-0.5">{{ session('success') }}</p>
+        </div>
+        <button onclick="document.getElementById('flashMessage').remove()" class="text-emerald-400 hover:text-emerald-600 transition-colors shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+    @endif
+
     {{-- Page Header --}}
     <div class="flex items-start justify-between mb-6">
         <div>
@@ -175,5 +214,19 @@
 
         </div>
     </div>
+
+    {{-- Auto-dismiss flash messages --}}
+    @if(session('error') || session('success'))
+    <script>
+        setTimeout(function() {
+            const flashMessage = document.getElementById('flashMessage');
+            if (flashMessage) {
+                flashMessage.style.transition = 'opacity 0.3s ease-out';
+                flashMessage.style.opacity = '0';
+                setTimeout(() => flashMessage.remove(), 300);
+            }
+        }, 5000);
+    </script>
+    @endif
 
 @endsection

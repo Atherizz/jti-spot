@@ -10,4 +10,20 @@ class ClassGroup extends Model
         'name',
         'major',
     ];
+
+    /**
+     * Get the users (students) in this class group.
+     */
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
+
+    /**
+     * Get the schedules for this class group.
+     */
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }
