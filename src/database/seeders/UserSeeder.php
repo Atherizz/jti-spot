@@ -24,7 +24,27 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'remember_token' => Str::random(),
                 'role' => 'admin'
+            ],
+            [
+                'name' => 'Mahasiswa',
+                'reg_number' => '2441070202',
+                'email' => 'mahasiswa@example.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password'),
+                'remember_token' => Str::random(),
+                'role' => 'student'
+            ],
+            [
+                'name' => 'Ketua Kelas',
+                'reg_number' => '2441070201',
+                'email' => 'ketua@example.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password'),
+                'remember_token' => Str::random(),
+                'role' => 'class_rep'
             ]
+
         ]);
+
     }
 }
