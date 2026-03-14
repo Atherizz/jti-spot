@@ -26,17 +26,75 @@ Untuk memahami detail teknis, rencana pengembangan, dan pembagian tugas, silakan
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Local Development)
 
-Jika Anda ingin menjalankan project ini secara lokal, pastikan telah melakukan instalasi PHP 8.x, Composer, dan Node.js, kemudian ikuti langkah di bawah ini:
+Pastikan laptop Anda sudah terinstal **PHP 8.3**, **Composer**, **Node.js**, dan sistem *database* PostgreSQL. Ikuti langkah-langkah instalasi ini secara berurutan:
+
+**1. Clone Repositori & Masuk ke Direktori**
+```bash
+git clone [https://github.com/Atherizz/jtispot.git](https://github.com/Atherizz/jtispot.git)
+cd jtispot/src
+
+```
+
+**2. Install Dependencies (Backend & Frontend)**
 
 ```bash
-git clone https://github.com/Atherizz/jtispot.git
-cd jtispot/src
 composer install
-npm install
+```
+
+**3. Setup Environment Variables**
+Salin *template* konfigurasi *environment* dan *generate application key* Laravel.
+
+```bash
+cp .env.example .env
+php artisan key:generate
+
+```
+
+**4. Konfigurasi Database (PENTING!)**
+Buka file `.env` yang baru saja dibuat. Sesuaikan kredensial *database* dengan yang ada di laptop Anda masing-masing (XAMPP/Laragon/Docker).
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=jti_spot
+DB_USERNAME=postgres
+DB_PASSWORD={password}
+
+```
+
+**5. Migrasi, Seeding, dan Storage Link**
+Setelah *database* siap, jalankan migrasi tabel beserta data *dummy*, lalu tautkan folder *storage* (penting untuk fitur QR Code/Upload).
+
+```bash
 php artisan migrate --seed
+php artisan storage:link
+
+```
+
+**6. Jalankan Server Lokal**
+Buka **dua terminal terpisah** di dalam folder `jtispot/src`.
+
+**Terminal 1 (Untuk kompilasi aset Tailwind/Vite):**
+
+```bash
+npm install
+npm run dev
+
+```
+
+**Terminal 2 (Untuk server Laravel):**
+
+```bash
 php artisan serve
 
 ```
 
+Aplikasi sekarang bisa diakses di `http://localhost:8000`.
+
+```
+
+
+```
