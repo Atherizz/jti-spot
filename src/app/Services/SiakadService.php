@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services;
+namespace App\Services;
 
 use App\Exceptions\SiakadException;
 use GuzzleHttp\Client;

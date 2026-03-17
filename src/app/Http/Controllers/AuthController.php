@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Services\SiakadService;
+use App\Services\SiakadService;
 use App\Models\ClassGroup;
 use App\Models\User;
 use Illuminate\Http\Request;

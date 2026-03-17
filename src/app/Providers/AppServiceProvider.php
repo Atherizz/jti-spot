@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
-use App\Http\Services\SiakadService;
+use App\Services\SiakadService;
+use App\Services\RoomScanService;
 use Illuminate\Support\ServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SiakadService::class, function ($app) {
             $siakadUrl = env('SIAKAD_URL', 'https://siakad.polinema.ac.id');
             return new SiakadService($siakadUrl);
+        });
+
+        $this->app->singleton(RoomScanService::class, function ($app) {
+            return new RoomScanService();
         });
     }
 
