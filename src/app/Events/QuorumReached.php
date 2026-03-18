@@ -2,14 +2,16 @@
 
 namespace App\Events;
 
-use App\Models\User;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use App\DTOs\Logs\LogMetadata;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ScanAttempted
+class QuorumReached
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -17,15 +19,15 @@ class ScanAttempted
      * Create a new event instance.
      */
     public function __construct(
-        public string $eventType, // 'SCAN_SUCCESS' or 'SCAN_FAILED'
-        public LogMetadata $metadata, 
-        public ?User $user = null,  
-        public ?int $roomId = null,
-        public ?int $scheduleId = null,
-        public ?int $classGroupId = null,
-        public ?string $qrToken = null
-    ) {}
-            
+        public int $scheduleId,
+        public int $classGroupId,
+        public int $roomId,
+        public LogMetadata $metadata
+    )
+    {
+        //
+    }
+
     /**
      * Get the channels the event should broadcast on.
      *

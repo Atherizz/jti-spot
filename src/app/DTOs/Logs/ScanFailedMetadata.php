@@ -7,7 +7,6 @@ readonly class ScanFailedMetadata implements LogMetadata
     public function __construct(
         public string $user_name,
         public string $reason,
-        public string $qr_token
     ) {}
 
     public function toArray(): array
@@ -15,7 +14,6 @@ readonly class ScanFailedMetadata implements LogMetadata
         return [
             'user_name' => $this->user_name,
             'reason'    => $this->reason,
-            'qr_token'  => $this->qr_token,
         ];
     }
 }

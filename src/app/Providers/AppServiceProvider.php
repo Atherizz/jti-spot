@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Listeners\ActivityLogSubscriber;
 use App\Services\SiakadService;
 use App\Services\RoomScanService;
 use Illuminate\Support\ServiceProvider;
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 
 
@@ -14,6 +16,8 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Register any application services.
      */
+
+
     public function register(): void
     {
         $this->app->singleton(SiakadService::class, function ($app) {
@@ -24,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(RoomScanService::class, function ($app) {
             return new RoomScanService();
         });
+
+        
     }
 
     /**
