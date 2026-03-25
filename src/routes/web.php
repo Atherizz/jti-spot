@@ -3,10 +3,92 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoomActionController;
+use App\Models\Room;
+use Carbon\Carbon;
 
 Route::get('/', function () {
-    return view('guest');
+    $now = Carbon::now();
+    $dayOfWeek = $now->dayOfWeek;
+    $currentTime = $now->format('H:i:s');
+
+    $rooms = Room::with(['schedules.classGroup'])
+        ->when(request('floor'), function ($query, $floor) {
+            return $query->where('floor', $floor);
+        })
+        ->get()
+        ->map(function ($room) use ($dayOfWeek, $currentTime) {
+            $currentSchedule = $room->schedules->first(function ($schedule) use ($dayOfWeek, $currentTime) {
+                return $schedule->day_of_week == $dayOfWeek
+                    && $schedule->start_time <= $currentTime
+                    && $schedule->end_time >= $currentTime;
+            });
+
+            $room->current_schedule = $currentSchedule;
+            $room->display_group = $currentSchedule ? $currentSchedule->classGroup->name : null;
+            $room->room_type = str_contains(strtoupper($room->name), 'STUDIO') ? 'AULA' : (str_contains(strtoupper($room->name), 'LAB') || str_contains(strtoupper($room->room_code), 'L') ? 'LAB' : 'KELAS');
+
+            return $room;
+        });
+
+    $stats = [
+        'available' => $rooms->where('current_status', 'available')->count(),
+        'occupied' => $rooms->where('current_status', 'occupied')->count(),
+        'soon' => $rooms->filter(function ($room) use ($now) {
+            if (! $room->current_schedule) {
+                return false;
+            }
+            $end = Carbon::createFromFormat('H:i:s', $room->current_schedule->end_time);
+            $diffMinutes = $end->diffInMinutes($now, false);
+            return $diffMinutes > 0 && $diffMinutes <= 15;
+        })->count(),
+        'labUsage' => $rooms->count() ? round($rooms->where('room_type', 'LAB')->where('current_status', 'occupied')->count() / max($rooms->where('room_type', 'LAB')->count(), 1) * 100) : 0,
+    ];
+
+    return view('guest', compact('rooms', 'stats'));
 });
+
+Route::get('/peta-ruang', function () {
+    $now = Carbon::now();
+    $dayOfWeek = $now->dayOfWeek;
+    $currentTime = $now->format('H:i:s');
+
+    // Menerapkan filter lantai jika ada parameter 'floor' di URL
+    $rooms = Room::with(['schedules.classGroup'])
+        ->when(request('floor'), function ($query, $floor) {
+            return $query->where('floor', $floor);
+        })
+        ->get()
+        ->map(function ($room) use ($dayOfWeek, $currentTime) {
+            $currentSchedule = $room->schedules->first(function ($schedule) use ($dayOfWeek, $currentTime) {
+                return $schedule->day_of_week == $dayOfWeek
+                    && $schedule->start_time <= $currentTime
+                    && $schedule->end_time >= $currentTime;
+            });
+
+            $room->current_schedule = $currentSchedule;
+            $room->display_group = $currentSchedule ? $currentSchedule->classGroup->name : 'Tidak Ada';
+            $room->room_type = str_contains(strtoupper($room->name), 'STUDIO') ? 'AULA' : (str_contains(strtoupper($room->name), 'LAB') || str_contains(strtoupper($room->room_code), 'L') ? 'LAB' : 'KELAS');
+
+            return $room;
+        });
+
+    $stats = [
+        'available' => $rooms->where('current_status', 'available')->count(),
+        'occupied' => $rooms->where('current_status', 'occupied')->count(),
+        'soon' => $rooms->filter(function ($room) {
+            if (! $room->current_schedule) {
+                return false;
+            }
+            $now = \Carbon\Carbon::now();
+            $end = \Carbon\Carbon::createFromFormat('H:i:s', $room->current_schedule->end_time);
+            $diff = $end->diffInMinutes($now, false);
+            return $diff > 0 && $diff <= 15;
+        })->count(),
+        'labUsage' => $rooms->count() ? round($rooms->where('room_type', 'LAB')->where('current_status', 'occupied')->count() / max($rooms->where('room_type', 'LAB')->count(), 1) * 100) : 0,
+    ];
+
+    return view('map', compact('rooms', 'stats'));
+})->name('map');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->middleware('guest')->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->middleware('guest');
@@ -46,9 +128,3 @@ Route::get('/debug-ip', function (\Illuminate\Http\Request $request) {
         'semua_header' => $request->headers->all()
     ]);
 });
-
-
-
-
-
-

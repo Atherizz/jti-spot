@@ -10,6 +10,8 @@ class Room extends Model
         'name',
         'current_status',
         'qr_token',
+        'floor',
+        'room_code',
     ];
 
     /**
