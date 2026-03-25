@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('room_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('schedule_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('room_claim_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('class_group_id')->nullable()->constrained()->nullOnDelete();
             
             // 2. TIPE EVENT 

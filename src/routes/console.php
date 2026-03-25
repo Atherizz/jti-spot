@@ -82,17 +82,21 @@ Schedule::call(function () {
             ->pluck('room_id')
             ->toArray();
 
+        $uniqueWaiting = array_unique($toWaiting);
+        $uniqueCancel = array_unique($toCancelQuorum);
+        $uniqueAvailable = array_unique($toAvailable);
+
         // Bulk update room status
-        if (!empty($toWaiting)) {
-            Room::whereIn('id', array_unique($toWaiting))
+        if (!empty($uniqueWaiting)) {
+            Room::whereIn('id', $uniqueWaiting)
                 ->where('current_status', 'available')
                 ->update(['current_status' => 'waiting']);
-            $logAndPrint('Cron: Rooms updated to [waiting] - IDs: ' . implode(', ', array_unique($toWaiting)));
+            $logAndPrint('Cron: Rooms updated to [waiting] - IDs: ' . implode(', ', array_unique($uniqueWaiting)));
         }
 
-        if (!empty($toCancelQuorum)) {
-
-            $finalToCancel = array_diff(array_unique($toCancelQuorum), $activeClaimedRoomIds);
+        if (!empty($uniqueCancel)) {
+            // FILTER: Dont cancel rooms that actually have active claims, or are in waiting for another schedule
+            $finalToCancel = array_diff($uniqueCancel, $activeClaimedRoomIds, $uniqueWaiting);
 
             Room::whereIn('id', array_unique($finalToCancel))
                 ->where('current_status', 'waiting')
@@ -100,8 +104,9 @@ Schedule::call(function () {
             $logAndPrint('Cron: Rooms updated to [available] (quorum failed) - IDs: ' . implode(', ', array_unique($finalToCancel)));
         }
 
-        if (!empty($toAvailable)) {
-            $finalToAvailable = array_diff(array_unique($toAvailable), $activeClaimedRoomIds);
+        if (!empty($uniqueAvailable)) {
+            // FILTER: Dont make available rooms that are currently waiting for another schedule, or have active claims
+            $finalToAvailable = array_diff($uniqueAvailable, $activeClaimedRoomIds, $uniqueWaiting);
 
             Room::whereIn('id', $finalToAvailable)
                 ->update(['current_status' => 'available']);

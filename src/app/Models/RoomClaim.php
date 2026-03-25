@@ -10,7 +10,7 @@ class RoomClaim extends Model
         'room_id',
         'schedule_id',
         'claimer_group_id',
-        'claimer_by_user_id',
+        'claimed_by_user_id',
         'claim_date',
         'start_time',
         'end_time',

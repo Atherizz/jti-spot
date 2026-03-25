@@ -145,8 +145,14 @@
             <div class="flex-1 min-w-0">
                 <div class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</div>
                 <div class="text-xs text-gray-400 truncate">
-                    @can('admin') Administrator
-                    @elsecan('class_rep') Ketua Kelas
+                    @can('admin') 
+                        Administrator
+                    @elsecan('class_rep') 
+                        @if(auth()->user()->classGroup)
+                            {{ auth()->user()->classGroup->name }} &bull; Ketua Kelas
+                        @else
+                            Ketua Kelas
+                        @endif
                     @else
                         @if(auth()->user()->classGroup)
                             {{ auth()->user()->classGroup->name }} &bull; Mahasiswa

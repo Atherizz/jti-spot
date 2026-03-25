@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-
+use App\Models\ClassGroup;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +15,8 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+
+    
          User::insert([
             [
                 'name' => 'Admin User',
@@ -23,7 +25,8 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
                 'remember_token' => Str::random(),
-                'role' => 'admin'
+                'role' => 'admin',
+                'class_group_id' => null
             ],
             [
                 'name' => 'Mahasiswa',
@@ -32,7 +35,8 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
                 'remember_token' => Str::random(),
-                'role' => 'student'
+                'role' => 'student',
+                'class_group_id' => ClassGroup::where('name', '2F')->where('major', 'TI')->first()->id
             ],
             [
                 'name' => 'Ketua Kelas',
@@ -41,7 +45,8 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'password' => Hash::make('password'),
                 'remember_token' => Str::random(),
-                'role' => 'class_rep'
+                'role' => 'class_rep',
+                'class_group_id' => ClassGroup::where('name', '2F')->where('major', 'TI')->first()->id
             ]
 
         ]);

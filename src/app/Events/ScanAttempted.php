@@ -22,6 +22,7 @@ class ScanAttempted
         public ?User $user = null,  
         public ?int $roomId = null,
         public ?int $scheduleId = null,
+        public ?int $claimId = null,
         public ?int $classGroupId = null,
         public ?string $qrToken = null
     ) {}

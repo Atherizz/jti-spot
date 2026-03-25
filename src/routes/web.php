@@ -25,6 +25,10 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/scan/confirm/{qr_token}', [RoomActionController::class, 'confirmScan'])
              ->middleware('check.location') 
              ->name('scan.confirm');
+
+        Route::post('/scan/claim/{qr_token}', [RoomActionController::class, 'initiateClaim'])
+             ->middleware('check.location')
+             ->name('scan.claim');
     });
 
     Route::prefix('admin')->middleware('can:admin')->group(function () {

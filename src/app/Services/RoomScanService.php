@@ -58,191 +58,138 @@ class RoomScanService
                             ->where('class_group_id', $classGroup->id)
                             ->first();
                     }
+                }
 
                 if ($schedule) {
-
+                    return $this->processAttendance($user, $qrToken, $room, $classGroup, $schedule);
                 }
 
-                    // // If still no schedule found, return error
-                    // if (!$schedule) {
-                    //     if ($user->role == 'class_rep') {
-                    //         // TODO: Initiate claim process for class rep if no schedule found
-                    //     } else if ($user->role == 'student') {
-                    //         // TODO: find room claims where class group is same, day is same 
-
-                    //         // TODO: if there is no claim, return error about no schedule found
-                    //     //  return $this->handleFailedScan($user, $qrToken, 'Tidak ada jadwal kuliah untuk kelas Anda di ruangan ini pada waktu sekarang!', $room->id);
-                    // }
-                    //     }
-                       
-                }
-
-                // Check if user already scanned today for this schedule
-                $existingScan = QuorumScan::where('user_id', $user->id)
-                    ->where('schedule_id', $schedule->id)
-                    ->where('scanned_date', $currentDate)
+                $activeClaim = RoomClaim::where('room_id', $room->id)
+                    ->where('claimer_group_id', $classGroup->id)
+                    ->where('claim_date', $currentDate)
+                    ->wherein('status', ['pending_quorum', 'locked'])
+                    ->whereTime('start_time', '<=', $currentTime)
+                    ->whereTime('end_time', '>=', $currentTime)
                     ->first();
 
-                if ($existingScan) {
-                    return $this->handleFailedScan($user, $qrToken, 'Anda sudah melakukan scan untuk jadwal ini hari ini!', $room->id, $schedule->id, $classGroup->id);
+                if ($activeClaim) {
+                    return $this->processAttendance($user, $qrToken, $room, $classGroup, null, $activeClaim);
                 }
 
-                // 6. Count current quorum scans for this schedule
-                $quorumCount = QuorumScan::where('schedule_id', $schedule->id)
-                    ->where('scanned_date', $currentDate)
-                    ->count();
+                if ($user->role == 'class_rep') {
 
-                // 7. Insert scan data to database
-                $quorumScan = QuorumScan::create([
-                    'user_id' => $user->id,
-                    'room_id' => $room->id,
-                    'schedule_id' => $schedule->id,
-                    'claim_id' => null,
-                    'scanned_date' => $currentDate,
-                    'scanned_at' => $now,
-                ]);
+                    if ($room->current_status !== 'available') {
+                        return $this->handleFailedScan($user, $qrToken, 'Ruangan sedang digunakan oleh kelas lain. Anda tidak bisa mengklaimnya saat ini!');
+                    }
 
-                // Recalculate quorum after insert
-                $newQuorumCount = $quorumCount + 1;
-
-                // Update room status to 'occupied' if quorum is reached
-                $quorumSize = env('QUORUM_SIZE', 5);
-                $isQuorumReached = false;
-                if ($newQuorumCount >= $quorumSize && $room->current_status !== 'occupied') {
-                    $room->update(['current_status' => 'occupied']);
-                    $isQuorumReached = true;
+                    return [
+                        'status' => 'claim_prompt',
+                        'message' => 'Ruangan tidak memiliki jadwal untuk kelas Anda. Ingin claim ruangan ini untuk kelas pengganti?',
+                        'room_id' => $room->id
+                    ];
                 }
 
-                $subjectName = $schedule->course_name ?? 'Mata Kuliah';
-                $roomName = $room->name ?? 'Ruangan';
-
-                // Dispatch Success Event
-                $metadata = new ScanSuccessMetadata(
-                    user_name: $user->name,
-                    room_name: $roomName,
-                    subject_name: $subjectName
-                );
-
-                event(new ScanAttempted(
-                    eventType: 'SCAN_SUCCESS',
-                    metadata: $metadata,
-                    user: $user,
-                    roomId: $room->id,
-                    scheduleId: $schedule->id,
-                    classGroupId: $classGroup->id,
-                    qrToken: $qrToken
-                ));
-
-                // Dispatch Quorum Reached Event if applicable
-                if ($isQuorumReached) {
-                    $quorumMetadata = new QuorumReachedMetadata(
-                        subject_name: $subjectName,
-                        room_name: $roomName,
-                        quorum_count: $newQuorumCount
-                    );
-
-                    event(new QuorumReached(
-                        scheduleId: $schedule->id,
-                        classGroupId: $classGroup->id,
-                        roomId: $room->id,
-                        metadata: $quorumMetadata
-                    ));
-                }
-
-                return [
-                    'status' => 'success',
-                    'message' => 'Scan berhasil! Kehadiran Anda telah tercatat',
-                ];
+                return $this->handleFailedScan($user, $qrToken, 'Tidak ada jadwal resmi atau kelas pengganti untuk kelas Anda saat ini.');
             });
         } catch (\Exception $e) {
             return $this->handleFailedScan($user, $qrToken, $e->getMessage());
         }
     }
 
-    private function processNormalAttendance($user, $schedule, $qrToken, $room, $classGroup) {
-        // Check if user already scanned today for this schedule
+    private function processAttendance($user, $qrToken, $room, $classGroup, $schedule = null, $claim = null)
+    {
+        $now = Carbon::now();
+        $currentDate = $now->format('Y-m-d');
 
-                $now = Carbon::now();
-                $currentDate = $now->format('Y-m-d');
+        $isClaim = !is_null($claim);
+        $targetColumn = $isClaim ? 'claim_id' : 'schedule_id';
+        $targetId = $isClaim ? $claim->id : ($schedule->id ?? null);
 
-                $existingScan = QuorumScan::where('user_id', $user->id)
-                    ->where('schedule_id', $schedule->id)
-                    ->where('scanned_date', $currentDate)
-                    ->first();
+        // Check if user already scanned today for this schedule/claim
+        $existingScan = QuorumScan::where('user_id', $user->id)
+            ->where($targetColumn, $targetId)
+            ->where('scanned_date', $currentDate)
+            ->first();
 
-                if ($existingScan) {
-                    return $this->handleFailedScan($user, $qrToken, 'Anda sudah melakukan scan untuk jadwal ini hari ini!', $room->id, $schedule->id, $classGroup->id);
-                }
+        if ($existingScan) {
+            return $this->handleFailedScan($user, $qrToken, 'Anda sudah melakukan scan untuk sesi ini hari ini!', $room->id, $isClaim ? null : $schedule->id, $classGroup->id);
+        }
 
-                // 6. Count current quorum scans for this schedule
-                $quorumCount = QuorumScan::where('schedule_id', $schedule->id)
-                    ->where('scanned_date', $currentDate)
-                    ->count();
+        // 6. Count current quorum scans for this schedule or claim
+        $quorumCount = QuorumScan::where($targetColumn, $targetId)
+            ->where('scanned_date', $currentDate)
+            ->count();
 
-                // 7. Insert scan data to database
-                $quorumScan = QuorumScan::create([
-                    'user_id' => $user->id,
-                    'room_id' => $room->id,
-                    'schedule_id' => $schedule->id,
-                    'claim_id' => null,
-                    'scanned_date' => $currentDate,
-                    'scanned_at' => $now,
-                ]);
+        // 7. Insert scan data to database
+        $scanData = [
+            'user_id' => $user->id,
+            'room_id' => $room->id,
+            'scanned_date' => $currentDate,
+            'scanned_at' => $now,
+            'schedule_id' => null,
+            'claim_id' => null,
+        ];
 
-                // Recalculate quorum after insert
-                $newQuorumCount = $quorumCount + 1;
+        $scanData[$targetColumn] = $targetId;
 
-                // Update room status to 'occupied' if quorum is reached
-                $quorumSize = env('QUORUM_SIZE', 5);
-                $isQuorumReached = false;
-                if ($newQuorumCount >= $quorumSize && $room->current_status !== 'occupied') {
-                    $room->update(['current_status' => 'occupied']);
-                    $isQuorumReached = true;
-                }
+        $quorumScan = QuorumScan::create($scanData);
 
-                $subjectName = $schedule->course_name ?? 'Mata Kuliah';
-                $roomName = $room->name ?? 'Ruangan';
+        // Recalculate quorum after insert
+        $newQuorumCount = $quorumCount + 1;
 
-                // Dispatch Success Event
-                $metadata = new ScanSuccessMetadata(
-                    user_name: $user->name,
-                    room_name: $roomName,
-                    subject_name: $subjectName
-                );
+        // Update room status to 'occupied' if quorum is reached
+        $quorumSize = env('QUORUM_SIZE', 5);
+        $isQuorumReached = false;
+        if ($newQuorumCount >= $quorumSize && $room->current_status !== 'occupied') {
+            $room->update(['current_status' => 'occupied']);
+            $isQuorumReached = true;
+        }
 
-                event(new ScanAttempted(
-                    eventType: 'SCAN_SUCCESS',
-                    metadata: $metadata,
-                    user: $user,
-                    roomId: $room->id,
-                    scheduleId: $schedule->id,
-                    classGroupId: $classGroup->id,
-                    qrToken: $qrToken
-                ));
+        $subjectName = $isClaim ? 'Klaim Ruangan' : ($schedule->course_name ?? 'Mata Kuliah');
+        $roomName = $room->name ?? 'Ruangan';
 
-                // Dispatch Quorum Reached Event if applicable
-                if ($isQuorumReached) {
-                    $quorumMetadata = new QuorumReachedMetadata(
-                        subject_name: $subjectName,
-                        room_name: $roomName,
-                        quorum_count: $newQuorumCount
-                    );
+        // Dispatch Success Event
+        $metadata = new ScanSuccessMetadata(
+            user_name: $user->name,
+            room_name: $roomName,
+            subject_name: $subjectName
+        );
 
-                    event(new QuorumReached(
-                        scheduleId: $schedule->id,
-                        classGroupId: $classGroup->id,
-                        roomId: $room->id,
-                        metadata: $quorumMetadata
-                    ));
-                }
+        event(new ScanAttempted(
+            eventType: 'SCAN_SUCCESS',
+            metadata: $metadata,
+            user: $user,
+            roomId: $room->id,
+            scheduleId: $schedule?->id,
+            claimId: $claim?->id,
+            classGroupId: $classGroup->id,
+            qrToken: $qrToken
+        ));
 
-                return [
-                    'status' => 'success',
-                    'message' => 'Scan berhasil! Kehadiran Anda telah tercatat',
-                ];
+        // Dispatch Quorum Reached Event if applicable
+        if ($isQuorumReached) {
+            $quorumMetadata = new QuorumReachedMetadata(
+                subject_name: $subjectName,
+                room_name: $roomName,
+                quorum_count: $newQuorumCount
+            );
+
+            event(new QuorumReached(
+                scheduleId: $schedule?->id,
+                claimId: $claim?->id,
+                classGroupId: $classGroup->id,
+                roomId: $room->id,
+                metadata: $quorumMetadata
+            ));
+        }
+
+        return [
+            'status' => 'success',
+            'message' => 'Scan berhasil! Kehadiran Anda telah tercatat',
+        ];
     }
 
-    private function initiateClaim($user, $qrToken, $originalScheduleId, $claimedScheduleId)
+    public function initiateClaim($user, $qrToken, $originalScheduleId, $claimedScheduleId)
     {
 
         $room = Room::where('qr_token', $qrToken)->lockForUpdate()->first();
@@ -279,6 +226,8 @@ class RoomScanService
             'end_time' => $claimedSchedule->end_time,
             'status' => 'pending_quorum',
         ]);
+
+        $room->update(['current_status' => 'waiting']);
 
         return [
             'status' => 'success',

@@ -19,7 +19,8 @@ class QuorumReached
      * Create a new event instance.
      */
     public function __construct(
-        public int $scheduleId,
+        public ?int $scheduleId = null,
+        public ?int $claimId = null,
         public int $classGroupId,
         public int $roomId,
         public LogMetadata $metadata
