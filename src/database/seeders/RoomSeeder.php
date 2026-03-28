@@ -18,6 +18,7 @@ class RoomSeeder extends Seeder
             ['room_code' => 'RT04',   'name' => 'Ruang Teori 4', 'floor' => 5],
             ['room_code' => 'RT05',   'name' => 'Ruang Teori 5', 'floor' => 5],
             ['room_code' => 'RT06',   'name' => 'Ruang Teori 6', 'floor' => 5],
+            ['room_code' => 'RT07',   'name' => 'Ruang Teori 7', 'floor' => 5],
             ['room_code' => 'LPY1',   'name' => 'Lab Proyek 1', 'floor' => 5],
 
             // Lantai 6
