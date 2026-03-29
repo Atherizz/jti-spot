@@ -1,15 +1,15 @@
 # STAGE 1: Composer
 FROM composer:latest AS composer_builder
 WORKDIR /app
-COPY src/composer.json src/composer.lock ./
+COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignore-platform-reqs
 
 # STAGE 2: Node (Vite/Breeze)
 FROM node:20-alpine AS node_builder
 WORKDIR /app
-COPY src/package.json src/package-lock.json src/vite.config.js ./
-COPY src/resources ./resources
-COPY src/public ./public
+COPY package.json package-lock.json vite.config.js ./
+COPY resources ./resources
+COPY public ./public
 RUN npm install && npm run build
 
 # STAGE 3: PHP
@@ -33,7 +33,7 @@ COPY --from=composer_builder /app/vendor ./vendor
 COPY --from=node_builder /app/public/build ./public/build
 
 # 2. Copy Source Code & Set Permissions
-COPY src/ .
+COPY . .
 
 RUN mkdir -p /var/www/html/storage/framework/views \
              /var/www/html/storage/framework/cache \
