@@ -1,95 +1,95 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Data Management Hub')
+@section('title', 'Pusat Manajemen Data')
 
 @section('content')
 
-    {{-- Page Header --}}
-    <div class="flex items-start justify-between mb-6">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-900">Data Management Hub</h1>
-            <p class="text-sm text-gray-500 mt-1">
-                Selamat datang, {{ auth()->user()->name }}. Kelola ruangan dan jadwal kampus dengan efisien.
-            </p>
-        </div>
-        {{-- Quick Actions (desktop only) --}}
-        <div class="hidden lg:flex items-center gap-3">
-            <button class="relative flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm text-gray-500 hover:text-gray-700 transition-colors shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <button class="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm text-gray-500 hover:text-gray-700 transition-colors shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-            </button>
+    {{-- Hero --}}
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-700 via-indigo-600 to-sky-600 shadow-lg mb-6">
+        <div class="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-white/8 blur-2xl"></div>
+        <div class="absolute -bottom-20 -left-12 w-52 h-52 rounded-full bg-sky-200/20 blur-2xl"></div>
+
+        <div class="relative p-6 sm:p-8 lg:p-9 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
+            <div>
+                <p class="text-xs font-semibold tracking-[0.2em] uppercase text-indigo-200 mb-2">Dashboard Admin</p>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-tight">Pusat Manajemen Data</h1>
+                <p class="text-sm text-indigo-100 mt-2 max-w-2xl">Selamat datang, {{ auth()->user()->name }}.<br>Kelola ruangan dan jadwal kampus dengan efisien.</p>
+
+                <div class="flex flex-wrap items-center gap-2 mt-4">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/15 text-white border border-white/20">
+                        <span class="w-2 h-2 rounded-full bg-emerald-300"></span>
+                        Sistem Normal
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 text-indigo-100 border border-white/20">
+                        Update Terakhir 2 Menit Lalu
+                    </span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 w-full max-w-sm">
+                <div class="rounded-2xl bg-indigo-200/35 border border-indigo-100/55 p-3.5 backdrop-blur-sm shadow-[0_8px_20px_rgba(99,102,241,0.12),inset_0_1px_0_rgba(255,255,255,0.35)]">
+                    <p class="text-[11px] uppercase tracking-wider text-white/85">Pengguna Aktif Hari Ini</p>
+                    <p class="text-2xl font-extrabold text-white mt-1">82%</p>
+                </div>
+                <div class="rounded-2xl bg-emerald-200/35 border border-emerald-100/60 p-3.5 backdrop-blur-sm shadow-[0_8px_20px_rgba(16,185,129,0.12),inset_0_1px_0_rgba(255,255,255,0.35)]">
+                    <p class="text-[11px] uppercase tracking-wider text-white/85">Ruang Tersedia</p>
+                    <p class="text-2xl font-extrabold text-white mt-1">18</p>
+                </div>
+            </div>
         </div>
     </div>
 
     {{-- Statistics Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-
-        {{-- Total Rooms --}}
-        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between mb-3">
+        <div class="relative bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-indigo-100 hover:shadow-md transition-shadow overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-indigo-100/60"></div>
+            <div class="relative flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
                     <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
+                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-1">+2 Bulan Ini</span>
             </div>
-            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Rooms</h3>
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Ruangan</h3>
             <p class="text-3xl font-extrabold text-indigo-900 mb-1">42</p>
-            <p class="text-xs text-emerald-600 font-medium flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
-                +2 added this month
-            </p>
+            <p class="text-xs text-gray-500">Semua ruangan terdaftar</p>
         </div>
 
-        {{-- Active Schedules --}}
-        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between mb-3">
+        <div class="relative bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-orange-100 hover:shadow-md transition-shadow overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-orange-100/60"></div>
+            <div class="relative flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
                     <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                 </div>
+                <span class="text-[11px] font-semibold text-orange-700 bg-orange-50 border border-orange-100 rounded-full px-2 py-1">Live</span>
             </div>
-            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Active Schedules</h3>
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Jadwal Aktif</h3>
             <p class="text-3xl font-extrabold text-indigo-900 mb-1">1,248</p>
-            <p class="text-xs text-gray-500 font-medium">Currently active semester</p>
+            <p class="text-xs text-gray-500">Semester aktif saat ini</p>
         </div>
 
-        {{-- Conflict Alerts --}}
-        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between mb-3">
+        <div class="relative bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-red-100 hover:shadow-md transition-shadow overflow-hidden">
+            <div class="absolute -right-8 -top-8 w-24 h-24 rounded-full bg-red-100/60"></div>
+            <div class="relative flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
                     <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
+                <span class="text-[11px] font-semibold text-red-700 bg-red-50 border border-red-100 rounded-full px-2 py-1">Perlu Tindakan</span>
             </div>
-            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Conflict Alerts</h3>
+            <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Peringatan Konflik</h3>
             <p class="text-3xl font-extrabold text-indigo-900 mb-1">3</p>
-            <p class="text-xs text-red-600 font-medium flex items-center gap-1">
-                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                </svg>
-                Requires attention
-            </p>
+            <p class="text-xs text-gray-500">Konflik jadwal belum selesai</p>
         </div>
 
-        {{-- Quick Add Card --}}
-        <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-5 sm:p-6 shadow-sm text-white">
+        <div class="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-2xl p-5 sm:p-6 shadow-sm text-white">
             <div class="flex items-start justify-between mb-3">
                 <div class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,28 +98,28 @@
                     </svg>
                 </div>
             </div>
-            <h3 class="text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-2">Quick Add</h3>
-            <p class="text-sm text-white/90 mb-4">Create a new schedule entry manually.</p>
-            <button class="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm border border-white/20">
+            <h3 class="text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-2">Tambah Cepat</h3>
+            <p class="text-sm text-white/90 mb-4">Buat entri jadwal baru secara manual.</p>
+            <button class="w-full bg-white/18 hover:bg-white/25 backdrop-blur-sm text-white font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm border border-white/30">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 4v16m8-8H4" />
                 </svg>
-                New Schedule
+                Jadwal Baru
             </button>
         </div>
 
     </div>
 
     {{-- Room Availability & Schedule Table --}}
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+    <div class="bg-white rounded-3xl shadow-sm border border-indigo-100/70 overflow-hidden">
         
         {{-- Table Header --}}
         <div class="p-5 sm:p-6 border-b border-gray-100">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-bold text-gray-900">Room Availability & Schedule</h2>
-                    <p class="text-sm text-gray-500 mt-0.5">Manage daily class schedules and room conflicts.</p>
+                    <h2 class="text-lg font-bold text-gray-900">Ketersediaan Ruang dan Jadwal</h2>
+                    <p class="text-sm text-gray-500 mt-0.5">Kelola jadwal kelas harian dan konflik ruangan.</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
@@ -134,7 +134,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Export
+                        Ekspor
                     </button>
                 </div>
             </div>
@@ -146,7 +146,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" placeholder="Search rooms or schedules..." 
+                    <input type="text" placeholder="Cari ruangan atau jadwal..." 
                         class="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
                 </div>
             </div>
@@ -158,12 +158,12 @@
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-100">
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Room Name</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Current Class</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Time Slot</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lecturer</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama Ruangan</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kelas Saat Ini</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Jam Kuliah</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dosen</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -175,7 +175,7 @@
                         <td class="px-6 py-4">
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">RT-01</p>
-                                <p class="text-xs text-gray-500">Building A, 2nd Floor</p>
+                                <p class="text-xs text-gray-500">Gedung A, Lantai 2</p>
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -201,7 +201,7 @@
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100">
                                 <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                Occupied
+                                Terpakai
                             </span>
                         </td>
                         <td class="px-6 py-4">
@@ -222,7 +222,7 @@
                         <td class="px-6 py-4">
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">RT-02</p>
-                                <p class="text-xs text-gray-500">Building A, 2nd Floor</p>
+                                <p class="text-xs text-gray-500">Gedung A, Lantai 2</p>
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -243,7 +243,7 @@
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
                                 <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                                Available
+                                Tersedia
                             </span>
                         </td>
                         <td class="px-6 py-4">
@@ -264,7 +264,7 @@
                         <td class="px-6 py-4">
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">RT-05</p>
-                                <p class="text-xs text-gray-500">Building B, 1st Floor</p>
+                                <p class="text-xs text-gray-500">Gedung B, Lantai 1</p>
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -290,13 +290,13 @@
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-100">
                                 <span class="w-1.5 h-1.5 bg-orange-500 rounded-full"></span>
-                                Conflict
+                                Konflik
                             </span>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-1">
                                 <button class="px-3 py-1.5 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 rounded-lg transition-colors">
-                                    Resolve
+                                    Selesaikan
                                 </button>
                                 <button class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -316,11 +316,11 @@
                         <td class="px-6 py-4">
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">LPR-01</p>
-                                <p class="text-xs text-gray-500">Lab Programming 1</p>
+                                <p class="text-xs text-gray-500">Lab Pemrograman 1</p>
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <span class="text-sm font-medium text-gray-900">Mobile Dev</span>
+                            <span class="text-sm font-medium text-gray-900">Pengembangan Mobile</span>
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-1.5 text-sm text-gray-700">
@@ -342,7 +342,7 @@
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-700 border border-red-100">
                                 <span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-                                Occupied
+                                Terpakai
                             </span>
                         </td>
                         <td class="px-6 py-4">
@@ -363,7 +363,7 @@
                         <td class="px-6 py-4">
                             <div>
                                 <p class="text-sm font-semibold text-gray-900">LPR-02</p>
-                                <p class="text-xs text-gray-500">Lab Programming 2</p>
+                                <p class="text-xs text-gray-500">Lab Pemrograman 2</p>
                             </div>
                         </td>
                         <td class="px-6 py-4">
@@ -384,7 +384,7 @@
                         <td class="px-6 py-4">
                             <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
                                 <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
-                                Available
+                                Tersedia
                             </span>
                         </td>
                         <td class="px-6 py-4">
@@ -404,7 +404,7 @@
         <div class="px-6 py-4 border-t border-gray-100">
             <div class="flex items-center justify-between">
                 <p class="text-sm text-gray-600">
-                    Showing <span class="font-semibold text-gray-900">1-5</span> of <span class="font-semibold text-gray-900">42</span> results
+                    Menampilkan <span class="font-semibold text-gray-900">1-5</span> dari <span class="font-semibold text-gray-900">42</span> data
                 </p>
                 <div class="flex items-center gap-2">
                     <button class="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
@@ -412,7 +412,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    <button class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-lg">1</button>
+                    <button class="px-3 py-1.5 text-sm font-medium text-white bg-indigo-900 hover:bg-indigo-800 rounded-lg transition-colors">1</button>
                     <button class="px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">2</button>
                     <button class="px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">3</button>
                     <button class="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
