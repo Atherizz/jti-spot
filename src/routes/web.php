@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\RoomActionController;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -117,6 +118,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', function () {
             return view('admin.dashboard.home');
         })->name('admin.dashboard.home');
+
+        Route::resource('users', AdminUserController::class)
+            ->except(['show'])
+            ->names('admin.users');
     });
     
 });
