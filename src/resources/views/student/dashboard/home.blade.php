@@ -74,47 +74,37 @@
             </div>
 
             <div class="space-y-3">
-                {{-- Item 1 --}}
+                @forelse($activities as $activity)
                 <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm">
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                        </svg>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-800">Kamu memverifikasi kehadiran di LPR 7</p>
-                        <p class="text-xs text-gray-400 mt-0.5">2 menit lalu &bull; Web Programming</p>
-                    </div>
-                </div>
-
-                {{-- Item 2 --}}
-                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center shrink-0 shadow-sm">
+                    <div class="w-9 h-9 rounded-xl {{ $activity['type'] === 'QUORUM_REACHED' ? 'bg-emerald-50 border border-emerald-100' : 'bg-white border border-gray-200' }} flex items-center justify-center shrink-0 shadow-sm">
+                        @if($activity['type'] === 'QUORUM_REACHED')
                         <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-800">Kuorum tercapai untuk Web Programming</p>
-                        <p class="text-xs text-gray-400 mt-0.5">5 menit lalu &bull; Kelas resmi dimulai</p>
-                    </div>
-                </div>
-
-                {{-- Item 3 --}}
-                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div class="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 shadow-sm">
+                        @else
                         <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0z" />
                         </svg>
+                        @endif
                     </div>
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-800">Budi memverifikasi kehadiran di LPR 7</p>
-                        <p class="text-xs text-gray-400 mt-0.5">10 menit lalu</p>
+                        <p class="text-sm font-medium text-gray-800">{{ $activity['title'] }}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">{{ $activity['subtitle'] }}</p>
                     </div>
                 </div>
+                @empty
+                <div class="p-3 rounded-xl bg-gray-50 text-sm text-gray-500">
+                    Belum ada aktivitas untuk kelas Anda saat ini.
+                </div>
+                @endforelse
+
+                @if($totalActivities > count($activities) && count($activities) > 0)
+                <a href="{{ route('student.activity.log') }}" class="block mt-4 p-3 rounded-xl text-center bg-indigo-50 hover:bg-indigo-100 transition-colors text-sm font-medium text-indigo-600 border border-indigo-200">
+                    Lihat Semua Aktivitas ({{ $totalActivities }} total)
+                </a>
+                @endif
             </div>
         </div>
 
@@ -128,8 +118,8 @@
                 </span>
             </div>
 
-            <h2 class="text-xl sm:text-2xl font-extrabold mb-1 leading-tight">Web Programming</h2>
-            <p class="text-sm text-gray-400 mb-5">Dr. Budi Santoso &bull; TI-2C</p>
+            <h2 class="text-xl sm:text-2xl font-extrabold mb-1 leading-tight">{{ $sessionTitle }}</h2>
+            <p class="text-sm text-gray-400 mb-5">{{ $sessionMeta }}</p>
 
             <div class="bg-white/10 rounded-xl p-3 flex items-center gap-3 mb-5">
                 <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
@@ -142,27 +132,51 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-400">Lokasi</p>
-                    <p class="text-sm font-semibold">LPR 7 (Lantai 6)</p>
+                    <p class="text-sm font-semibold">{{ $sessionLocation }}</p>
                 </div>
             </div>
 
             <div class="mb-5">
                 <div class="flex items-center justify-between text-xs mb-2">
                     <span class="text-gray-400 font-medium">Live Quorum Tracker</span>
-                    <span class="text-white font-semibold">3/5 Scan terkumpul</span>
+                    <span class="text-white font-semibold">{{ $currentQuorum }}/{{ $quorumSize }} Scan terkumpul</span>
                 </div>
                 <div class="w-full bg-white/10 rounded-full h-2">
-                    <div class="bg-orange-500 h-2 rounded-full" style="width: 60%"></div>
+                    <div class="bg-orange-500 h-2 rounded-full" style="width: {{ $progressPercent }}%"></div>
                 </div>
             </div>
 
-            <button class="mt-auto w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                </svg>
-                Scan untuk Verifikasi Kehadiran
+            @if($canManualCheckIn && !$alreadyScanned)
+            <form method="POST" action="{{ route('student.attendance.confirm') }}" class="mt-auto">
+                @csrf
+                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 13l4 4L19 7" />
+                    </svg>
+                    Konfirmasi Hadir Sekarang
+                </button>
+            </form>
+            @elseif($alreadyScanned)
+            <div class="mt-auto flex items-center gap-2">
+                <a href="{{ $checkInPageUrl ?? '#' }}" class="flex-1 bg-emerald-500/80 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors {{ $checkInPageUrl ? '' : 'pointer-events-none opacity-70' }}">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Kehadiran Sudah Tercatat
+                </a>
+
+                <a href="{{ $checkInPageUrl ?? '#' }}" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center shrink-0 transition-colors {{ $checkInPageUrl ? '' : 'pointer-events-none opacity-70' }}" title="Buka halaman check-in">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                </a>
+            </div>
+            @else
+            <button class="mt-auto w-full bg-gray-500/50 text-gray-200 font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm cursor-not-allowed" disabled>
+                Tidak Ada Sesi Aktif
             </button>
+            @endif
         </div>
     </div>
 
@@ -180,7 +194,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 font-medium">Total Scan Minggu Ini</p>
-                    <p class="text-2xl font-extrabold text-indigo-900">12</p>
+                    <p class="text-2xl font-extrabold text-indigo-900">{{ $weeklyScans }}</p>
                 </div>
             </div>
 
@@ -193,7 +207,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 font-medium">Ruang Terverifikasi</p>
-                    <p class="text-2xl font-extrabold text-indigo-900">8</p>
+                    <p class="text-2xl font-extrabold text-indigo-900">{{ $verifiedRooms }}</p>
                 </div>
             </div>
 
@@ -208,7 +222,7 @@
                 </div>
                 <div>
                     <p class="text-xs text-gray-400 font-medium">Streak Saat Ini</p>
-                    <p class="text-2xl font-extrabold text-indigo-900">5 hari</p>
+                    <p class="text-2xl font-extrabold text-indigo-900">{{ $streakDays }} hari</p>
                 </div>
             </div>
 
