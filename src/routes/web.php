@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoomImportController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomActionController;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -97,6 +99,7 @@ Route::post('/login', [AuthController::class, 'authenticate'])->middleware('gues
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
     
     Route::prefix('student')->middleware('can:student')->group(function () {
         Route::get('/dashboard', function () {
@@ -172,6 +175,9 @@ Route::middleware(['auth'])->group(function () {
 
             return view('admin.room.detail', compact('room'));
         })->name('admin.room.detail');
+        Route::resource('users', AdminUserController::class)
+            ->except(['show'])
+            ->names('admin.users');
     });
     
 });
