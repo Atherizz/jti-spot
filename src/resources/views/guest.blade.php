@@ -37,7 +37,7 @@
             </div>
             <div class="text-3xl font-bold text-indigo-900 mb-4">{{ $stats['occupied'] ?? 0 }}</div>
             <div class="w-full bg-gray-100 rounded-full h-1.5">
-                <div class="bg-rose-500 h-1.5 rounded-full" style="width: {{ $rooms->count() ? round(($stats['occupied'] ?? 0) / $rooms->count() * 100) : 0 }}%"></div>
+                <div class="bg-rose-500 h-1.5 rounded-full" style="width: {{ $rooms->total() ? round(($stats['occupied'] ?? 0) / $rooms->total() * 100) : 0 }}%"></div>
             </div>
         </div>
 
@@ -77,7 +77,7 @@
         @endphp
 
         <div class="flex flex-wrap gap-2 items-center">
-            <a href="{{ request()->fullUrlWithQuery(['floor' => null]) }}" 
+            <a href="{{ request()->fullUrlWithQuery(['floor' => null, 'page' => null]) }}" 
                 class="border border-gray-200 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 {{ is_null($currentFloor) ? 'bg-indigo-50 text-indigo-900 border-indigo-200' : 'bg-white text-gray-700 hover:bg-gray-50' }}">
                 <svg class="w-4 h-4 {{ is_null($currentFloor) ? 'text-indigo-900' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
@@ -87,7 +87,7 @@
     
             <div class="bg-white border border-gray-200 rounded-md flex overflow-hidden">
                 @foreach([5, 6, 7, 8] as $floor)
-                    <a href="{{ request()->fullUrlWithQuery(['floor' => $floor]) }}" 
+                    <a href="{{ request()->fullUrlWithQuery(['floor' => $floor, 'page' => null]) }}" 
                         class="px-4 py-2 text-sm font-medium transition-colors {{ $currentFloor == $floor ? 'bg-indigo-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                         Lantai {{ $floor }}
                     </a>
@@ -119,7 +119,7 @@
                 if ($room->current_schedule) {
                     $end = \Carbon\Carbon::createFromFormat('H:i:s', $room->current_schedule->end_time);
                     $now = \Carbon\Carbon::now();
-                    $remaining = max(0, $now->diffInMinutes($end, false));
+                    $remaining = max(0, round($now->diffInMinutes($end, false)));
                     $durationText = $remaining > 0 ? "Berakhir dalam {$remaining} mnt" : 'Selesai';
                     $start = \Carbon\Carbon::createFromFormat('H:i:s', $room->current_schedule->start_time);
                     $total = max(1, $start->diffInMinutes($end));
@@ -155,7 +155,7 @@
                         <div class="bg-{{ $color }}-500 h-1 rounded-full" style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
-            </div>
-        @endforeach
+            </div> @endforeach </div> <div class="mt-8">
+        {{ $rooms->links() }}
     </div>
 @endsection
