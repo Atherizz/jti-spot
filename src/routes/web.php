@@ -9,20 +9,16 @@ use App\Http\Controllers\RoomActionController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\AdminRoomController;
 
-// Rute Publik (Modifikasi Paginasi Anda)
 Route::get('/', [GuestController::class, 'index'])->name('home');
 Route::get('/peta-ruang', [GuestController::class, 'map'])->name('map');
 
-// Autentikasi
 Route::get('/login', [AuthController::class, 'showLogin'])->middleware('guest')->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rute Terproteksi
 Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
     
-    // Mahasiswa
     Route::prefix('student')->middleware('can:student')->group(function () {
         Route::view('/dashboard', 'student.dashboard.home')->name('student.dashboard.home');
         Route::get('/scan/{qr_token}', [RoomActionController::class, 'scanInitial'])->name('scan.initial');
@@ -30,7 +26,6 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/scan/claim/{qr_token}', [RoomActionController::class, 'initiateClaim'])->middleware('check.location')->name('scan.claim');
     });
 
-    // Admin (Pembaruan dari Tim Anda)
     Route::prefix('admin')->middleware('can:admin')->group(function () {
         Route::view('/dashboard', 'admin.dashboard.home')->name('admin.dashboard.home');
         

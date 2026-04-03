@@ -11,15 +11,20 @@ use Illuminate\Support\Collection;
 
 class RoomStatusService
 {
-    public function getRoomsWithStatus(?int $floor): Collection
+    public function getRoomsWithStatus(?int $floor, ?string $search = null): Collection
     {
         $now = Carbon::now();
         $dayOfWeek = $now->dayOfWeek;
         $currentTime = $now->format('H:i:s');
 
-        // Sesuai aturan No. 2: Explicitly use Eager Loading (with) untuk mencegah N+1
         return Room::with(['schedules.classGroup'])
             ->when($floor, fn ($query, $floor) => $query->where('floor', $floor))
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('room_code', 'like', '%' . $search . '%');
+                });
+            })
             ->get()
             ->map(function ($room) use ($dayOfWeek, $currentTime) {
                 $currentSchedule = $room->schedules->first(function ($schedule) use ($dayOfWeek, $currentTime) {
