@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class DebugController extends Controller
 {
@@ -109,24 +110,38 @@ class DebugController extends Controller
             );
         }
 
-        $userIp = $request->ip();
+        // Resolve real client IP dengan prioritas:
+        // 1. CF-Connecting-IP  → paling reliable jika pakai Cloudflare
+        // 2. X-Forwarded-For pertama → real IP sebelum melewati proxy chain
+        // 3. $request->ip()    → fallback bawaan Laravel
+        $cfConnectingIp   = $request->header('CF-Connecting-IP');
+        $xForwardedForRaw = $request->header('X-Forwarded-For');
+        $xForwardedForFirst = $xForwardedForRaw
+            ? trim(explode(',', $xForwardedForRaw)[0])
+            : null;
+
+        $resolvedIp = $cfConnectingIp ?? $xForwardedForFirst ?? $request->ip();
 
         $rawAllowedIps = env('ALLOWED_WIFI_IPS', '');
         $allowedIps = array_values(array_filter(
             array_map('trim', explode(',', $rawAllowedIps))
         ));
 
-        $isAllowed = in_array($userIp, $allowedIps, strict: true);
+        // IpUtils::checkIp() mendukung CIDR range (e.g. 103.113.118.0/23)
+        $isAllowed = IpUtils::checkIp($resolvedIp, $allowedIps);
 
         return response()->json([
-            'user_ip'     => $userIp,
-            'allowed_ips' => $allowedIps,
-            'is_allowed'  => $isAllowed,
-            'environment' => app()->environment(),
-            'headers'     => [
-                'x-forwarded-for' => $request->header('X-Forwarded-For'),
-                'x-real-ip'       => $request->header('X-Real-IP'),
-                'remote-addr'     => $request->server('REMOTE_ADDR'),
+            'resolved_ip'  => $resolvedIp,
+            'allowed_ips'  => $allowedIps,
+            'is_allowed'   => $isAllowed,
+            'environment'  => app()->environment(),
+            'ip_sources'   => [
+                'laravel_request_ip'   => $request->ip(),
+                'cf-connecting-ip'     => $cfConnectingIp,
+                'x-forwarded-for'      => $xForwardedForRaw,
+                'x-forwarded-for-first'=> $xForwardedForFirst,
+                'x-real-ip'            => $request->header('X-Real-IP'),
+                'remote-addr'          => $request->server('REMOTE_ADDR'),
             ],
         ]);
     }

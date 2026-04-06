@@ -12,7 +12,16 @@ class CheckLocation
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $clientIp = $request->ip();
+        // Resolve real client IP dengan prioritas:
+        // 1. CF-Connecting-IP  → paling reliable jika pakai Cloudflare
+        // 2. X-Forwarded-For pertama → real IP sebelum melewati proxy chain
+        // 3. $request->ip()    → fallback bawaan Laravel
+        $cfConnectingIp     = $request->header('CF-Connecting-IP');
+        $xForwardedForFirst = $request->header('X-Forwarded-For')
+            ? trim(explode(',', $request->header('X-Forwarded-For'))[0])
+            : null;
+
+        $clientIp = $cfConnectingIp ?? $xForwardedForFirst ?? $request->ip();
 
         $rawAllowedIps = explode(',', env('ALLOWED_WIFI_IPS', '127.0.0.1'));
         $allowedIps = array_map('trim', $rawAllowedIps);
