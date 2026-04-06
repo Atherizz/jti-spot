@@ -19,7 +19,7 @@
         @endphp
 
         <div class="flex flex-wrap gap-2 items-center">
-            <a href="{{ request()->fullUrlWithQuery(['floor' => null]) }}" 
+            <a href="{{ request()->fullUrlWithQuery(['floor' => null, 'page' => null]) }}" 
                 class="border border-gray-200 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 {{ is_null($currentFloor) ? 'bg-indigo-50 text-indigo-900 border-indigo-200' : 'bg-white text-gray-700 hover:bg-gray-50' }}">
                 <svg class="w-4 h-4 {{ is_null($currentFloor) ? 'text-indigo-900' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
@@ -29,7 +29,7 @@
     
             <div class="bg-white border border-gray-200 rounded-md flex overflow-hidden">
                 @foreach([5, 6, 7, 8] as $floor)
-                    <a href="{{ request()->fullUrlWithQuery(['floor' => $floor]) }}" 
+                    <a href="{{ request()->fullUrlWithQuery(['floor' => $floor, 'page' => null]) }}" 
                         class="px-4 py-2 text-sm font-medium transition-colors {{ $currentFloor == $floor ? 'bg-indigo-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
                         Lantai {{ $floor }}
                     </a>
@@ -37,14 +37,18 @@
             </div>
         </div>
 
-        <div class="relative w-full md:w-auto">
+        <form method="GET" action="{{ url()->current() }}" class="relative w-full md:w-auto">
+            @if(request('floor'))
+                <input type="hidden" name="floor" value="{{ request('floor') }}">
+            @endif
+            
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
             </div>
-            <input type="text" placeholder="Cari ruang (mis. LSI-1)" class="pl-10 pr-4 py-2 border border-gray-200 rounded-md text-sm focus:ring-orange-500 focus:border-orange-500 w-full sm:w-72 shadow-sm">
-        </div>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari ruang (mis. LSI-1)" class="pl-10 pr-4 py-2 border border-gray-200 rounded-md text-sm focus:ring-orange-500 focus:border-orange-500 w-full sm:w-72 shadow-sm">
+        </form>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -69,6 +73,9 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+            <div class="mt-6">
+                {{ $rooms->links() }}
             </div>
         </div>
 

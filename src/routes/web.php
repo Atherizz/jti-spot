@@ -2,102 +2,30 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RoomImportController;
 use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomActionController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentScheduleController;
 use App\Models\Room;
 use Carbon\Carbon;
+use App\Http\Controllers\GuestController;
+use App\Http\Controllers\AdminRoomController;
+use App\Http\Controllers\DebugController;
 
-Route::get('/', function () {
-    $now = Carbon::now();
-    $dayOfWeek = $now->dayOfWeek;
-    $currentTime = $now->format('H:i:s');
+Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip');
+Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
 
-    $rooms = Room::with(['schedules.classGroup'])
-        ->when(request('floor'), function ($query, $floor) {
-            return $query->where('floor', $floor);
-        })
-        ->get()
-        ->map(function ($room) use ($dayOfWeek, $currentTime) {
-            $currentSchedule = $room->schedules->first(function ($schedule) use ($dayOfWeek, $currentTime) {
-                return $schedule->day_of_week == $dayOfWeek
-                    && $schedule->start_time <= $currentTime
-                    && $schedule->end_time >= $currentTime;
-            });
-
-            $room->current_schedule = $currentSchedule;
-            $room->display_group = $currentSchedule ? $currentSchedule->classGroup->name : null;
-            $room->room_type = str_contains(strtoupper($room->name), 'STUDIO') ? 'AULA' : (str_contains(strtoupper($room->name), 'LAB') || str_contains(strtoupper($room->room_code), 'L') ? 'LAB' : 'KELAS');
-
-            return $room;
-        });
-
-    $stats = [
-        'available' => $rooms->where('current_status', 'available')->count(),
-        'occupied' => $rooms->where('current_status', 'occupied')->count(),
-        'soon' => $rooms->filter(function ($room) use ($now) {
-            if (! $room->current_schedule) {
-                return false;
-            }
-            $end = Carbon::createFromFormat('H:i:s', $room->current_schedule->end_time);
-            $diffMinutes = $end->diffInMinutes($now, false);
-            return $diffMinutes > 0 && $diffMinutes <= 15;
-        })->count(),
-        'labUsage' => $rooms->count() ? round($rooms->where('room_type', 'LAB')->where('current_status', 'occupied')->count() / max($rooms->where('room_type', 'LAB')->count(), 1) * 100) : 0,
-    ];
-
-    return view('guest', compact('rooms', 'stats'));
-});
-
-Route::get('/peta-ruang', function () {
-    $now = Carbon::now();
-    $dayOfWeek = $now->dayOfWeek;
-    $currentTime = $now->format('H:i:s');
-
-    // Menerapkan filter lantai jika ada parameter 'floor' di URL
-    $rooms = Room::with(['schedules.classGroup'])
-        ->when(request('floor'), function ($query, $floor) {
-            return $query->where('floor', $floor);
-        })
-        ->get()
-        ->map(function ($room) use ($dayOfWeek, $currentTime) {
-            $currentSchedule = $room->schedules->first(function ($schedule) use ($dayOfWeek, $currentTime) {
-                return $schedule->day_of_week == $dayOfWeek
-                    && $schedule->start_time <= $currentTime
-                    && $schedule->end_time >= $currentTime;
-            });
-
-            $room->current_schedule = $currentSchedule;
-            $room->display_group = $currentSchedule ? $currentSchedule->classGroup->name : 'Tidak Ada';
-            $room->room_type = str_contains(strtoupper($room->name), 'STUDIO') ? 'AULA' : (str_contains(strtoupper($room->name), 'LAB') || str_contains(strtoupper($room->room_code), 'L') ? 'LAB' : 'KELAS');
-
-            return $room;
-        });
-
-    $stats = [
-        'available' => $rooms->where('current_status', 'available')->count(),
-        'occupied' => $rooms->where('current_status', 'occupied')->count(),
-        'soon' => $rooms->filter(function ($room) {
-            if (! $room->current_schedule) {
-                return false;
-            }
-            $now = \Carbon\Carbon::now();
-            $end = \Carbon\Carbon::createFromFormat('H:i:s', $room->current_schedule->end_time);
-            $diff = $end->diffInMinutes($now, false);
-            return $diff > 0 && $diff <= 15;
-        })->count(),
-        'labUsage' => $rooms->count() ? round($rooms->where('room_type', 'LAB')->where('current_status', 'occupied')->count() / max($rooms->where('room_type', 'LAB')->count(), 1) * 100) : 0,
-    ];
-
-    return view('map', compact('rooms', 'stats'));
-})->name('map');
+Route::get('/', [GuestController::class, 'index'])->name('home');
+Route::get('/peta-ruang', [GuestController::class, 'map'])->name('map');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->middleware('guest')->name('login');
 Route::post('/login', [AuthController::class, 'authenticate'])->middleware('guest');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
     
     Route::prefix('student')->middleware('can:student')->group(function () {
         Route::get('/dashboard', [StudentDashboardController::class, 'home'])
@@ -128,21 +56,12 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('admin')->middleware('can:admin')->group(function () {
-        Route::get('/dashboard', function () {
-            return view('admin.dashboard.home');
-        })->name('admin.dashboard.home');
+        Route::view('/dashboard', 'admin.dashboard.home')->name('admin.dashboard.home');
+        
+        Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
+        Route::post('/rooms/import', [RoomImportController::class, 'import'])->name('admin.room.import');
+        Route::get('/rooms/{roomCode}', [AdminRoomController::class, 'show'])->name('admin.room.detail');
 
-        Route::resource('users', AdminUserController::class)
-            ->except(['show'])
-            ->names('admin.users');
+        Route::resource('users', AdminUserController::class)->except(['show'])->names('admin.users');
     });
-    
-});
-
-Route::get('/debug-ip', function (\Illuminate\Http\Request $request) {
-    return response()->json([
-        'ip_menurut_laravel' => $request->ip(),
-        'ip_asli_dari_header' => $request->header('x-forwarded-for'),
-        'semua_header' => $request->headers->all()
-    ]);
 });

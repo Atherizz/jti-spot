@@ -5,28 +5,29 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use App\Helpers\LocationHelper;
+use Symfony\Component\HttpFoundation\IpUtils;
+use App\Helpers\LocationHelper; // Sesuaikan dengan namespace aslimu
 
 class CheckLocation
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
-        // 1. Ekstrak IP Asli (Kebal Proxy/Ngrok)
-        $rawIp = $request->header('x-forwarded-for') ?: $request->ip();
-        $clientIp = trim(explode(',', $rawIp)[0]);
+        // Resolve real client IP dengan prioritas:
+        // 1. CF-Connecting-IP  → paling reliable jika pakai Cloudflare
+        // 2. X-Forwarded-For pertama → real IP sebelum melewati proxy chain
+        // 3. $request->ip()    → fallback bawaan Laravel
+        $cfConnectingIp     = $request->header('CF-Connecting-IP');
+        $xForwardedForFirst = $request->header('X-Forwarded-For')
+            ? trim(explode(',', $request->header('X-Forwarded-For'))[0])
+            : null;
 
-        // Ambil daftar IP yang diizinkan dari .env
-        $allowedIps = explode(',', env('ALLOWED_WIFI_IPS', '127.0.0.1'));
+        $clientIp = $cfConnectingIp ?? $xForwardedForFirst ?? $request->ip();
 
-        // Cek Validitas IP
-        $isIpValid = in_array($clientIp, $allowedIps);
+        $rawAllowedIps = explode(',', env('ALLOWED_WIFI_IPS', '127.0.0.1'));
+        $allowedIps = array_map('trim', $rawAllowedIps);
 
-        // 2. Cek Jarak GPS (Jika request mengirimkan lat & lng)
+        $isIpValid = IpUtils::checkIp($clientIp, $allowedIps);
+
         $isGpsValid = false;
         $lat = $request->input('lat');
         $lng = $request->input('lng');
@@ -43,6 +44,7 @@ class CheckLocation
             }
         }
 
+        // 3. Keputusan Eksekusi: Harus memenuhi salah satu (WiFi ATAU GPS)
         if (!$isIpValid && !$isGpsValid) {
             return redirect()->route('student.dashboard.home')
                 ->with('error', 'Akses ditolak. Anda berada di luar jangkauan gedung JTI atau tidak menggunakan WiFi kampus.');
