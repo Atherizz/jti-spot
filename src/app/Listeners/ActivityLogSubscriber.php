@@ -7,6 +7,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use App\Events\ScanAttempted;
 use App\Events\QuorumReached;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class ActivityLogSubscriber
 {
@@ -36,6 +37,10 @@ public function handleScanLog(ScanAttempted $event): void
 
     private function insertLog($type, $metadata, $userId, $roomId, $scheduleId, $classId): void
     {
+        if (!Schema::hasTable('activity_logs')) {
+            return;
+        }
+
         DB::table('activity_logs')->insert([
             'user_id'         => $userId,
             'room_id'         => $roomId,
