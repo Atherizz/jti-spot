@@ -8,6 +8,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomActionController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\AdminRoomController;
+use App\Http\Controllers\DebugController;
+
+Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip');
+Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
 
 Route::get('/', [GuestController::class, 'index'])->name('home');
 Route::get('/peta-ruang', [GuestController::class, 'map'])->name('map');
