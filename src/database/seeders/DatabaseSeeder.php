@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RoomSeeder::class,
             ScheduleSeeder::class,
-            DashboardMahasiswaSeeder::class,
             ]
     );
     }
