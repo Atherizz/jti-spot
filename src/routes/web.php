@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomActionController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentScheduleController;
+use App\Http\Controllers\AdminScheduleController;
 use App\Models\Room;
 use Carbon\Carbon;
 use App\Http\Controllers\GuestController;
@@ -61,6 +62,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
         Route::post('/rooms/import', [RoomImportController::class, 'import'])->name('admin.room.import');
         Route::get('/rooms/{roomCode}', [AdminRoomController::class, 'show'])->name('admin.room.detail');
+        Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
 
         Route::resource('users', AdminUserController::class)->except(['show'])->names('admin.users');
     });

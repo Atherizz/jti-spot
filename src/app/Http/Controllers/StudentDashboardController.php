@@ -99,16 +99,19 @@ class StudentDashboardController extends Controller
 
         $activities = [];
         $totalActivities = 0;
+        $successfulScanTypes = $this->successfulScanEventTypes();
 
         if (Schema::hasTable('activity_logs')) {
             $totalActivities = ActivityLog::query()
                 ->where('class_group_id', $classGroupId)
-                ->where('event_type', 'SCAN_SUCCESS')
+                ->whereIn('event_type', $successfulScanTypes)
+                ->whereDate('created_at', $currentDate)
                 ->count();
 
             $activities = ActivityLog::query()
                 ->where('class_group_id', $classGroupId)
-                ->where('event_type', 'SCAN_SUCCESS')
+                ->whereIn('event_type', $successfulScanTypes)
+                ->whereDate('created_at', $currentDate)
                 ->latest()
                 ->take(5)
                 ->get()
@@ -222,12 +225,15 @@ class StudentDashboardController extends Controller
     {
         $user = $request->user();
         $classGroupId = $user->class_group_id;
+        $currentDate = Carbon::today()->toDateString();
+        $successfulScanTypes = $this->successfulScanEventTypes();
 
         $activities = [];
         if (Schema::hasTable('activity_logs')) {
             $activities = ActivityLog::query()
                 ->where('class_group_id', $classGroupId)
-                ->where('event_type', 'SCAN_SUCCESS')
+                ->whereIn('event_type', $successfulScanTypes)
+                ->whereDate('created_at', $currentDate)
                 ->latest()
                 ->paginate(10)
                 ->through(function (ActivityLog $log) {
@@ -242,5 +248,10 @@ class StudentDashboardController extends Controller
         return view('student.dashboard.activity-log', [
             'activities' => $activities,
         ]);
+    }
+
+    private function successfulScanEventTypes(): array
+    {
+        return ['SCAN_SUCCESS', 'SCAN_SUCCEED', 'Scan_Succeed'];
     }
 }
