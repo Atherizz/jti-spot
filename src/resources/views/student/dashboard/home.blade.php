@@ -4,228 +4,201 @@
 
 @section('content')
 
-    {{-- Flash Messages --}}
+    {{-- Soft Editorial Flash Messages --}}
     @if(session('error'))
-    <div id="flashMessage" class="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3 shadow-sm">
-        <div class="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center shrink-0 mt-0.5">
-            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+    <div id="flashMessage" class="mb-8 w-full bg-red-50 border border-red-100 rounded-2xl p-4 flex items-start gap-4 shadow-sm">
+        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center shrink-0 mt-0.5 text-red-500">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </div>
         <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-red-900">Error</p>
+            <p class="font-semibold text-red-900 text-sm">Sistem Error</p>
             <p class="text-sm text-red-700 mt-0.5">{{ session('error') }}</p>
         </div>
-        <button onclick="document.getElementById('flashMessage').remove()" class="text-red-400 hover:text-red-600 transition-colors shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+        <button onclick="document.getElementById('flashMessage').remove()" class="text-red-400 hover:text-red-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
     </div>
     @endif
 
     @if(session('success'))
-    <div id="flashMessage" class="mb-6 bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start gap-3 shadow-sm">
-        <div class="w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center shrink-0 mt-0.5">
-            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+    <div id="flashMessage" class="mb-8 w-full bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex items-start gap-4 shadow-sm">
+        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5 text-emerald-600">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
         </div>
         <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-emerald-900">Berhasil</p>
+            <p class="font-semibold text-emerald-900 text-sm">Berhasil</p>
             <p class="text-sm text-emerald-700 mt-0.5">{{ session('success') }}</p>
         </div>
-        <button onclick="document.getElementById('flashMessage').remove()" class="text-emerald-400 hover:text-emerald-600 transition-colors shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+        <button onclick="document.getElementById('flashMessage').remove()" class="text-emerald-400 hover:text-emerald-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
     </div>
     @endif
 
     {{-- Page Header --}}
-    <div class="flex items-start justify-between mb-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 stagger-1">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-900">Dashboard Mahasiswa</h1>
-            <p class="text-sm text-gray-500 mt-1">
-                Selamat datang, {{ auth()->user()->name }}. Ini yang sedang terjadi di kampus.
-            </p>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                <span class="font-display text-[11px] font-bold uppercase tracking-widest text-ink/50">Terminal Mahasiswa</span>
+            </div>
+            <h1 class="font-display text-4xl sm:text-5xl font-bold tracking-tight text-ink leading-none">
+                Dashboard
+            </h1>
+            <p class="text-base text-ink/60 mt-3 md:mt-2">Selamat datang kembali, <span class="font-semibold text-ink">{{ auth()->user()->name }}</span>.</p>
         </div>
-        {{-- Notifikasi (desktop only) --}}
-        <button class="hidden lg:flex relative items-center justify-center w-10 h-10 rounded-full bg-white border border-gray-200 shadow-sm text-gray-500 hover:text-gray-700 transition-colors shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
     </div>
 
-    {{-- Grid Utama --}}
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
+    {{-- Grid Utama (Formal Panels) --}}
+    <div class="flex flex-col xl:flex-row gap-6 mb-8 stagger-2">
 
-        {{-- Aktivitas Crowdsourcing --}}
-        <div class="lg:col-span-3 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100">
-            <div class="flex items-center gap-2 mb-5">
-                <div class="w-7 h-7 rounded-lg bg-red-50 flex items-center justify-center">
-                    <span class="w-3 h-3 bg-red-500 rounded-full"></span>
-                </div>
-                <h2 class="text-base font-bold text-gray-900">Aktivitas Crowdsourcing</h2>
-            </div>
+        {{-- Sesi Saat Ini (Soft Instrument Panel) --}}
+        <div class="xl:w-2/5 flex flex-col order-first xl:order-last">
+            <div class="bg-ink text-white editorial-panel border-none p-6 md:p-8 flex flex-col h-full relative overflow-hidden group">
+                <div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle at top right, rgba(255,255,255,0.4), transparent 50%);"></div>
+                
+                <div class="relative z-10 flex flex-col flex-1">
+                    <div class="flex items-center justify-between pb-4 mb-6 border-b border-white/10">
+                        <span class="font-display text-xs font-semibold uppercase tracking-widest text-white/60">Sesi Akademik Saat Ini</span>
+                        <div class="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/20 border border-emerald-500/30 rounded-full">
+                            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+                            <span class="text-[10px] font-semibold text-emerald-300">Live</span>
+                        </div>
+                    </div>
 
-            <div class="space-y-3">
-                @forelse($activities as $activity)
-                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
-                    <div class="w-9 h-9 rounded-xl {{ $activity['type'] === 'QUORUM_REACHED' ? 'bg-emerald-50 border border-emerald-100' : 'bg-white border border-gray-200' }} flex items-center justify-center shrink-0 shadow-sm">
-                        @if($activity['type'] === 'QUORUM_REACHED')
-                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    <h2 class="font-display text-2xl sm:text-3xl font-bold leading-tight mb-2">{{ $sessionTitle }}</h2>
+                    <p class="text-sm text-white/60 mb-6">{{ $sessionMeta }}</p>
+
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between mb-8 backdrop-blur-sm">
+                        <div>
+                            <p class="text-[11px] font-semibold uppercase tracking-widest text-white/50 mb-0.5">Lokasi Kelas</p>
+                            <p class="font-semibold text-sm">{{ $sessionLocation }}</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        </div>
+                    </div>
+
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between text-xs mb-2">
+                            <span class="font-medium text-white/60">Pengumpulan Radar</span>
+                            <span class="font-semibold text-emerald-300">{{ $currentQuorum }} / {{ $quorumSize }}</span>
+                        </div>
+                        <div class="w-full bg-white/10 rounded-full h-1.5">
+                            <div class="bg-gradient-to-r from-orange-400 to-orange-500 h-full rounded-full relative" style="width: {{ $progressPercent }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto">
+                        @if($canManualCheckIn && !$alreadyScanned)
+                        <form method="POST" action="{{ route('student.attendance.confirm') }}">
+                            @csrf
+                            <button type="submit" class="w-full bg-white text-ink font-semibold text-sm py-3.5 rounded-xl hover:bg-gray-50 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 group/btn">
+                                Konfirmasi Hadir
+                                <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+                            </button>
+                        </form>
+                        @elseif($alreadyScanned)
+                        <div class="flex items-stretch gap-2">
+                            <a href="{{ $checkInPageUrl ?? '#' }}" class="flex-1 bg-white/10 text-white font-medium text-sm py-3 px-4 rounded-xl {{ $checkInPageUrl ? 'hover:bg-white/20 transition-colors' : 'opacity-50 pointer-events-none' }} flex items-center justify-center gap-2 border border-white/10">
+                                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Kehadiran Tercatat
+                            </a>
+                        </div>
                         @else
-                        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                        </svg>
+                        <button class="w-full bg-white/5 text-white/40 border border-white/5 font-medium text-sm py-3.5 rounded-xl cursor-not-allowed">
+                            Tidak Ada Sesi Aktif Saat Ini
+                        </button>
                         @endif
                     </div>
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-medium text-gray-800">{{ $activity['title'] }}</p>
-                        <p class="text-xs text-gray-400 mt-0.5">{{ $activity['subtitle'] }}</p>
-                    </div>
                 </div>
-                @empty
-                <div class="p-3 rounded-xl bg-gray-50 text-sm text-gray-500">
-                    Belum ada aktivitas untuk kelas Anda saat ini.
-                </div>
-                @endforelse
-
-                @if($totalActivities > count($activities) && count($activities) > 0)
-                <a href="{{ route('student.activity.log') }}" class="block mt-4 p-3 rounded-xl text-center bg-indigo-50 hover:bg-indigo-100 transition-colors text-sm font-medium text-indigo-600 border border-indigo-200">
-                    Lihat Semua Aktivitas ({{ $totalActivities }} total)
-                </a>
-                @endif
             </div>
         </div>
 
-        {{-- Sesi Saat Ini --}}
-        <div class="lg:col-span-2 bg-[#1e2333] rounded-2xl p-5 sm:p-6 text-white flex flex-col shadow-sm">
-            <div class="flex items-center justify-between mb-4">
-                <span class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Sesi Saat Ini</span>
-                <span class="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 text-xs font-semibold px-2.5 py-1 rounded-full border border-emerald-500/30">
-                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></span>
-                    Berlangsung
-                </span>
-            </div>
-
-            <h2 class="text-xl sm:text-2xl font-extrabold mb-1 leading-tight">{{ $sessionTitle }}</h2>
-            <p class="text-sm text-gray-400 mb-5">{{ $sessionMeta }}</p>
-
-            <div class="bg-white/10 rounded-xl p-3 flex items-center gap-3 mb-5">
-                <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </div>
+        {{-- Aktivitas Crowdsourcing (Editorial Timeline softly styled) --}}
+        <div class="xl:w-3/5 editorial-panel bg-white p-6 md:p-8 flex flex-col">
+            <div class="flex items-end justify-between border-b border-gray-100 pb-5 mb-6">
                 <div>
-                    <p class="text-xs text-gray-400">Lokasi</p>
-                    <p class="text-sm font-semibold">{{ $sessionLocation }}</p>
+                    <h2 class="font-display text-xl font-bold tracking-tight text-ink">Timeline Ketersediaan</h2>
+                    <p class="font-medium text-xs text-ink/50 mt-1">Laporan Langsung dari Jaringan</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 </div>
             </div>
 
-            <div class="mb-5">
-                <div class="flex items-center justify-between text-xs mb-2">
-                    <span class="text-gray-400 font-medium">Live Quorum Tracker</span>
-                    <span class="text-white font-semibold">{{ $currentQuorum }}/{{ $quorumSize }} Scan terkumpul</span>
-                </div>
-                <div class="w-full bg-white/10 rounded-full h-2">
-                    <div class="bg-orange-500 h-2 rounded-full" style="width: {{ $progressPercent }}%"></div>
+            <div class="flex-1 relative">
+                <!-- Soft Timeline Line -->
+                <div class="absolute left-[11px] top-4 bottom-4 w-px bg-gray-100"></div>
+
+                <div class="space-y-6 relative z-10 py-2">
+                    @forelse($activities as $activity)
+                    <div class="flex items-start gap-5 group">
+                        <div class="w-6 h-6 shrink-0 rounded-full bg-white border-2 flex items-center justify-center mt-1 {{ $activity['type'] === 'QUORUM_REACHED' ? 'border-emerald-500 text-emerald-500' : 'border-gray-200 text-gray-300' }} group-hover:scale-110 transition-transform relative z-20">
+                            @if($activity['type'] === 'QUORUM_REACHED')
+                                <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+                            @else
+                                <div class="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+                            @endif
+                        </div>
+                        <div>
+                            <p class="font-medium text-ink leading-tight">{{ $activity['title'] }}</p>
+                            <p class="text-sm text-ink/50 mt-1">{{ $activity['subtitle'] }}</p>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="border border-dashed border-gray-200 rounded-2xl p-8 text-center bg-gray-50/50">
+                        <p class="font-medium text-ink/60 text-sm">Belum ada sinyal crowdsourcing yang tercatat pada kelas Anda.</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
 
-            @if($canManualCheckIn && !$alreadyScanned)
-            <form method="POST" action="{{ route('student.attendance.confirm') }}" class="mt-auto">
-                @csrf
-                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 active:bg-orange-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5 13l4 4L19 7" />
-                    </svg>
-                    Konfirmasi Hadir Sekarang
-                </button>
-            </form>
-            @elseif($alreadyScanned)
-            <div class="mt-auto flex items-center gap-2">
-                <a href="{{ $checkInPageUrl ?? '#' }}" class="flex-1 bg-emerald-500/80 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm transition-colors {{ $checkInPageUrl ? '' : 'pointer-events-none opacity-70' }}">
-                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Kehadiran Sudah Tercatat
+            @if($totalActivities > count($activities) && count($activities) > 0)
+            <div class="mt-8 pt-5 border-t border-gray-100 text-center">
+                <a href="{{ route('student.activity.log') }}" class="inline-flex items-center gap-1.5 font-medium text-sm text-orange-600 hover:text-orange-700 transition-colors">
+                    Lihat Semua Aktivitas ({{ $totalActivities }})
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                 </a>
-
-                <a href="{{ $checkInPageUrl ?? '#' }}" class="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center shrink-0 transition-colors {{ $checkInPageUrl ? '' : 'pointer-events-none opacity-70' }}" title="Buka halaman check-in">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                </a>
             </div>
-            @else
-            <button class="mt-auto w-full bg-gray-500/50 text-gray-200 font-bold py-3 rounded-xl flex items-center justify-center gap-2 text-sm cursor-not-allowed" disabled>
-                Tidak Ada Sesi Aktif
-            </button>
             @endif
         </div>
     </div>
 
-    {{-- Statistik Kontribusi --}}
-    <div>
-        <h2 class="text-base font-bold text-gray-800 mb-3">Statistik Kontribusi</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-
-            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
-                <div class="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 3.5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                    </svg>
+    {{-- Statistik Kontribusi (Soft Cards) --}}
+    <div class="stagger-3 mb-10">
+        <h2 class="font-display text-lg font-bold tracking-tight mb-4">Statistik Kontribusi</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="editorial-panel bg-white p-6 flex flex-col h-full justify-between gap-4 group hover:bg-gray-50/50">
+                <div class="flex items-center justify-between">
+                    <p class="font-display text-[11px] font-semibold uppercase tracking-widest text-ink/50">Total Partisipasi Awal</p>
+                    <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-gray-400 font-medium">Total Scan Minggu Ini</p>
-                    <p class="text-2xl font-extrabold text-indigo-900">{{ $weeklyScans }}</p>
-                </div>
+                <p class="font-display text-4xl font-bold text-ink">{{ $weeklyScans }}</p>
             </div>
 
-            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
-                <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+            <div class="editorial-panel bg-white p-6 flex flex-col h-full justify-between gap-4 group hover:bg-gray-50/50">
+                <div class="flex items-center justify-between">
+                    <p class="font-display text-[11px] font-semibold uppercase tracking-widest text-ink/50">Ruang Dikonfirmasi</p>
+                    <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-gray-400 font-medium">Ruang Terverifikasi</p>
-                    <p class="text-2xl font-extrabold text-indigo-900">{{ $verifiedRooms }}</p>
-                </div>
+                <p class="font-display text-4xl font-bold text-emerald-600">{{ $verifiedRooms }}</p>
             </div>
 
-            <div class="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
-                <div class="w-11 h-11 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-                    </svg>
+            <div class="editorial-panel bg-white p-6 flex flex-col h-full justify-between gap-4 group hover:bg-gray-50/50">
+                <div class="flex items-center justify-between">
+                    <p class="font-display text-[11px] font-semibold uppercase tracking-widest text-ink/50">Streak Saat Ini</p>
+                    <div class="w-8 h-8 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" /></svg>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-gray-400 font-medium">Streak Saat Ini</p>
-                    <p class="text-2xl font-extrabold text-indigo-900">{{ $streakDays }} hari</p>
-                </div>
+                <p class="font-display text-4xl font-bold text-ink">{{ $streakDays }}<span class="text-sm font-medium text-gray-400 ml-1">Hari</span></p>
             </div>
-
         </div>
     </div>
 
@@ -235,12 +208,14 @@
         setTimeout(function() {
             const flashMessage = document.getElementById('flashMessage');
             if (flashMessage) {
-                flashMessage.style.transition = 'opacity 0.3s ease-out';
+                flashMessage.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
                 flashMessage.style.opacity = '0';
-                setTimeout(() => flashMessage.remove(), 300);
+                flashMessage.style.transform = 'translateY(-10px)';
+                setTimeout(() => flashMessage.remove(), 400);
             }
         }, 5000);
     </script>
     @endif
 
 @endsection
+
