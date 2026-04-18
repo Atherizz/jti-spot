@@ -1,43 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-2">
-            <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20l9-7-9-7-9 7 9 7z"></path>
-            </svg>
-            <h1 class="text-2xl font-bold text-indigo-900">Peta Ruang</h1>
+    <div class="mb-10 pb-8 stagger-1 relative pt-4">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
+            <div class="max-w-2xl text-ink">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="font-display font-semibold uppercase tracking-widest text-[11px] text-ink/50">Navigasi Visual</span>
+                </div>
+                <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight leading-tight mb-3">
+                    Peta Ruang Kampus
+                </h1>
+                <p class="text-base font-medium max-w-lg mt-3 text-ink/60">
+                    Lihat status ruang secara visual berdasarkan lantai. Klik opsi lantai untuk fokus pada area tertentu.
+                </p>
+            </div>
+            <a href="/" class="editorial-panel bg-white px-6 py-4 flex flex-col justify-center items-center text-center self-start md:self-end hover:bg-gray-50 transition-colors group">
+                <span class="block text-[10px] font-semibold uppercase tracking-widest text-ink/40 mb-1">Aksi Cepat</span>
+                <span class="font-display text-sm font-bold text-ink inline-flex items-center gap-2">
+                    <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Kembali ke Beranda
+                </span>
+            </a>
         </div>
-        <a href="/" class="text-sm text-orange-600 hover:text-orange-700 font-semibold">Kembali ke Beranda</a>
+        <div class="absolute left-0 top-0 w-64 h-64 bg-emerald-50 rounded-full blur-3xl -translate-x-1/4 -translate-y-1/4 pointer-events-none z-0"></div>
     </div>
 
-    <p class="text-sm text-gray-500 mb-6">Lihat status ruang secara visual berdasarkan lantai. Klik opsi lantai untuk fokus pada area tertentu.</p>
-
-    <div class="flex flex-col md:flex-row gap-4 mb-8">
+    <div class="bg-white border rounded-2xl border-gray-100 shadow-sm p-3 mb-8 flex flex-col md:flex-row justify-between items-center gap-4 stagger-2">
         @php
             $currentFloor = request('floor');
         @endphp
-
-        <div class="flex flex-wrap gap-2 items-center">
+        
+        <div class="flex items-center gap-1.5 bg-gray-50/50 p-1.5 rounded-xl border border-gray-100 w-full md:w-auto overflow-x-auto">
             <a href="{{ request()->fullUrlWithQuery(['floor' => null, 'page' => null]) }}" 
-                class="border border-gray-200 px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2 {{ is_null($currentFloor) ? 'bg-indigo-50 text-indigo-900 border-indigo-200' : 'bg-white text-gray-700 hover:bg-gray-50' }}">
-                <svg class="w-4 h-4 {{ is_null($currentFloor) ? 'text-indigo-900' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
+                class="px-4 py-2 font-medium text-xs rounded-lg transition-all flex items-center gap-2 {{ is_null($currentFloor) ? 'bg-white text-ink shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:text-ink' }}">
+                <svg class="w-4 h-4 {{ is_null($currentFloor) ? 'text-orange-600' : 'text-gray-400' }}" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
                 </svg>
                 Semua Lantai
             </a>
-    
-            <div class="bg-white border border-gray-200 rounded-md flex overflow-hidden">
-                @foreach([5, 6, 7, 8] as $floor)
-                    <a href="{{ request()->fullUrlWithQuery(['floor' => $floor, 'page' => null]) }}" 
-                        class="px-4 py-2 text-sm font-medium transition-colors {{ $currentFloor == $floor ? 'bg-indigo-900 text-white' : 'text-gray-700 hover:bg-gray-50' }}">
-                        Lantai {{ $floor }}
-                    </a>
-                @endforeach
-            </div>
+            
+            @foreach([5, 6, 7, 8] as $floor)
+                <a href="{{ request()->fullUrlWithQuery(['floor' => $floor, 'page' => null]) }}" 
+                    class="px-4 py-2 font-medium text-xs rounded-lg transition-all {{ $currentFloor == $floor ? 'bg-white text-ink shadow-sm ring-1 ring-gray-200' : 'text-gray-500 hover:text-ink' }}">
+                    Lantai {{ $floor }}
+                </a>
+            @endforeach
         </div>
 
-        <form method="GET" action="{{ url()->current() }}" class="relative w-full md:w-auto">
+        <form method="GET" action="{{ url()->current() }}" class="w-full md:w-auto relative group">
             @if(request('floor'))
                 <input type="hidden" name="floor" value="{{ request('floor') }}">
             @endif
@@ -58,8 +68,10 @@
             <div class="flex flex-col gap-2 overflow-y-auto pr-1 pb-4 custom-scrollbar">
                 @foreach($rooms as $room)
                     @php
-                        $status = $room->current_status;
-                        $statusClass = $status === 'available' ? 'emerald' : ($status === 'occupied' ? 'red' : 'orange');
+                        $statusColors = ['available' => 'bg-emerald-50 text-emerald-700 ring-emerald-200', 'waiting' => 'bg-orange-50 text-orange-700 ring-orange-200', 'occupied' => 'bg-red-50 text-red-700 ring-red-200'];
+                        $badgeClass = $statusColors[$room->current_status] ?? 'bg-gray-50 text-gray-700 ring-gray-200';
+                        $dotColors = ['available' => 'bg-emerald-500', 'waiting' => 'bg-orange-500', 'occupied' => 'bg-red-500'];
+                        $dotClass = $dotColors[$room->current_status] ?? 'bg-gray-500';
                     @endphp
                     <div class="border border-gray-100 rounded-lg p-3 bg-gray-50/30 hover:bg-indigo-50/50 btn-kelas cursor-pointer hover:border-indigo-200 transition-all flex items-center justify-between group shadow-sm hover:shadow-md" data-target="{{ strtolower($room->room_code) }}">
                         <div class="flex items-center gap-3 overflow-hidden">
@@ -291,6 +303,8 @@
                     <path d="M116.5 556.505C459.476 419.889 841.718 425.632 1153 549.083" stroke="black"/>
                 </svg>
             </div>
+            <h2 class="font-display text-lg font-bold text-ink mb-1">Visualisasi Denah Tersedia Segera</h2>
+            <p class="text-sm text-ink/50 text-center max-w-sm">Integrasi modul peta interaktif sedang dalam tahap pengembangan. Untuk sementara silakan gunakan navigasi daftar indeks di samping.</p>
         </div>
     </div>
 

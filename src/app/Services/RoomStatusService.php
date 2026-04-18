@@ -21,8 +21,8 @@ class RoomStatusService
             ->when($floor, fn ($query, $floor) => $query->where('floor', $floor))
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%')
-                      ->orWhere('room_code', 'like', '%' . $search . '%');
+                    $q->where('name', 'ilike', '%' . $search . '%')
+                      ->orWhere('room_code', 'ilike', '%' . $search . '%');
                 });
             })
             ->get()
