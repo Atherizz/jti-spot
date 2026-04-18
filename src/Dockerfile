@@ -13,8 +13,6 @@ RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --ignor
 FROM node:20-alpine AS node_builder
 WORKDIR /app
 COPY package.json package-lock.json vite.config.js ./
-# TAMBAHAN KRUSIAL: Salin config Tailwind
-COPY tailwind.config.js postcss.config.js* ./ 
 COPY resources ./resources
 COPY public ./public
 RUN npm install && npm run build
