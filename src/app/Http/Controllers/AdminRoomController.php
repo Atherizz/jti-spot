@@ -29,13 +29,13 @@ class AdminRoomController extends Controller
         $hasFloor ? $query->orderBy('floor') : null;
         $hasRoomCode ? $query->orderBy('room_code') : $query->orderBy('id');
 
-        $rooms = $query->get();
+        $rooms = $query->paginate(15)->withQueryString();
 
         $stats = [
-            'total' => $rooms->count(),
-            'lab' => $rooms->filter(fn ($room) => str_starts_with(strtoupper((string) ($room->room_code ?? '')), 'L'))->count(),
-            'theory' => $rooms->filter(fn ($room) => str_starts_with(strtoupper((string) ($room->room_code ?? '')), 'RT'))->count(),
-            'waiting' => $rooms->where('current_status', 'waiting')->count(),
+            'total' => Room::count(),
+            'lab' => $hasRoomCode ? Room::where('room_code', 'like', 'L%')->count() : 0,
+            'theory' => $hasRoomCode ? Room::where('room_code', 'like', 'RT%')->count() : 0,
+            'waiting' => Room::where('current_status', 'waiting')->count(),
         ];
 
         return view('admin.room.room', compact('rooms', 'stats'));

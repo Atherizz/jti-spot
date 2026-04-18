@@ -165,7 +165,7 @@
                                         0 => 'Minggu', 1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu', 4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', default => '-',
                                     };
                                 @endphp
-                                <span class="font-bold text-sm {{ current_day_somehow_equals_this ? 'text-orange-600' : 'text-gray-600' }}">{{ $dayLabel }}</span>
+                                <span class="font-bold text-sm {{ now()->dayOfWeek == $schedule->day_of_week ? 'text-orange-600' : 'text-gray-600' }}">{{ $dayLabel }}</span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center gap-1 font-mono text-[13px] font-semibold text-gray-600">
