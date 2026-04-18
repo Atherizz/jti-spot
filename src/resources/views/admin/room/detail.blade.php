@@ -1,180 +1,196 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Room Detail')
+@section('title', 'Detail Fasilitas')
 
 @section('content')
     @php
         $roomLabel = $room->room_code ?? ('ROOM-' . $room->id);
-        $buildingLabel = $room->floor ? ('Building ' . $room->floor) : 'Building -';
+        $buildingLabel = $room->floor ? ('Gedung LT ' . $room->floor) : 'Lantai Indefinit';
         $scanUrl = route('scan.initial', $room->qr_token);
-        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=10&data=' . urlencode($scanUrl);
+        $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' . urlencode($scanUrl);
     @endphp
 
-    {{-- Breadcrumb --}}
-    <div class="mb-4">
-        <p class="text-xs sm:text-sm text-gray-500">
-            Rooms <span class="mx-1">/</span> {{ $buildingLabel }} <span class="mx-1">/</span>
-            <span class="font-semibold text-gray-700">{{ $roomLabel }}</span>
-        </p>
-    </div>
-
-    {{-- Page Header --}}
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-6">
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-900">{{ $roomLabel }} Management & Monitoring</h1>
-            <p class="text-sm text-gray-500 mt-1">
-                Manage room availability, view live scan logs, and manage class booking QR codes.
-            </p>
+    {{-- Editorial Breadcrumb & Header --}}
+    <div class="mb-8 stagger-1">
+        <div class="flex items-center gap-2 mb-3">
+            <span class="font-display font-semibold uppercase tracking-widest text-[10px] text-ink/50 bg-gray-100 px-2 py-1 rounded">Manajemen Ruang</span>
+            <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            <span class="font-display font-semibold uppercase tracking-widest text-[10px] text-ink/50">{{ $buildingLabel }}</span>
+            <svg class="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            <span class="font-display font-bold uppercase tracking-widest text-[10px] text-orange-600">{{ $roomLabel }}</span>
         </div>
 
-        <button class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Edit Room Details
-        </button>
-    </div>
-
-    {{-- Statistics Cards --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
-        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between mb-3">
-                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Occupancy Rate</h3>
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857" />
-                    </svg>
-                </div>
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-ink leading-tight mb-2">
+                    Operasional Ruang <span class="text-orange-600 border-b-2 border-orange-200">{{ $roomLabel }}</span>
+                </h1>
+                <p class="text-sm font-medium text-ink/60 max-w-xl leading-relaxed">
+                    Instalasi kode QR statis untuk validasi geo-lokasi, parameter operasional, dan histori stempel akses.
+                </p>
             </div>
-            <div class="flex items-end gap-2">
-                <p class="text-3xl font-extrabold text-indigo-900">75%</p>
-                <p class="text-xs text-emerald-600 font-semibold mb-1">+5%</p>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between mb-3">
-                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Scans Today</h3>
-                <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="flex items-end gap-2">
-                <p class="text-3xl font-extrabold text-indigo-900">120</p>
-                <p class="text-xs text-gray-400 mb-1">today</p>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-            <div class="flex items-start justify-between mb-3">
-                <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Conflict Alerts</h3>
-                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-7.938 4h15.876c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-            </div>
-            <div class="flex items-end gap-2">
-                <p class="text-3xl font-extrabold text-indigo-900">2</p>
-                <p class="text-xs text-red-500 font-semibold mb-1">+1</p>
-            </div>
-        </div>
-    </div>
-
-    {{-- Detail Content --}}
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        <section class="xl:col-span-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
-            <h2 class="text-lg font-bold text-gray-900">Static QR Code</h2>
-            <p class="text-sm text-gray-500 mt-1">Scan for class booking in {{ $roomLabel }}</p>
-
-            <div class="mt-5 rounded-2xl border border-gray-100 bg-gray-50 p-4 flex items-center justify-center">
-                <div class="w-56 h-56 bg-white border border-gray-200 rounded-xl p-3 flex items-center justify-center shadow-sm">
-                    <img src="{{ $qrImageUrl }}" alt="QR Booking {{ $roomLabel }}" class="w-full h-full rounded-lg object-contain" />
-                </div>
-            </div>
-
-            <a href="{{ $scanUrl }}" target="_blank" rel="noopener noreferrer" class="mt-5 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-indigo-700 rounded-xl hover:bg-indigo-600 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h6m0 0v6m0-6L10 16" />
+            
+            <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-ink bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm shrink-0">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
-                Open Booking Link
-            </a>
-            <p class="text-xs text-gray-400 mt-3 text-center break-all">{{ $scanUrl }}</p>
+                Perbarui Metadata
+            </button>
+        </div>
+    </div>
+
+    {{-- Main Grid --}}
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 stagger-2">
+        
+        {{-- QR Code Section (Left) --}}
+        <section class="xl:col-span-4 flex flex-col h-full">
+            <div class="editorial-panel bg-white p-6 sm:p-8 relative overflow-hidden flex flex-col items-center justify-center text-center h-full">
+                <!-- Abstract glowing accent -->
+                <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-orange-50/50 to-transparent pointer-events-none"></div>
+
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-100 text-[10px] font-bold text-orange-700 uppercase tracking-widest mb-6 relative z-10">
+                    <div class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></div>
+                    Pemindai Ruangan Aktif
+                </div>
+
+                <div class="relative z-10 bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6">
+                    <img src="{{ $qrImageUrl }}" alt="QR Akses {{ $roomLabel }}" class="w-48 h-48 sm:w-56 sm:h-56 object-contain" />
+                </div>
+
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2 relative z-10">Tautan Integrasi Jaringan</p>
+                <div class="w-full bg-gray-50 border border-gray-100 rounded-lg p-3 mb-6 relative z-10">
+                    <p class="text-xs font-mono text-gray-500 truncate select-all">{{ $scanUrl }}</p>
+                </div>
+
+                <a href="{{ $scanUrl }}" target="_blank" rel="noopener noreferrer" class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-bold text-white bg-ink rounded-xl hover:bg-ink/90 transition-colors shadow-sm relative z-10">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Uji Tautan Eksternal
+                </a>
+            </div>
         </section>
 
-        <section class="xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <div class="p-5 sm:p-6 border-b border-gray-100 flex items-start justify-between">
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900">Live Scan Log</h2>
-                    <p class="text-sm text-gray-500 mt-1">Recent student scans for this room.</p>
+        {{-- Log & Data Section (Right) --}}
+        <section class="xl:col-span-8 flex flex-col gap-6">
+            
+            {{-- Mini Stats --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div class="editorial-panel bg-white p-5 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Rate Utilisasi</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-3xl font-bold text-ink leading-none">75%</span>
+                        <div class="flex items-center gap-1 text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                            5%
+                        </div>
+                    </div>
                 </div>
-                <button class="text-indigo-600 hover:text-indigo-700 transition-colors p-1" title="Refresh">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M5 9a7 7 0 0112.48-3.856L20 9M4 15l2.52 3.856A7 7 0 0019 15" />
-                    </svg>
-                </button>
+                <div class="editorial-panel bg-white p-5 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Pemindaian Hari Ini</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-3xl font-bold text-ink leading-none">120</span>
+                        <span class="text-[10px] font-bold text-gray-400">Entri</span>
+                    </div>
+                </div>
+                <div class="editorial-panel bg-white p-5 flex flex-col justify-between">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Anomali Sistem</span>
+                    <div class="flex items-end justify-between">
+                        <span class="font-display text-3xl font-bold text-orange-600 leading-none">2</span>
+                        <span class="text-[10px] font-bold text-orange-600/60 uppercase tracking-widest">Konflik</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100 text-left">
-                            <th class="px-6 py-3 text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-[11px] font-semibold text-gray-600 uppercase tracking-wider">NIM</th>
-                            <th class="px-6 py-3 text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Time</th>
-                            <th class="px-6 py-3 text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Verification</th>
-                            <th class="px-6 py-3 text-[11px] font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100 text-sm text-gray-700">
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 font-medium text-gray-900">Budi Santoso</td>
-                            <td class="px-6 py-4 text-gray-500">2141720001</td>
-                            <td class="px-6 py-4">08:15 AM</td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">WiFi</span></td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Success</span></td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 font-medium text-gray-900">Siti Aminah</td>
-                            <td class="px-6 py-4 text-gray-500">2141720002</td>
-                            <td class="px-6 py-4">08:12 AM</td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-600">GPS</span></td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Success</span></td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 font-medium text-gray-900">Agus Pratama</td>
-                            <td class="px-6 py-4 text-gray-500">2141720003</td>
-                            <td class="px-6 py-4">08:05 AM</td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-600">WiFi</span></td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Success</span></td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 font-medium text-gray-900">Unknown User</td>
-                            <td class="px-6 py-4 text-gray-400">-</td>
-                            <td class="px-6 py-4">07:59 AM</td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-500">Failed</span></td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center gap-1 text-red-500 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Location Mismatch</span></td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 font-medium text-gray-900">Dewi Lestari</td>
-                            <td class="px-6 py-4 text-gray-500">2141720005</td>
-                            <td class="px-6 py-4">07:55 AM</td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-600">GPS</span></td>
-                            <td class="px-6 py-4"><span class="inline-flex items-center gap-1 text-emerald-600 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Success</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            {{-- Live Audit Log --}}
+            <div class="editorial-panel bg-white flex-1 overflow-hidden flex flex-col">
+                <div class="p-6 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                        <h2 class="font-display text-lg font-bold text-ink">Catatan Log Aktivitas</h2>
+                        <p class="text-xs font-semibold text-gray-500 mt-1 uppercase tracking-widest">Data Audit Telemetri Ruang</p>
+                    </div>
+                    <button class="w-8 h-8 rounded-lg bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-500 flex items-center justify-center transition-colors shadow-sm" title="Refresh Telemetri">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M5 9a7 7 0 0112.48-3.856L20 9M4 15l2.52 3.856A7 7 0 0019 15" />
+                        </svg>
+                    </button>
+                </div>
 
-            <div class="px-6 py-4 border-t border-gray-100">
-                <a href="#" class="text-sm font-medium text-indigo-700 hover:text-indigo-900 transition-colors">View All Logs</a>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50/50 border-b border-gray-100 text-left">
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Aktor / Obyek</th>
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Waktu Transaksi</th>
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Metode Validasi</th>
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest text-right">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-ink text-sm">Budi Santoso</p>
+                                    <p class="text-[10px] font-mono text-gray-400 mt-0.5">2141720001</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-ink text-sm">08:15 AM</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 uppercase tracking-widest border border-orange-100">WiFi Poin</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="inline-flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-widest">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                        Sukses
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-ink text-sm">Siti Aminah</p>
+                                    <p class="text-[10px] font-mono text-gray-400 mt-0.5">2141720002</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-ink text-sm">08:12 AM</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 uppercase tracking-widest border border-blue-100">Satelit GPS</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="inline-flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-widest">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                        Sukses
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50/50 transition-colors bg-rose-50/20">
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-rose-900 text-sm">Entitas Anonim</p>
+                                    <p class="text-[10px] font-mono text-rose-400 mt-0.5">Tidak DIkenali</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <p class="font-bold text-ink text-sm">07:59 AM</p>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 uppercase tracking-widest border border-gray-200">Gagal Validasi</span>
+                                </td>
+                                <td class="px-6 py-4 text-right">
+                                    <div class="inline-flex items-center gap-1.5 text-rose-600 font-bold text-xs uppercase tracking-widest">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
+                                        Ditolak Mismatch
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-gray-100 bg-gray-50/30 text-center">
+                    <a href="#" class="text-xs font-bold text-orange-600 uppercase tracking-widest hover:text-orange-800 transition-colors">Tarik Lebih Banyak Data Audit</a>
+                </div>
             </div>
+            
         </section>
     </div>
 @endsection
+

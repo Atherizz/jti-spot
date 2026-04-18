@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             ClassGroupSeeder::class,
             UserSeeder::class,
             RoomSeeder::class,
-            ScheduleSeeder::class
+            ScheduleSeeder::class,
             ]
     );
     }

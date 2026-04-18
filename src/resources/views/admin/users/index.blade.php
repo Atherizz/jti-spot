@@ -17,7 +17,7 @@
 
     <div class="flex items-start justify-between mb-6">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-900">Manajemen Pengguna</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-orange-900">Manajemen Pengguna</h1>
             <p class="text-sm text-gray-500 mt-1">Kelola akun admin, ketua kelas, dan mahasiswa dalam satu tempat.</p>
         </div>
         <div class="hidden lg:flex items-center gap-3">
@@ -31,24 +31,24 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-6">
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Total Pengguna</h3>
-            <p class="text-3xl font-extrabold text-indigo-900">{{ number_format($stats['total']) }}</p>
+            <p class="text-3xl font-extrabold text-orange-900">{{ number_format($stats['total']) }}</p>
             <p class="text-xs text-gray-500 mt-2">Seluruh akun terdaftar</p>
         </div>
 
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Administrator</h3>
-            <p class="text-3xl font-extrabold text-indigo-900">{{ number_format($stats['admin']) }}</p>
+            <p class="text-3xl font-extrabold text-orange-900">{{ number_format($stats['admin']) }}</p>
             <p class="text-xs text-gray-500 mt-2">Akses penuh sistem</p>
         </div>
 
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Ketua Kelas</h3>
-            <p class="text-3xl font-extrabold text-indigo-900">{{ number_format($stats['class_rep']) }}</p>
+            <p class="text-3xl font-extrabold text-orange-900">{{ number_format($stats['class_rep']) }}</p>
             <p class="text-xs text-gray-500 mt-2">Koordinator kelas aktif</p>
         </div>
 
-        <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-5 sm:p-6 shadow-sm text-white">
-            <h3 class="text-xs font-semibold text-indigo-200 uppercase tracking-wider mb-1">Mahasiswa</h3>
+        <div class="bg-gradient-to-br from-orange-600 to-orange-800 rounded-2xl p-5 sm:p-6 shadow-sm text-white">
+            <h3 class="text-xs font-semibold text-orange-200 uppercase tracking-wider mb-1">Mahasiswa</h3>
             <p class="text-3xl font-extrabold">{{ number_format($stats['student']) }}</p>
             <p class="text-xs text-white/90 mt-2">Akun mahasiswa aktif</p>
         </div>
@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="w-full md:w-auto flex items-center gap-2.5">
-                    <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-indigo-900 rounded-xl hover:bg-indigo-800 transition-colors whitespace-nowrap">
+                    <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-orange-900 rounded-xl hover:bg-orange-800 transition-colors whitespace-nowrap">
                         + Tambah User
                     </a>
 
@@ -78,11 +78,11 @@
                             name="q"
                             value="{{ $search }}"
                             placeholder="Cari nama, email, NIM/NIP, role..."
-                            class="w-full pl-10 pr-24 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                            class="w-full pl-10 pr-24 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all"
                         >
                             <button
                                 type="submit"
-                                class="absolute right-1.5 top-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-indigo-900 rounded-lg hover:bg-indigo-800 transition-colors"
+                                class="absolute right-1.5 top-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-orange-900 rounded-lg hover:bg-orange-800 transition-colors"
                             >
                                 Cari
                             </button>
@@ -111,7 +111,7 @@
                             <td class="px-6 py-4 text-sm font-medium text-gray-500">{{ $users->firstItem() + $loop->index }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-bold">
+                                    <div class="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 text-xs font-bold">
                                         {{ strtoupper(substr($user->name, 0, 1)) }}
                                     </div>
                                     <div>
@@ -132,7 +132,7 @@
                             <td class="px-6 py-4">
                                 @php
                                     $roleMap = [
-                                        'admin' => ['label' => 'Admin', 'class' => 'bg-indigo-50 text-indigo-700 border-indigo-100'],
+                                        'admin' => ['label' => 'Admin', 'class' => 'bg-orange-50 text-orange-700 border-orange-100'],
                                         'class_rep' => ['label' => 'Ketua Kelas', 'class' => 'bg-orange-50 text-orange-700 border-orange-100'],
                                         'student' => ['label' => 'Mahasiswa', 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-100'],
                                     ];
@@ -146,7 +146,7 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
-                                    <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-lg hover:bg-indigo-100 transition-colors">
+                                    <a href="{{ route('admin.users.edit', $user) }}" class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-orange-700 bg-orange-50 border border-orange-100 rounded-lg hover:bg-orange-100 transition-colors">
                                         Edit
                                     </a>
 
@@ -192,7 +192,7 @@
 
                     <a
                         href="{{ $users->hasMorePages() ? $users->nextPageUrl() : '#' }}"
-                        class="inline-flex items-center px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border transition-colors {{ $users->hasMorePages() ? 'border-indigo-200 text-indigo-700 bg-indigo-50 hover:bg-indigo-100' : 'border-gray-200 text-gray-400 bg-gray-100 pointer-events-none' }}"
+                        class="inline-flex items-center px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border transition-colors {{ $users->hasMorePages() ? 'border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100' : 'border-gray-200 text-gray-400 bg-gray-100 pointer-events-none' }}"
                     >
                         Next
                     </a>
@@ -201,3 +201,4 @@
         </div>
     </div>
 @endsection
+

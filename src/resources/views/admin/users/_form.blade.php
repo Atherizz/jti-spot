@@ -31,7 +31,7 @@
                     value="{{ old('name', $user->name ?? '') }}"
                     required
                     {{ $isEdit ? 'readonly' : '' }}
-                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent {{ $isEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
+                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent {{ $isEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
                 >
             </div>
 
@@ -44,7 +44,7 @@
                     value="{{ old('email', $user->email ?? '') }}"
                     required
                     {{ $isEdit ? 'readonly' : '' }}
-                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent {{ $isEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
+                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent {{ $isEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
                 >
             </div>
 
@@ -56,7 +56,7 @@
                     name="reg_number"
                     value="{{ old('reg_number', $user->reg_number ?? '') }}"
                     {{ $isEdit ? 'readonly' : '' }}
-                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent {{ $isEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
+                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent {{ $isEdit ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}"
                 >
             </div>
 
@@ -80,7 +80,7 @@
                         id="role"
                         name="role"
                         required
-                        class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
                         <option value="class_rep" {{ $selectedRole === 'class_rep' ? 'selected' : '' }}>Ketua Kelas</option>
                         <option value="student" {{ $selectedRole === 'student' ? 'selected' : '' }}>Mahasiswa</option>
@@ -103,7 +103,7 @@
                         id="class_group_id"
                         name="class_group_id"
                         disabled
-                        class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100 text-gray-500 cursor-not-allowed"
+                        class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-100 text-gray-500 cursor-not-allowed"
                     >
                         <option value="">Pilih kelas</option>
                         @foreach ($classGroups as $classGroup)
@@ -129,7 +129,7 @@
                     type="password"
                     name="password"
                     {{ $isEdit ? '' : 'required' }}
-                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
             </div>
 
@@ -140,7 +140,7 @@
                     type="password"
                     name="password_confirmation"
                     {{ $isEdit ? '' : 'required' }}
-                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
             </div>
         </div>
@@ -150,7 +150,7 @@
         <a href="{{ route('admin.users.index') }}" class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
             Batal
         </a>
-        <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-indigo-900 rounded-xl hover:bg-indigo-800 transition-colors">
+        <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-semibold text-white bg-orange-900 rounded-xl hover:bg-orange-800 transition-colors">
             {{ $isEdit ? 'Simpan Perubahan' : 'Simpan Pengguna' }}
         </button>
     </div>
@@ -184,3 +184,4 @@
         })();
     </script>
 @endpush
+

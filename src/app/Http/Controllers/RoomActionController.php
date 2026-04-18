@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\RoomScanService;
 use App\Models\Room;
+use App\Models\QuorumScan;
 use App\Models\Schedule;
+use Carbon\Carbon;
 
 class RoomActionController extends Controller
 {
@@ -50,6 +52,11 @@ class RoomActionController extends Controller
 
         }
 
+        if ($result['status'] === 'success') {
+            return redirect()->route('student.checkin.show', $qrToken)
+                ->with($flashType, $result['message']);
+        }
+
         return redirect()->route('student.dashboard.home')
             ->with($flashType, $result['message']);
     }
@@ -70,7 +77,72 @@ class RoomActionController extends Controller
 
         $flashType = $result['status'] === 'success' ? 'success' : 'error';
 
+        $targetRoute = $result['status'] === 'success'
+            ? 'student.schedules'
+            : 'student.dashboard.home';
+
+        return redirect()->route($targetRoute)
+            ->with($flashType, $result['message']);
+    }
+
+    public function confirmWithoutScan(Request $request)
+    {
+        $result = $this->roomScanService->confirmWithoutScan($request->user());
+
+        $flashType = $result['status'] === 'success' ? 'success' : 'error';
+
+        if ($result['status'] === 'success' && !empty($result['room_qr_token'])) {
+            return redirect()->route('student.checkin.show', $result['room_qr_token'])
+                ->with($flashType, $result['message']);
+        }
+
         return redirect()->route('student.dashboard.home')
             ->with($flashType, $result['message']);
+    }
+
+    public function showCheckIn(Request $request, $qrToken)
+    {
+        $room = Room::where('qr_token', $qrToken)->first();
+
+        if (!$room) {
+            return redirect()->route('student.dashboard.home')
+                ->with('error', 'Ruangan tidak ditemukan.');
+        }
+
+        $user = $request->user();
+        $now = Carbon::now();
+        $today = $now->toDateString();
+
+        $activeSchedule = Schedule::where('room_id', $room->id)
+            ->where('class_group_id', $user->class_group_id)
+            ->where('day_of_week', $now->dayOfWeek)
+            ->where('start_time', '<=', $now->format('H:i:s'))
+            ->where('end_time', '>=', $now->format('H:i:s'))
+            ->first();
+
+        $latestScan = QuorumScan::where('user_id', $user->id)
+            ->where('room_id', $room->id)
+            ->where('scanned_date', $today)
+            ->orderByDesc('scanned_at')
+            ->first();
+
+        $subjectName = $activeSchedule?->course_name ?? 'Sesi Check-in';
+        $lecturerName = 'Dosen pengampu';
+        $className = $user->classGroup?->name ?? '-';
+
+        $remainingSeconds = 0;
+        if ($activeSchedule) {
+            $sessionEnd = Carbon::parse($today . ' ' . $activeSchedule->end_time);
+            $remainingSeconds = max(0, $now->diffInSeconds($sessionEnd, false));
+        }
+
+        return view('student.scan.checkin', [
+            'room' => $room,
+            'subjectName' => $subjectName,
+            'lecturerName' => $lecturerName,
+            'className' => $className,
+            'checkedInAt' => $latestScan?->scanned_at,
+            'remainingSeconds' => $remainingSeconds,
+        ]);
     }
 }

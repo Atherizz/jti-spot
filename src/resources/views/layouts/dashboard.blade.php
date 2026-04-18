@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') — JTISpot</title>
+    <title>@yield('title', 'Dashboard') â€” JTISpot</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Inter', sans-serif; }</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-100 antialiased">
+<body class="font-sans antialiased text-ink bg-texture">
 
     {{-- Overlay mobile sidebar --}}
     <div id="sidebar-overlay"
@@ -22,14 +23,14 @@
     {{-- Wrapper konten utama: geser ke kanan selebar sidebar di desktop --}}
     <div class="lg:pl-56 flex flex-col min-h-screen">
 
-        {{-- Top Bar — hanya tampil di mobile --}}
+        {{-- Top Bar â€” hanya tampil di mobile --}}
         <header class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
             <button onclick="toggleSidebar()" class="p-1 text-gray-600 hover:text-gray-900 rounded-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
-            <span class="font-bold text-indigo-900 text-sm">JTISpot</span>
+            <span class="font-bold text-orange-900 text-sm">JTISpot</span>
             <button class="relative p-1 text-gray-500 hover:text-gray-700 rounded-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -46,9 +47,9 @@
 
     </div>
 
-    {{-- Bottom Navigation — hanya tampil di mobile --}}
+    {{-- Bottom Navigation â€” hanya tampil di mobile --}}
     <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-10 flex">
-        <a href="#" class="flex-1 flex flex-col items-center justify-center py-2.5 gap-1 text-indigo-900">
+        <a href="#" class="flex-1 flex flex-col items-center justify-center py-2.5 gap-1 text-orange-900">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -98,3 +99,4 @@
 
 </body>
 </html>
+

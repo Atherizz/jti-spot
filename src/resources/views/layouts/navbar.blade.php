@@ -1,4 +1,4 @@
-﻿<nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
+<nav class="bg-white border-b border-gray-100 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -9,7 +9,7 @@
                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5h-2v-5h2v5zm0-7h-2v-2h2v2zm5 7h-2v-5h2v5zm0-7h-2v-2h2v2z"/>
                         </svg>
                     </div>
-                    <a href="/" class="text-xl font-bold text-indigo-900">
+                    <a href="/" class="text-xl font-bold text-orange-900">
                         JTISpot
                     </a>
                 </div>
@@ -155,3 +155,4 @@
     </div>
 </div>
 @endauth
+
