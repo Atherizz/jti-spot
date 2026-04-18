@@ -15,6 +15,9 @@ WORKDIR /app
 COPY package.json package-lock.json vite.config.js ./
 COPY resources ./resources
 COPY public ./public
+# Tailwind v4 @source di app.css mereferensikan vendor/ untuk scan
+# kelas pagination views Laravel — tanpa ini, banyak class tidak ter-generate.
+COPY --from=composer_builder /app/vendor ./vendor
 RUN npm install && npm run build
 
 # ==========================================
@@ -22,14 +25,13 @@ RUN npm install && npm run build
 # ==========================================
 FROM php:8.3-fpm-alpine
 
-
 RUN apk add --no-cache \
     libzip-dev \
     libpng-dev \
     libjpeg-turbo-dev \
     freetype-dev \
     unzip \
-    postgresql-dev \ 
+    postgresql-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql zip bcmath gd \
     && rm -rf /var/cache/apk/*
@@ -37,7 +39,6 @@ RUN apk add --no-cache \
 WORKDIR /var/www/html
 
 COPY . .
-
 
 COPY --from=composer_builder /app/vendor ./vendor
 COPY --from=node_builder /app/public/build ./public/build
@@ -51,12 +52,13 @@ RUN mkdir -p storage/framework/views \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-
 ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer dump-autoload --no-dev --optimize
 
+# Entrypoint: sync public/ ke shared volume sebelum start PHP-FPM
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-USER www-data
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["entrypoint.sh"]
