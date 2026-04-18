@@ -23,11 +23,11 @@
             <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-[#2c1d2e]/30 to-transparent"></div>
             
             <div class="flex-1 flex flex-col justify-center items-center z-10 w-full relative">
-                <div class="bg-white rounded-full p-2 mb-6 shadow-lg">
-                    <div class="w-20 h-20 bg-[#355e3b] rounded-full flex items-center justify-center">
-                        <span class="text-white text-xl font-bold tracking-widest flex items-center gap-1">
-                            <span class="text-xs">✦</span> JISpot
-                        </span>
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-white/10 rounded-full scale-110 animate-pulse"></div>
+                    
+                    <div class="relative bg-white rounded-full p-4 shadow-2xl ring-4 ring-white/20">
+                        <img src="/images/logo1.png" alt="JTISpot Logo" class="w-24 h-24 rounded-full object-contain">
                     </div>
                 </div>
                 
