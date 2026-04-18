@@ -157,6 +157,13 @@
                         <div class="bg-{{ $color }}-500 h-1 rounded-full" style="width: {{ $progress }}%"></div>
                     </div>
                 </div>
+                <a href="{{ url('/peta-ruang?floor=' . $room->floor . '&room=' . strtolower($room->room_code)) }}" class="mt-3 flex items-center justify-center gap-2 py-2 px-4 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-all border border-indigo-100 group">
+                    <svg class="w-3.5 h-3.5 text-indigo-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Lihat di Peta
+                </a>
             </div> @endforeach </div> <div class="mt-8">
         {{ $rooms->links() }}
     </div>
