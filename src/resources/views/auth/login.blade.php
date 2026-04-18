@@ -20,13 +20,12 @@
         <!-- Left Panel: Brand & Information -->
         <div class="w-full md:w-[45%] bg-ink relative flex flex-col justify-between p-10 md:p-12 overflow-hidden text-white border-r border-ink/5 group">
             
-            <!-- Abstract decorative geometric pattern inside dark panel -->
-            <div class="absolute right-0 bottom-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl transform translate-x-1/3 translate-y-1/3 pointer-events-none group-hover:bg-orange-500/30 transition-colors duration-700"></div>
-            
-            <div class="relative z-10">
-                <div class="flex items-center gap-3 mb-10">
-                    <div class="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.4)] border border-orange-400">
-                        <span class="font-display font-bold text-white text-lg tracking-wider">J</span>
+            <div class="flex-1 flex flex-col justify-center items-center z-10 w-full relative">
+                <div class="relative mb-6">
+                    <div class="absolute inset-0 bg-white/10 rounded-full scale-110 animate-pulse"></div>
+                    
+                    <div class="relative bg-white rounded-full p-4 shadow-2xl ring-4 ring-white/20">
+                        <img src="/images/logo1.png" alt="JTISpot Logo" class="w-24 h-24 rounded-full object-contain">
                     </div>
                 </div>
                 
