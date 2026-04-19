@@ -12,7 +12,7 @@ services:
     networks:
       - jti-spot-network
     volumes:
-    - public_data:/var/www/html/public
+      - public_data:/shared-public
     restart: always
 
   web-jti-spot:
