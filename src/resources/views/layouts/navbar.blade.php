@@ -3,14 +3,9 @@
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center">
-                        <svg class="w-8 h-8 text-orange-600" fill="currentColor" viewBox="0 0 24 24">
-                           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5h-2v-5h2v5zm0-7h-2v-2h2v2zm5 7h-2v-5h2v5zm0-7h-2v-2h2v2z"/>
-                        </svg>
-                    </div>
-                    <a href="/" class="text-xl font-bold text-orange-900">
-                        JTISpot
+                <div class="shrink-0 flex items-center">
+                    <a href="/">
+                        <img src="{{ asset('images/logo1.png') }}" alt="Logo JTISpot" class="h-[40px] w-auto hover:opacity-90 transition-opacity">
                     </a>
                 </div>
 

@@ -16,13 +16,11 @@
     <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 70%);"></div>
 
     {{-- Logo --}}
-    <div class="flex items-center gap-3 px-6 py-6 border-b border-white/10 shrink-0 relative z-10">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center font-display font-bold text-sm shrink-0 shadow-[0_0_15px_rgba(79,70,229,0.3)] border border-orange-400/30">
-            JTI
-        </div>
+    <div class="flex flex-col items-start gap-2.5 px-6 py-6 border-b border-white/10 shrink-0 relative z-10">
+        <a href="/" class="block">
+            <img src="{{ asset('images/logo3.png') }}" alt="Logo JTISpot" class="h-10 md:h-[45px] w-auto hover:opacity-90 transition-opacity">        </a>
         <div>
-            <div class="font-display font-bold tracking-tight text-base leading-tight">JTISpot</div>
-            <div class="text-[10px] font-semibold uppercase tracking-widest text-orange-300/80 mt-0.5">
+            <div class="text-[10px] font-semibold uppercase tracking-widest text-orange-300/80">
                 @can('admin') Sistem Admin
                 @elsecan('class_rep') Portal Kelas
                 @else Portal Mahasiswa
