@@ -27,10 +27,19 @@ class GuestController extends Controller
     {
         $floor = $request->query('floor') ? (int) $request->query('floor') : null;
         $search = $request->query('search');
+        $room = $request->query('room');
 
-        $allRooms = $this->roomStatusService->getRoomsWithStatus($floor, $search);
+        $searchFilter = $room ? null : $search;
+
+        $allRooms = $this->roomStatusService->getRoomsWithStatus($floor, $searchFilter);
         
         $allRooms->transform(function ($room) {
+            $room->display_group = $room->display_group ?? 'Tidak Ada';
+            return $room;
+        });
+
+        $allRoomsData = $this->roomStatusService->getRoomsWithStatus(null, null);
+        $allRoomsData->transform(function ($room) {
             $room->display_group = $room->display_group ?? 'Tidak Ada';
             return $room;
         });
@@ -38,6 +47,6 @@ class GuestController extends Controller
         $stats = $this->roomStatusService->calculateStats($allRooms);
         $rooms = $this->roomStatusService->paginateRooms($allRooms);
 
-        return view('map', compact('rooms', 'stats'));
+        return view('map', compact('rooms', 'stats', 'allRoomsData'));
     }
 }
