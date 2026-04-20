@@ -646,32 +646,93 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const tombolKelas = document.querySelectorAll('.btn-kelas');
-            tombolKelas.forEach(tombol => {
-                tombol.addEventListener('click', function() {
-                    const ruanganAktif = document.querySelector('.highlight-glow');
-                    if (ruanganAktif) ruanganAktif.classList.remove('highlight-glow');
+        const allRoomsData = @json($allRoomsData);
+        
+        const roomsMap = {};
+        allRoomsData.forEach(room => {
+            roomsMap[room.room_code.toLowerCase()] = room;
+        });
 
-                    const targetId = this.getAttribute('data-target');
+        document.addEventListener('DOMContentLoaded', function() {
+            function highlightRoom(targetId) {
+                const ruanganAktif = document.querySelector('.highlight-glow');
+                if (ruanganAktif) ruanganAktif.classList.remove('highlight-glow');
+
+                if (targetId) {
                     const ruanganDiPeta = document.getElementById(targetId);
                     if (ruanganDiPeta) {
                         ruanganDiPeta.classList.add('highlight-glow');
+                        ruanganDiPeta.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }
+                }
+            }
+
+            const tombolKelas = document.querySelectorAll('.btn-kelas');
+            tombolKelas.forEach(tombol => {
+                tombol.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    highlightRoom(targetId);
                 });
             });
+
+            const searchInput = document.querySelector('input[name="search"]');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        
+                        const searchValue = this.value.toLowerCase().trim();
+                        
+                        if (searchValue === '') {
+                            const ruanganAktif = document.querySelector('.highlight-glow');
+                            if (ruanganAktif) ruanganAktif.classList.remove('highlight-glow');
+                            return;
+                        }
+
+                        let foundRoom = null;
+                        
+                        for (const [code, room] of Object.entries(roomsMap)) {
+                            const roomName = room.name.toLowerCase();
+                            const roomCode = room.room_code.toLowerCase();
+                            
+                            if (roomName.includes(searchValue) || roomCode.includes(searchValue)) {
+                                foundRoom = room;
+                                break;
+                            }
+                        }
+
+                        if (foundRoom) {
+                            const currentFloor = new URLSearchParams(window.location.search).get('floor');
+                            const roomFloor = foundRoom.floor;
+                            
+                            if (currentFloor != roomFloor) {
+                                const url = new URL(window.location);
+                                url.searchParams.set('floor', roomFloor);
+                                url.searchParams.set('search', searchValue); 
+                                url.searchParams.set('page', null);
+                                url.searchParams.set('room', foundRoom.room_code.toLowerCase());
+                                window.location.href = url.toString();
+                            } else {
+                                highlightRoom(foundRoom.room_code.toLowerCase());
+                                searchInput.value = '';
+                            }
+                        } else {
+                            searchInput.value = '';
+                        }
+                    }
+                });
+            }
 
             const urlParams = new URLSearchParams(window.location.search);
             const autoHighlight = urlParams.get('room');
 
             if (autoHighlight) {
-                const targetElement = document.getElementById(autoHighlight);
-                if (targetElement) {
-                    setTimeout(() => {
-                        targetElement.classList.add('highlight-glow');
-                        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 500);
-                }
+                setTimeout(() => {
+                    highlightRoom(autoHighlight);
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                }, 500);
             }
         });
     </script>
