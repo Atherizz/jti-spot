@@ -98,7 +98,7 @@
 
                 <div class="w-full lg:w-auto space-y-4">
                     {{-- Importer Form --}}
-                    <form method="POST" action="{{ route('admin.room.import') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row sm:items-center gap-3 w-full justify-end">
+                    <form method="POST" action="{{ route('admin.schedules.import') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row sm:items-center gap-3 w-full justify-end">
                         @csrf
                         <div class="relative w-full sm:w-auto">
                             <input type="file" name="excel_file" accept=".xlsx,.xls,.csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-ink hover:file:bg-gray-200 transition-colors bg-white border border-gray-200 rounded-xl" />
@@ -154,7 +154,8 @@
                                 <span class="font-bold text-ink text-sm bg-gray-100 px-2.5 py-1 rounded">{{ $schedule->room?->room_code ?? ('ROOM-' . $schedule->room_id) }}</span>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="font-bold text-orange-900 border-b-2 border-orange-100">{{ ($schedule->classGroup?->major ?? '-') . ' ' . ($schedule->classGroup?->name ?? '-') }}</span>
+                                <span class="font-bold text-orange-900 border-b-2 border-orange-100">{{ $schedule->classGroup ? ($schedule->classGroup->major === 'Umum' ? $schedule->classGroup->name : $schedule->classGroup->major . ' ' . $schedule->classGroup->name) : '-' }}
+                                </span>
                             </td>
                             <td class="px-6 py-4">
                                 <span class="font-medium text-ink">{{ $schedule->course_name }}</span>
@@ -233,4 +234,3 @@
     </div>
 
 @endsection
-

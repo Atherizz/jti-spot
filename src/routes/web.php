@@ -60,9 +60,9 @@ Route::middleware(['auth'])->group(function () {
         Route::view('/dashboard', 'admin.dashboard.home')->name('admin.dashboard.home');
         
         Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
-        Route::post('/rooms/import', [RoomImportController::class, 'import'])->name('admin.room.import');
         Route::get('/rooms/{roomCode}', [AdminRoomController::class, 'show'])->name('admin.room.detail');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
+        Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');
 
         Route::resource('users', AdminUserController::class)->except(['show'])->names('admin.users');
     });
