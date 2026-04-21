@@ -60,7 +60,7 @@ class ClassRepTokenController extends Controller
 
             return redirect()
                 ->route('profile.show')
-                ->with('success', 'Berhasil! Role Anda diperbarui menjadi Ketua Kelas.')
+                ->with('success', 'Berhasil! Role Anda diperbarui menjadi Perwakilan Kelas.')
                 ->with('claim_success', true);
         } catch (DomainException $exception) {
             return redirect()

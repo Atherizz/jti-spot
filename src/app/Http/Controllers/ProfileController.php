@@ -22,7 +22,7 @@ class ProfileController extends Controller
 
         $roleLabel = match ($user->role) {
             'admin' => 'Administrator',
-            'class_rep' => 'Ketua Kelas',
+            'class_rep' => 'Perwakilan Kelas',
             default => 'Mahasiswa',
         };
 
