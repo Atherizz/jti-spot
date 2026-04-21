@@ -133,7 +133,7 @@
                                 @php
                                     $roleMap = [
                                         'admin' => ['label' => 'Admin', 'class' => 'bg-orange-50 text-orange-700 border-orange-100'],
-                                        'class_rep' => ['label' => 'Ketua Kelas', 'class' => 'bg-orange-50 text-orange-700 border-orange-100'],
+                                        'class_rep' => ['label' => 'Perwakilan Kelas', 'class' => 'bg-orange-50 text-orange-700 border-orange-100'],
                                         'student' => ['label' => 'Mahasiswa', 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-100'],
                                     ];
 

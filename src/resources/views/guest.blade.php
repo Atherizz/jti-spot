@@ -94,7 +94,7 @@
             @endforeach
         </div>
         
-        <form id="search-form" method="GET" action="{{ url()->current() }}" class="w-full md:w-auto relative group">
+        <form method="GET" action="{{ url()->current() }}" class="w-full md:w-auto relative group">
             @if(request('floor')) <input type="hidden" name="floor" value="{{ request('floor') }}"> @endif
             <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari ruangan (Mis. LSI-1)" class="w-full sm:w-64 pl-9 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-300 text-sm transition-all shadow-sm">
@@ -172,44 +172,3 @@
         {{ $rooms->links() }}
     </div>
 @endsection
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchForm = document.querySelector('form');
-    const searchInput = document.querySelector('input[name="search"]');
-    
-    if (searchForm && searchInput) {
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-        });
-        
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const searchValue = this.value.trim();
-                if (searchValue) {
-                    const currentUrl = new URL(window.location);
-                    currentUrl.searchParams.set('search', searchValue);
-                    currentUrl.hash = '#search-form';
-                    
-                    window.location.href = currentUrl.toString();
-                }
-            }
-        });
-        
-        if (window.location.hash === '#search-form') {
-            setTimeout(() => {
-                const searchForm = document.getElementById('search-form');
-                if (searchForm) {
-                    searchForm.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'center',
-                        inline: 'nearest'
-                    });
-                    searchInput.value = '';
-                }
-            }, 300);
-        }
-    }
-});
-</script>

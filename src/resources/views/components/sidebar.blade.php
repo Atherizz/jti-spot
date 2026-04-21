@@ -6,6 +6,9 @@
         . ($currentRoute === 'profile.show' ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10' : 'text-gray-400 hover:bg-white/5 hover:text-white');
     $userNavClass = 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 '
         . (str_starts_with($currentRoute, 'admin.users.') ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10' : 'text-gray-400 hover:bg-white/5 hover:text-white');
+    // Aktif untuk semua halaman di bawah /student/action/*
+    $actionNavClass = 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 '
+        . (str_starts_with($currentRoute, 'student.action.') ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10' : 'text-gray-400 hover:bg-white/5 hover:text-white');
 @endphp
 
 <aside id="sidebar"
@@ -103,9 +106,9 @@
                 Dashboard
             </a>
 
-            {{-- Pusat Aksi: khusus ketua kelas --}}
             @can('class_rep')
-                <a href="#" class="{{ $navClass('student.action-center') }}">
+                {{-- Pusat Aksi: hanya tersedia untuk ketua kelas --}}
+                <a href="{{ route('student.action.center') }}" class="{{ $actionNavClass }}">
                     <svg class="w-5 h-5 shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -155,9 +158,9 @@
                         Administrator Utama
                     @elsecan('class_rep') 
                         @if(auth()->user()->classGroup)
-                            {{ auth()->user()->classGroup->name }} &bull; Ketua
+                            {{ auth()->user()->classGroup->name }} &bull; Perwakilan Kelas
                         @else
-                            Ketua Kelas
+                            Perwakilan Kelas
                         @endif
                     @else
                         @if(auth()->user()->classGroup)
