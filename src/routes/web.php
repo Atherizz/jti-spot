@@ -57,7 +57,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('admin')->middleware('can:admin')->group(function () {
-        Route::view('/dashboard', 'admin.dashboard.home')->name('admin.dashboard.home');
+        Route::get('/dashboard', [AdminScheduleController::class, 'dashboard'])->name('admin.dashboard.home');
         
         Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
         Route::post('/rooms/import', [RoomImportController::class, 'import'])->name('admin.room.import');
