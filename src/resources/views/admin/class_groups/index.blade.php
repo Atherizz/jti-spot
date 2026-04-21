@@ -4,6 +4,8 @@
 
 @section('content')
     @php
+        $generateTokenRouteTemplate = route('admin.class-groups.generate-token', ['classGroup' => '__CLASS_GROUP_ID__']);
+
         $serializedClassGroups = $classGroups
             ->map(fn ($classGroup) => [
                 'id' => $classGroup->id,
@@ -27,6 +29,20 @@
             </p>
         </div>
     </div>
+
+    @if (session('success'))
+        <div class="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-800 flex items-center gap-2">
+            <svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            {{ session('error') }}
+        </div>
+    @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="lg:col-span-1 bg-white editorial-panel p-6">
@@ -73,6 +89,16 @@
                     <p class="text-[11px] uppercase tracking-widest font-semibold text-ink/50 mb-2">Access Token</p>
                     <div class="rounded-xl bg-ink px-4 py-3 text-sm sm:text-base font-mono font-semibold text-orange-200 break-all" id="token-value">-</div>
                 </div>
+
+                <form id="generate-token-form" method="POST" action="#" class="mt-5" onsubmit="return confirm('Generate ulang token untuk kelas ini? Token lama akan tidak berlaku.')">
+                    @csrf
+                    <button id="generate-token-button" type="submit" disabled class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl transition-colors bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Generate Ulang Token
+                    </button>
+                </form>
             </div>
         </section>
 
@@ -85,6 +111,7 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Prodi</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Kelas</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Access Token</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -93,10 +120,21 @@
                                 <td class="px-4 py-3 text-sm font-semibold text-ink">{{ strtoupper((string) $classGroup->major) }}</td>
                                 <td class="px-4 py-3 text-sm font-semibold text-ink">{{ strtoupper((string) $classGroup->name) }}</td>
                                 <td class="px-4 py-3 text-sm font-mono text-ink/80">{{ $classGroup->access_token ?? '-' }}</td>
+                                <td class="px-4 py-3">
+                                    <form method="POST" action="{{ route('admin.class-groups.generate-token', $classGroup) }}" onsubmit="return confirm('Generate ulang token untuk kelas {{ strtoupper((string) $classGroup->major) }}{{ strtoupper((string) $classGroup->name) }}?')">
+                                        @csrf
+                                        <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-ink hover:bg-ink/90 transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                            </svg>
+                                            Generate Ulang
+                                        </button>
+                                    </form>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="px-4 py-10 text-center text-sm font-medium text-gray-500">Data kelas belum tersedia.</td>
+                                <td colspan="4" class="px-4 py-10 text-center text-sm font-medium text-gray-500">Data kelas belum tersedia.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -115,6 +153,9 @@
             const tokenMajor = document.getElementById('token-major');
             const tokenClass = document.getElementById('token-class');
             const tokenValue = document.getElementById('token-value');
+            const generateTokenForm = document.getElementById('generate-token-form');
+            const generateTokenButton = document.getElementById('generate-token-button');
+            const generateTokenRouteTemplate = @json($generateTokenRouteTemplate);
 
             let selectedMajor = 'TI';
 
@@ -145,11 +186,15 @@
                 tokenMajor.textContent = item.major;
                 tokenClass.textContent = item.name;
                 tokenValue.textContent = item.access_token ?? '-';
+                generateTokenForm.action = generateTokenRouteTemplate.replace('__CLASS_GROUP_ID__', String(item.id));
+                generateTokenButton.disabled = false;
             };
 
             const resetSelection = () => {
                 tokenCard.classList.add('hidden');
                 emptyState.classList.remove('hidden');
+                generateTokenForm.action = '#';
+                generateTokenButton.disabled = true;
             };
 
             const buildClassOptions = () => {

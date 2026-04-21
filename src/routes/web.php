@@ -64,6 +64,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
         Route::get('/rooms/{roomCode}', [AdminRoomController::class, 'show'])->name('admin.room.detail');
         Route::get('/class-groups', [AdminClassGroupController::class, 'index'])->name('admin.class-groups.index');
+        Route::post('/class-groups/{classGroup}/generate-token', [AdminClassGroupController::class, 'generateToken'])
+            ->name('admin.class-groups.generate-token');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
         Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');
 
