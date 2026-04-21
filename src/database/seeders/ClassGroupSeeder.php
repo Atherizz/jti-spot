@@ -45,6 +45,7 @@ class ClassGroupSeeder extends Seeder
                     'name' => $className,
                     'major' => 'SIB',
                     'access_token' => $buildToken('SIB', $className),
+                    'token_quota' => 3,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -56,6 +57,7 @@ class ClassGroupSeeder extends Seeder
                     'name' => $className,
                     'major' => 'TI',
                     'access_token' => $buildToken('TI', $className),
+                    'token_quota' => 3,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -69,6 +71,7 @@ class ClassGroupSeeder extends Seeder
         foreach ($specialClasses as $class) {
             $classGroups[] = array_merge($class, [
                 'access_token' => $buildToken($class['major'], $class['name']),
+                'token_quota' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -95,5 +98,12 @@ class ClassGroupSeeder extends Seeder
                     'updated_at' => now(),
                 ]);
         }
+
+        DB::table('class_groups')
+            ->whereNull('token_quota')
+            ->update([
+                'token_quota' => 3,
+                'updated_at' => now(),
+            ]);
     }
 }

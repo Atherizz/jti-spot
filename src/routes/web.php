@@ -16,6 +16,7 @@ use App\Http\Controllers\GuestController;
 use App\Http\Controllers\AdminRoomController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\RoomQrPdfController;
+use App\Http\Controllers\ClassRepTokenController;
 
 Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip');
 Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
@@ -57,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/scan/claim/{qr_token}', [RoomActionController::class, 'initiateClaim'])
              ->middleware('check.location')
              ->name('scan.claim');
+
+        Route::post('/claim-class-rep-token', [ClassRepTokenController::class, 'claim'])
+            ->name('student.claim.class-rep-token');
     });
 
     Route::prefix('admin')->middleware('can:admin')->group(function () {
