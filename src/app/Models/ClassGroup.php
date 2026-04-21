@@ -9,6 +9,7 @@ class ClassGroup extends Model
     protected $fillable = [
         'name',
         'major',
+        'access_token',
     ];
 
     /**
