@@ -52,6 +52,9 @@ class RoomImportController extends Controller
                 &$scheduleInserted,
                 &$scheduleUpdated
             ) {
+                // Hapus data jadwal yang lama sebelum menimpa dengan hasil import baru
+                Schedule::query()->delete();
+
                 foreach (array_slice($rows, 1) as $rowIndex => $rowValues) {
                     $lineNumber = $rowIndex + 2;
                     $row = $this->toAssocRow($headers, $rowValues);
@@ -61,7 +64,7 @@ class RoomImportController extends Controller
                     }
 
                     $roomCode = strtoupper((string) ($row['room_code'] ?? $row['kode_ruang'] ?? ''));
-                    $roomName = (string) ($row['room_name'] ?? $row['nama_ruang'] ?? $row['name'] ?? '');
+                    $roomName = (string) ($row['room'] ?? $row['room_name'] ?? $row['nama_ruang'] ?? $row['name'] ?? '');
                     $status = strtolower((string) ($row['status'] ?? $row['current_status'] ?? 'available'));
                     $floor = $this->toNullableInt($row['floor'] ?? $row['lantai'] ?? null);
 
@@ -99,14 +102,16 @@ class RoomImportController extends Controller
                         $roomUpdated++;
                     }
 
-                    $courseName = trim((string) ($row['course_name'] ?? $row['mata_kuliah'] ?? $row['course'] ?? ''));
-                    $classGroupName = trim((string) ($row['class_group'] ?? $row['class_name'] ?? $row['kelas'] ?? ''));
+                    $courseName = trim((string) ($row['course_code'] ?? $row['course_name'] ?? $row['mata_kuliah'] ?? $row['course'] ?? ''));
+                    $classGroupName = trim((string) ($row['class_name'] ?? $row['class_group'] ?? $row['kelas'] ?? ''));
                     $majorName = trim((string) ($row['major'] ?? $row['jurusan'] ?? 'Umum'));
-                    $dayOfWeek = $this->parseDayOfWeek($row['day_of_week'] ?? $row['day'] ?? $row['hari'] ?? null);
+                    $dayOfWeek = $this->parseDayOfWeek($row['day'] ?? $row['day_name'] ?? $row['day_of_week'] ?? $row['hari'] ?? null);
+                    $startPeriod = $this->toNullableInt($row['start_period'] ?? null);
+                    $endPeriod = $this->toNullableInt($row['end_period'] ?? null);
                     $startTime = $this->parseTimeValue($row['start_time'] ?? $row['jam_mulai'] ?? null);
                     $endTime = $this->parseTimeValue($row['end_time'] ?? $row['jam_selesai'] ?? null);
 
-                    if ($courseName === '' || $classGroupName === '' || $dayOfWeek === null || $startTime === null || $endTime === null) {
+                    if ($courseName === '' || $classGroupName === '' || $dayOfWeek === null || $startPeriod === null || $endPeriod === null || $startTime === null || $endTime === null) {
                         continue;
                     }
 
@@ -120,6 +125,8 @@ class RoomImportController extends Controller
                     $schedule = Schedule::where('room_id', $room->id)
                         ->where('class_group_id', $classGroup->id)
                         ->where('day_of_week', $dayOfWeek)
+                        ->where('start_period', $startPeriod)
+                        ->where('end_period', $endPeriod)
                         ->where('start_time', $startTime)
                         ->where('end_time', $endTime)
                         ->where('course_name', $courseName)
@@ -132,6 +139,8 @@ class RoomImportController extends Controller
                             'room_id' => $room->id,
                             'class_group_id' => $classGroup->id,
                             'day_of_week' => $dayOfWeek,
+                            'start_period' => $startPeriod,
+                            'end_period' => $endPeriod,
                             'start_time' => $startTime,
                             'end_time' => $endTime,
                             'course_name' => $courseName,

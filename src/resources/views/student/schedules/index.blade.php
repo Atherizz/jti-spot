@@ -22,9 +22,6 @@
             
             <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-col shadow-sm">
-                        <span class="font-display font-bold text-ink leading-none">{{ substr($day['day'], 0, 3) }}</span>
-                    </div>
                     <h2 class="font-display text-xl font-bold text-ink">{{ $day['day'] }}</h2>
                 </div>
                 

@@ -120,67 +120,39 @@
                     <table class="w-full">
                         <thead>
                             <tr class="bg-gray-50/50 border-b border-gray-100 text-left">
-                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Aktor / Obyek</th>
-                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Waktu Transaksi</th>
-                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Metode Validasi</th>
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Nama</th>
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Waktu Scan</th>
+                                <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest">Status Validasi</th>
                                 <th class="px-6 py-4 font-display text-[10px] font-bold text-ink/50 uppercase tracking-widest text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-ink text-sm">Budi Santoso</p>
-                                    <p class="text-[10px] font-mono text-gray-400 mt-0.5">2141720001</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-ink text-sm">08:15 AM</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-50 text-orange-600 uppercase tracking-widest border border-orange-100">WiFi Poin</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="inline-flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-widest">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                        Sukses
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-ink text-sm">Siti Aminah</p>
-                                    <p class="text-[10px] font-mono text-gray-400 mt-0.5">2141720002</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-ink text-sm">08:12 AM</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 uppercase tracking-widest border border-blue-100">Satelit GPS</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="inline-flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-widest">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-                                        Sukses
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50/50 transition-colors bg-rose-50/20">
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-rose-900 text-sm">Entitas Anonim</p>
-                                    <p class="text-[10px] font-mono text-rose-400 mt-0.5">Tidak DIkenali</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <p class="font-bold text-ink text-sm">07:59 AM</p>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 uppercase tracking-widest border border-gray-200">Gagal Validasi</span>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <div class="inline-flex items-center gap-1.5 text-rose-600 font-bold text-xs uppercase tracking-widest">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>
-                                        Ditolak Mismatch
-                                    </div>
-                                </td>
-                            </tr>
+                            @forelse($recentLogs as $log)
+                                <tr class="hover:bg-gray-50/50 transition-colors {{ $log->event_type === 'SCAN_FAILED' ? 'bg-rose-50/20' : '' }}">
+                                    <td class="px-6 py-4">
+                                        <p class="font-bold {{ $log->event_type === 'SCAN_FAILED' ? 'text-rose-900' : 'text-ink' }} text-sm">{{ $log->user->name ?? 'Entitas Anonim' }}</p>
+                                        <p class="text-[10px] font-mono {{ $log->event_type === 'SCAN_FAILED' ? 'text-rose-400' : 'text-gray-400' }} mt-0.5">{{ $log->user->reg_number ?? 'Tidak Dikenali' }}</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p class="font-bold text-ink text-sm">{{ $log->created_at->format('h:i A') }}</p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold {{ $log->event_type === 'SCAN_SUCCESS' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-gray-100 text-gray-500 border border-gray-200' }} uppercase tracking-widest">
+                                            {{ $log->event_type === 'SCAN_SUCCESS' ? 'Sistem QR' : 'Gagal Validasi' }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="inline-flex items-center gap-1.5 {{ $log->event_type === 'SCAN_SUCCESS' ? 'text-emerald-600' : 'text-rose-600' }} font-bold text-xs uppercase tracking-widest">
+                                            <div class="w-1.5 h-1.5 rounded-full {{ $log->event_type === 'SCAN_SUCCESS' ? 'bg-emerald-500' : 'bg-rose-500' }}"></div>
+                                            {{ $log->event_type === 'SCAN_SUCCESS' ? 'Sukses' : 'Ditolak' }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-gray-500 font-medium">Belum ada data log aktivitas untuk ruangan ini.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

@@ -10,11 +10,14 @@ use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentScheduleController;
 use App\Http\Controllers\StudentActionController;
 use App\Http\Controllers\AdminScheduleController;
+use App\Http\Controllers\AdminClassGroupController;
 use App\Models\Room;
 use Carbon\Carbon;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\AdminRoomController;
 use App\Http\Controllers\DebugController;
+use App\Http\Controllers\RoomQrPdfController;
+use App\Http\Controllers\ClassRepTokenController;
 
 Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip');
 Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
@@ -40,6 +43,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('student.schedules');
 
         Route::post('/attendance/confirm', [RoomActionController::class, 'confirmWithoutScan'])
+            ->middleware('check.location') 
             ->name('student.attendance.confirm');
 
         Route::get('/scan/{qr_token}', [RoomActionController::class, 'scanInitial'])
@@ -74,15 +78,21 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/action/history', [StudentActionController::class, 'history'])
                 ->name('student.action.history');
         });
+        Route::post('/claim-class-rep-token', [ClassRepTokenController::class, 'claim'])
+            ->name('student.claim.class-rep-token');
     });
 
     Route::prefix('admin')->middleware('can:admin')->group(function () {
-        Route::view('/dashboard', 'admin.dashboard.home')->name('admin.dashboard.home');
+        Route::get('/dashboard', [AdminScheduleController::class, 'dashboard'])->name('admin.dashboard.home');
         
         Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
-        Route::post('/rooms/import', [RoomImportController::class, 'import'])->name('admin.room.import');
+        Route::get('/rooms/qr-print-all', [RoomQrPdfController::class, 'printAll'])->name('admin.rooms.qr.print.all');
         Route::get('/rooms/{roomCode}', [AdminRoomController::class, 'show'])->name('admin.room.detail');
+        Route::get('/class-groups', [AdminClassGroupController::class, 'index'])->name('admin.class-groups.index');
+        Route::post('/class-groups/{classGroup}/generate-token', [AdminClassGroupController::class, 'generateToken'])
+            ->name('admin.class-groups.generate-token');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
+        Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');
 
         Route::resource('users', AdminUserController::class)->except(['show'])->names('admin.users');
     });

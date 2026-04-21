@@ -50,6 +50,12 @@ class AdminRoomController extends Controller
             $room = Room::findOrFail((int) $roomCode);
         }
 
-        return view('admin.room.detail', compact('room'));
+        $recentLogs = \App\Models\ActivityLog::with('user')
+            ->where('room_id', $room->id)
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('admin.room.detail', compact('room', 'recentLogs'));
     }
 }

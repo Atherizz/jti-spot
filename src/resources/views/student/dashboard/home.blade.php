@@ -37,7 +37,7 @@
 
     {{-- Page Header --}}
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 stagger-1">
-        <div>
+        <div>   
             <div class="flex items-center gap-2 mb-2">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500"></span>
                 <span class="font-display text-[11px] font-bold uppercase tracking-widest text-ink/50">Terminal Mahasiswa</span>
