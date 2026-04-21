@@ -219,7 +219,7 @@
 						</div>
 					</div>
 
-					<form method="POST" action="{{ route('student.claim.class-rep-token') }}" class="space-y-5" onsubmit="const btn = this.querySelector('button[type=submit]'); btn.disabled = true; btn.classList.add('opacity-75', 'cursor-not-allowed'); btn.innerHTML = 'Memproses...';">
+					<form id="claim-token-form" method="POST" action="{{ route('student.claim.class-rep-token') }}" class="space-y-5">
 						@csrf
 						<div>
 							<label for="claim-token-input" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Access Token</label>
@@ -239,11 +239,35 @@
 							<button type="button" onclick="document.getElementById('claim-token-modal').classList.add('hidden')" class="w-full sm:w-auto flex-1 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-ink text-sm font-semibold rounded-xl transition-colors border border-gray-200">
 								Batal
 							</button>
-							<button type="submit" class="w-full sm:w-auto flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+							<button id="claim-token-submit-button" type="button" onclick="openClaimConfirmModal()" class="w-full sm:w-auto flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
 								Klaim Token
 							</button>
 						</div>
 					</form>
+				</div>
+			</div>
+		</div>
+
+		<div id="claim-confirm-modal" class="hidden fixed inset-0 z-[101] flex items-center justify-center p-4">
+			<div class="fixed inset-0 bg-ink/60 backdrop-blur-sm transition-opacity" onclick="document.getElementById('claim-confirm-modal').classList.add('hidden')"></div>
+			<div class="relative editorial-panel bg-white shadow-2xl w-[90%] md:w-full mx-auto p-8 overflow-hidden transform transition-all" style="max-width: 460px;">
+				<div class="absolute right-0 top-0 w-32 h-32 bg-orange-50 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+				<div class="relative z-10 text-center">
+					<div class="w-16 h-16 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-5 ring-4 ring-white border border-orange-100">
+						<svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+					</div>
+					<h3 class="font-display text-2xl font-bold text-ink mb-2">Konfirmasi Klaim</h3>
+					<p class="text-sm font-medium text-gray-600 mb-6">Setelah lanjut, role akun Anda akan diubah menjadi Ketua Kelas. Pastikan token yang dimasukkan sudah benar.</p>
+
+					<div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+						<button type="button" onclick="document.getElementById('claim-confirm-modal').classList.add('hidden')" class="w-full sm:w-auto flex-1 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-ink text-sm font-semibold rounded-xl transition-colors border border-gray-200">
+							Batal
+						</button>
+						<button type="button" onclick="submitClaimTokenForm()" class="w-full sm:w-auto flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+							Ya, Ubah Role
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -255,6 +279,33 @@
 				});
 			</script>
 		@endif
+
+		<script>
+			function openClaimConfirmModal() {
+				const form = document.getElementById('claim-token-form');
+
+				if (!form || !form.reportValidity()) {
+					return;
+				}
+
+				document.getElementById('claim-confirm-modal')?.classList.remove('hidden');
+			}
+
+			function submitClaimTokenForm() {
+				const form = document.getElementById('claim-token-form');
+				const submitButton = document.getElementById('claim-token-submit-button');
+
+				if (!form || !submitButton) {
+					return;
+				}
+
+				submitButton.disabled = true;
+				submitButton.classList.add('opacity-75', 'cursor-not-allowed');
+				submitButton.innerHTML = 'Memproses...';
+
+				form.submit();
+			}
+		</script>
 	@endif
 
 	@if (session('claim_success') && $user->role === 'class_rep')
