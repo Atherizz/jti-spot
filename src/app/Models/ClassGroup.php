@@ -10,6 +10,7 @@ class ClassGroup extends Model
         'name',
         'major',
         'access_token',
+        'token_quota',
     ];
 
     /**
