@@ -319,7 +319,7 @@
 						<svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"/></svg>
 					</div>
 					<h3 class="font-display text-2xl font-bold text-ink mb-2">Selamat!</h3>
-					<p class="text-sm font-medium text-gray-600 mb-6">Anda sekarang terdaftar sebagai Ketua Kelas. Akses peran class representative sudah aktif.</p>
+					<p class="text-sm font-medium text-gray-600 mb-6">Anda sekarang terdaftar sebagai Perwakilan Kelas. Akses peran 'Perwakilan Kelas' sudah aktif.</p>
 
 					<button type="button" onclick="document.getElementById('claim-success-modal').classList.add('hidden')" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
 						Tutup

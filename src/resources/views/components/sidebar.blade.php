@@ -170,9 +170,9 @@
                         Administrator Utama
                     @elsecan('class_rep') 
                         @if(auth()->user()->classGroup)
-                            {{ auth()->user()->classGroup->name }} &bull; Ketua
+                            {{ auth()->user()->classGroup->name }} &bull; Perwakilan Kelas
                         @else
-                            Ketua Kelas
+                            Perwakilan Kelas
                         @endif
                     @else
                         @if(auth()->user()->classGroup)
