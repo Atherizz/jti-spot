@@ -12,6 +12,7 @@
                 'major' => strtoupper((string) $classGroup->major),
                 'name' => strtoupper((string) $classGroup->name),
                 'access_token' => $classGroup->access_token,
+                'token_quota' => (int) ($classGroup->token_quota ?? 0),
             ])
             ->values();
     @endphp
@@ -90,6 +91,11 @@
                     <div class="rounded-xl bg-ink px-4 py-3 text-sm sm:text-base font-mono font-semibold text-orange-200 break-all" id="token-value">-</div>
                 </div>
 
+                <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/60 px-4 py-3">
+                    <p class="text-[11px] uppercase tracking-widest font-semibold text-emerald-700">Sisa Kuota</p>
+                    <p class="mt-1 text-lg font-display font-bold text-emerald-700" id="token-quota-value">0/3</p>
+                </div>
+
                 <form id="generate-token-form" method="POST" action="#" class="mt-5" onsubmit="return confirm('Generate ulang token untuk kelas ini? Token lama akan tidak berlaku.')">
                     @csrf
                     <button id="generate-token-button" type="submit" disabled class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-xl transition-colors bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-orange-500">
@@ -115,12 +121,13 @@
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Prodi</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Kelas</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Access Token</th>
+                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Sisa Kuota</th>
                             <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="summary-table-body" class="divide-y divide-gray-100">
                         <tr>
-                            <td colspan="4" class="px-4 py-10 text-center text-sm font-medium text-gray-500">Memuat data kelas...</td>
+                            <td colspan="5" class="px-4 py-10 text-center text-sm font-medium text-gray-500">Memuat data kelas...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -163,6 +170,7 @@
             const tokenMajor = document.getElementById('token-major');
             const tokenClass = document.getElementById('token-class');
             const tokenValue = document.getElementById('token-value');
+            const tokenQuotaValue = document.getElementById('token-quota-value');
             const generateTokenForm = document.getElementById('generate-token-form');
             const generateTokenButton = document.getElementById('generate-token-button');
             const generateTokenRouteTemplate = @json($generateTokenRouteTemplate);
@@ -252,6 +260,7 @@
                 tokenMajor.textContent = item.major;
                 tokenClass.textContent = item.name;
                 tokenValue.textContent = item.access_token ?? '-';
+                tokenQuotaValue.textContent = `${item.token_quota ?? 0}/3`;
                 generateTokenForm.action = generateTokenRouteTemplate.replace('__CLASS_GROUP_ID__', String(item.id));
                 generateTokenButton.disabled = false;
             };
@@ -285,7 +294,7 @@
                 });
 
                 if (!summaryPage.items.length) {
-                    summaryTableBody.innerHTML = '<tr><td colspan="4" class="px-4 py-10 text-center text-sm font-medium text-gray-500">Data kelas belum tersedia.</td></tr>';
+                    summaryTableBody.innerHTML = '<tr><td colspan="5" class="px-4 py-10 text-center text-sm font-medium text-gray-500">Data kelas belum tersedia.</td></tr>';
                     return;
                 }
 
@@ -294,6 +303,7 @@
                         <td class="px-4 py-3 text-sm font-semibold text-ink">${item.major}</td>
                         <td class="px-4 py-3 text-sm font-semibold text-ink">${item.name}</td>
                         <td class="px-4 py-3 text-sm font-mono text-ink/80">${item.access_token ?? '-'}</td>
+                        <td class="px-4 py-3 text-sm font-semibold text-emerald-700">${Number(item.token_quota ?? 0)}/3</td>
                         <td class="px-4 py-3">
                             <form method="POST" action="${generateTokenRouteTemplate.replace('__CLASS_GROUP_ID__', String(item.id))}" onsubmit="return confirm('Generate ulang token untuk kelas ${item.major}${item.name}?')">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
