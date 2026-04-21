@@ -39,6 +39,7 @@ Route::middleware(['auth'])->group(function () {
             ->name('student.schedules');
 
         Route::post('/attendance/confirm', [RoomActionController::class, 'confirmWithoutScan'])
+            ->middleware('check.location') 
             ->name('student.attendance.confirm');
 
         Route::get('/scan/{qr_token}', [RoomActionController::class, 'scanInitial'])
