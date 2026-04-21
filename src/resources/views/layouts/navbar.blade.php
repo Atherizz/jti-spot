@@ -5,7 +5,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="/">
-                        <img src="{{ asset('images/logo1.png') }}" alt="Logo JTISpot" class="h-[40px] w-auto hover:opacity-90 transition-opacity">
+                        <img src="{{ asset('images/logo5.png') }}" alt="Logo JTISpot" class="h-[40px] w-auto hover:opacity-90 transition-opacity">
                     </a>
                 </div>
 
