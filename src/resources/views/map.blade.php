@@ -11,7 +11,8 @@
                     Peta Ruang Kampus
                 </h1>
                 <p class="text-base font-medium max-w-lg mt-3 text-ink/60">
-                    Lihat status ruang secara visual berdasarkan lantai. Klik opsi lantai untuk fokus pada area tertentu.
+                    Lihat status ruang secara visual berdasarkan lantai. <br>
+                    Klik opsi lantai untuk fokus pada area tertentu.
                 </p>
             </div>
             <a href="/" class="editorial-panel bg-white px-6 py-4 flex flex-col justify-center items-center text-center self-start md:self-end hover:bg-gray-50 transition-colors group">
