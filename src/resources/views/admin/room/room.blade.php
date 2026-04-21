@@ -131,16 +131,6 @@
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center gap-3">
-                    <form method="POST" action="{{ route('admin.room.import') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-                        @csrf
-                        <div class="relative w-full sm:w-auto">
-                            <input type="file" name="excel_file" accept=".xlsx,.xls,.csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-ink hover:file:bg-gray-200 transition-colors bg-white border border-gray-200 rounded-xl" />
-                        </div>
-                        <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white border border-gray-200 text-ink text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm shrink-0">
-                            Sinkronisasi Batch
-                        </button>
-                    </form>
-
                     <form method="GET" action="{{ route('admin.room.room') }}" class="flex items-center gap-3 w-full sm:w-auto">
                         <div class="relative w-full sm:w-64">
                             <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

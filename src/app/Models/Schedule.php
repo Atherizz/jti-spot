@@ -10,6 +10,8 @@ class Schedule extends Model
         'room_id',
         'class_group_id',
         'day_of_week',
+        'start_period',
+        'end_period',
         'start_time',
         'end_time',
         'course_name',
