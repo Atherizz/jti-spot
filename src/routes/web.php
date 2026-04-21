@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomActionController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentScheduleController;
+use App\Http\Controllers\StudentActionController;
 use App\Http\Controllers\AdminScheduleController;
 use App\Http\Controllers\AdminClassGroupController;
 use App\Models\Room;
@@ -59,6 +60,24 @@ Route::middleware(['auth'])->group(function () {
              ->middleware('check.location')
              ->name('scan.claim');
 
+        // ── Pusat Aksi (Hanya Ketua Kelas) ──────────────────────────
+        Route::middleware('can:class_rep')->group(function () {
+            Route::get('/action', [StudentActionController::class, 'center'])
+                ->name('student.action.center');
+
+            Route::get('/action/reservasi', [StudentActionController::class, 'showReservasi'])
+                ->name('student.action.reservasi');
+            Route::post('/action/reservasi', [StudentActionController::class, 'storeReservasi'])
+                ->name('student.action.reservasi.store');
+
+            Route::get('/action/pembatalan', [StudentActionController::class, 'showPembatalan'])
+                ->name('student.action.pembatalan');
+            Route::post('/action/pembatalan', [StudentActionController::class, 'storePembatalan'])
+                ->name('student.action.pembatalan.store');
+
+            Route::get('/action/history', [StudentActionController::class, 'history'])
+                ->name('student.action.history');
+        });
         Route::post('/claim-class-rep-token', [ClassRepTokenController::class, 'claim'])
             ->name('student.claim.class-rep-token');
     });
