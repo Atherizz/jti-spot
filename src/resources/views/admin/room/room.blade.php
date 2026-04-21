@@ -68,12 +68,21 @@
                         Kelola seluruh data ruangan kelas, verifikasi fasilitas, dan pantau status ketersediaan secara sentralistik.
                     </p>
                 </div>
-                <button class="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-ink rounded-xl hover:bg-ink/90 transition-all shadow-sm shadow-ink/10 shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    Entri Ruang Baru
-                </button>
+                <div class="flex items-center gap-2 shrink-0">
+                    <a href="{{ route('admin.rooms.qr.print.all') }}" target="_blank"
+                       class="inline-flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold text-ink bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
+                        <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6v-8z"/>
+                        </svg>
+                        Print Semua QR
+                    </a>
+                    <button class="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-ink rounded-xl hover:bg-ink/90 transition-all shadow-sm shadow-ink/10">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Entri Ruang Baru
+                    </button>
+                </div>
             </div>
         </div>
     </div>
