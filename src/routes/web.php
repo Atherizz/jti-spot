@@ -9,6 +9,7 @@ use App\Http\Controllers\RoomActionController;
 use App\Http\Controllers\StudentDashboardController;
 use App\Http\Controllers\StudentScheduleController;
 use App\Http\Controllers\AdminScheduleController;
+use App\Http\Controllers\AdminClassGroupController;
 use App\Models\Room;
 use Carbon\Carbon;
 use App\Http\Controllers\GuestController;
@@ -62,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
         
         Route::get('/rooms', [AdminRoomController::class, 'index'])->name('admin.room.room');
         Route::get('/rooms/{roomCode}', [AdminRoomController::class, 'show'])->name('admin.room.detail');
+        Route::get('/class-groups', [AdminClassGroupController::class, 'index'])->name('admin.class-groups.index');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
         Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');
 
