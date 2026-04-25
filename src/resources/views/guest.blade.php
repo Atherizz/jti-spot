@@ -16,9 +16,10 @@
                     Pantau ketersediaan lab dan ruang kelas secara real-time berdasarkan data sinkronisasi otomatis.
                 </p>
             </div>
-            <div class="editorial-panel bg-white px-6 py-4 flex flex-col justify-center items-center text-center self-start md:self-end">
+            <div class="editorial-panel bg-white px-6 py-4 flex flex-col justify-center items-center text-center self-start md:self-end" id="update-widget">
                 <span class="block text-[10px] font-semibold uppercase tracking-widest text-ink/40 mb-1">Update Terakhir</span>
-                <span class="font-display text-lg font-bold text-ink">1 Menit Lalu</span>
+                <span class="font-display text-lg font-bold text-ink" id="last-update-time">{{ now()->format('H:i:s') }}</span>
+                <span class="text-[10px] text-ink/40 mt-0.5" id="next-update-label">refresh dalam <span id="countdown">60</span>d</span>
             </div>
         </div>
         <div class="absolute left-0 top-0 w-64 h-64 bg-orange-50 rounded-full blur-3xl -translate-x-1/4 -translate-y-1/4 pointer-events-none z-0"></div>
@@ -37,10 +38,10 @@
                 </div>
             </div>
             <div class="relative z-10">
-                <div class="font-display text-6xl font-bold tracking-tight mb-3">{{ $stats['available'] ?? 0 }}</div>
+                <div class="font-display text-6xl font-bold tracking-tight mb-3" id="stat-available">{{ $stats['available'] ?? 0 }}</div>
                 <div class="font-medium bg-white/10 text-white inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs box-shadow-sm backdrop-blur-sm">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    <span>+{{ max(0, ($stats['available'] ?? 0) - ($stats['occupied'] ?? 0)) }} dibanding terisi</span>
+                    <span id="stat-diff">+{{ max(0, ($stats['available'] ?? 0) - ($stats['occupied'] ?? 0)) }} dibanding terisi</span>
                 </div>
             </div>
         </div>
@@ -51,7 +52,7 @@
                 <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-orange-50 rounded-full blur-xl"></div>
                 <h3 class="font-display font-semibold text-[11px] uppercase tracking-widest text-ink/40 mb-6">Kosong &lt; 15 Menit</h3>
                 <div class="mt-auto relative z-10">
-                    <div class="font-display text-4xl font-bold mb-1 text-orange-600">{{ $stats['soon'] ?? 0 }}</div>
+                    <div class="font-display text-4xl font-bold mb-1 text-orange-600" id="stat-soon">{{ $stats['soon'] ?? 0 }}</div>
                     <p class="font-medium text-xs text-ink/50">Ruang segera bebas digunakan.</p>
                 </div>
             </div>
@@ -59,9 +60,9 @@
             <div class="editorial-panel bg-white p-6 flex flex-col relative">
                 <h3 class="font-display font-semibold text-[11px] uppercase tracking-widest text-ink/40 mb-6">Ruang Terpakai</h3>
                 <div class="mt-auto">
-                    <div class="font-display text-4xl font-bold mb-3 text-ink">{{ $stats['occupied'] ?? 0 }}</div>
+                    <div class="font-display text-4xl font-bold mb-3 text-ink" id="stat-occupied">{{ $stats['occupied'] ?? 0 }}</div>
                     <div class="w-full bg-gray-100 rounded-full h-1.5">
-                        <div class="bg-orange-600 h-full rounded-full" style="width: {{ $rooms->total() ? round(($stats['occupied'] ?? 0) / $rooms->total() * 100) : 0 }}%"></div>
+                        <div class="bg-orange-600 h-full rounded-full" id="stat-occupied-bar" style="width: {{ $rooms->total() ? round(($stats['occupied'] ?? 0) / $rooms->total() * 100) : 0 }}%"></div>
                     </div>
                 </div>
             </div>
@@ -69,7 +70,7 @@
             <div class="sm:col-span-2 editorial-panel bg-ink text-white p-6 flex items-center justify-between">
                 <div>
                     <h3 class="font-display font-medium text-[11px] uppercase tracking-widest text-white/50 mb-2">Penggunaan Lab Aktual</h3>
-                    <div class="font-display text-3xl font-bold text-white">{{ $stats['labUsage'] ?? 0 }}%</div>
+                    <div class="font-display text-3xl font-bold text-white" id="stat-lab">{{ $stats['labUsage'] ?? 0 }}%</div>
                 </div>
                 <div class="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
                     <svg class="w-6 h-6 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
@@ -171,4 +172,165 @@
             </div> @endforeach </div> <div class="mt-8">
         {{ $rooms->links() }}
     </div>
+@push('scripts')
+<script>
+(function () {
+    const POLL_INTERVAL = 30; // detik
+
+    // ── Status color maps ────────────────────────────────────────────────────
+    const statusBadge = {
+        available : 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+        waiting   : 'bg-orange-50 text-orange-700 ring-orange-200',
+        occupied  : 'bg-red-50 text-red-700 ring-red-200',
+    };
+    const statusDot = {
+        available : 'bg-emerald-500',
+        waiting   : 'bg-orange-500',
+        occupied  : 'bg-red-500',
+    };
+    const statusBar = {
+        available : 'bg-emerald-500',
+        waiting   : 'bg-orange-500',
+        occupied  : 'bg-red-500',
+    };
+
+    // ── Build query string dari URL saat ini (preserve floor & search) ───────
+    function getLiveUrl() {
+        const params = new URLSearchParams(window.location.search);
+        // Hapus 'page' — live data selalu hal 1 agar konsisten dengan view
+        params.delete('page');
+        return '/live-data?' + params.toString();
+    }
+
+    // ── Render satu card ruangan ─────────────────────────────────────────────
+    function buildCard(room) {
+        const badge  = statusBadge[room.current_status] ?? 'bg-gray-50 text-gray-700 ring-gray-200';
+        const dot    = statusDot[room.current_status]   ?? 'bg-gray-500';
+        const bar    = statusBar[room.current_status]   ?? 'bg-gray-500';
+        const mapUrl = `/peta-ruang?floor=${room.floor}&room=${room.room_code.toLowerCase()}`;
+
+        return `
+        <div class="editorial-panel bg-white flex flex-col overflow-hidden relative hover:shadow-lg transition-all transform hover:-translate-y-1">
+            <div class="p-5 flex-1 flex flex-col">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <h3 class="font-display text-lg font-bold tracking-tight text-ink">${escHtml(room.name)}</h3>
+                        <div class="text-[11px] font-medium tracking-widest text-ink/40 mt-0.5 uppercase">${escHtml(room.room_type)} &bull; LT ${room.floor}</div>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ring-1 ${badge}">
+                        <span class="w-1.5 h-1.5 rounded-full ${dot}"></span>
+                        ${ucfirst(room.current_status)}
+                    </span>
+                </div>
+                <div class="mb-5 flex-1 mt-2">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 14l6.16-3.422M12 20.5l9-5-9-5-9 5 9 5z"/></svg>
+                        <span class="font-medium text-sm text-ink leading-tight">${escHtml(room.display_group)}</span>
+                    </div>
+                </div>
+                <div class="mt-auto pt-4 border-t border-gray-100">
+                    <div class="flex justify-between text-xs font-medium mb-2">
+                        <span class="text-gray-500">${escHtml(room.duration_text)}</span>
+                        ${room.end_time ? `<span class="text-ink font-semibold">${escHtml(room.end_time)}</span>` : ''}
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-1">
+                        <div class="h-full rounded-full ${bar}" style="width:${room.progress}%"></div>
+                    </div>
+                </div>
+            </div>
+            <a href="${mapUrl}" class="mt-3 flex items-center justify-center gap-2 py-2 px-4 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-100 transition-all border border-indigo-100 group">
+                <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                Lihat di Peta
+            </a>
+        </div>`;
+    }
+
+    function escHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function ucfirst(str) {
+        return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+    }
+
+    // ── Update DOM dari response JSON ────────────────────────────────────────
+    function applyData(data) {
+        // Stats
+        const avail   = data.stats.available ?? 0;
+        const occ     = data.stats.occupied  ?? 0;
+        document.getElementById('stat-available').textContent = avail;
+        document.getElementById('stat-diff').textContent      = `+${Math.max(0, avail - occ)} dibanding terisi`;
+        document.getElementById('stat-soon').textContent      = data.stats.soon ?? 0;
+        document.getElementById('stat-occupied').textContent  = occ;
+        document.getElementById('stat-lab').textContent       = (data.stats.labUsage ?? 0) + '%';
+        const barPct = data.total ? Math.round(occ / data.total * 100) : 0;
+        document.getElementById('stat-occupied-bar').style.width = barPct + '%';
+
+        // Room cards
+        const grid = document.getElementById('room-results');
+        grid.innerHTML = data.rooms.map(buildCard).join('');
+
+        // Timestamp
+        document.getElementById('last-update-time').textContent = data.last_update;
+    }
+
+    // ── Indikator loading di widget ──────────────────────────────────────────
+    function setLoading(isLoading) {
+        const el = document.getElementById('last-update-time');
+        if (isLoading) {
+            el.classList.add('opacity-40');
+        } else {
+            el.classList.remove('opacity-40');
+        }
+    }
+
+    // ── Countdown ticker ────────────────────────────────────────────────────
+    let secondsLeft = POLL_INTERVAL;
+    const countdownEl = document.getElementById('countdown');
+
+    function tickCountdown() {
+        if (countdownEl) countdownEl.textContent = secondsLeft;
+        if (secondsLeft > 0) {
+            secondsLeft--;
+        }
+    }
+
+    setInterval(tickCountdown, 1000);
+
+    // ── Polling utama ────────────────────────────────────────────────────────
+    async function poll() {
+        // Jangan poll kalau tab tidak aktif — hemat server
+        if (document.hidden) return;
+
+        setLoading(true);
+        try {
+            const res = await fetch(getLiveUrl(), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            applyData(data);
+        } catch (e) {
+            console.warn('[JTI-Spot] Poll gagal:', e.message);
+        } finally {
+            setLoading(false);
+            secondsLeft = POLL_INTERVAL; // reset countdown
+        }
+    }
+
+    // Mulai interval
+    setInterval(poll, POLL_INTERVAL * 1000);
+
+    // Poll segera saat tab kembali aktif setelah lama hidden
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) poll();
+    });
+})();
+</script>
+@endpush
+
 @endsection

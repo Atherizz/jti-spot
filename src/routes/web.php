@@ -23,6 +23,7 @@ Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip'
 Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
 
 Route::get('/', [GuestController::class, 'index'])->name('home');
+Route::get('/live-data', [GuestController::class, 'liveData'])->name('live.data');
 Route::get('/peta-ruang', [GuestController::class, 'map'])->name('map');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->middleware('guest')->name('login');
