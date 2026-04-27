@@ -47,7 +47,19 @@ class UserSeeder extends Seeder
                 'remember_token' => Str::random(),
                 'role' => 'class_rep',
                 'class_group_id' => ClassGroup::where('name', '2F')->where('major', 'TI')->first()->id
-            ]
+            ],
+            [
+                'name' => 'Ketua Kelas 2',
+                'reg_number' => '2441070203',
+                'email' => 'ketua2@example.com',
+                'email_verified_at' => now(),
+                'password' => Hash::make('password'),
+                'remember_token' => Str::random(),
+                'role' => 'class_rep',
+                'class_group_id' => ClassGroup::where('name', '2B')->where('major', 'TI')->first()->id
+            ],
+            
+
 
         ]);
 

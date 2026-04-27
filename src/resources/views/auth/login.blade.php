@@ -6,7 +6,7 @@
     <title>JTI-Spot &mdash; Portal Otentikasi</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-gray-50 font-sans text-ink flex items-center justify-center p-6 relative overflow-hidden">
+<body class="min-h-screen bg-gray-50 font-sans text-ink p-4 py-8 sm:p-6 relative overflow-x-hidden flex flex-col">
 
     {{-- Abstract Ambient Background --}}
     <div class="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Main Container -->
-    <div class="w-full max-w-[1000px] flex flex-col md:flex-row relative z-10 bg-white editorial-panel overflow-hidden shadow-2xl">
+    <div class="w-full max-w-[1000px] mx-auto my-auto flex flex-col md:flex-row relative z-10 bg-white rounded-[2rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl">
         
         <!-- Left Panel: Brand & Information -->
         <div class="w-full md:w-[45%] bg-ink relative flex flex-col justify-between p-10 md:p-12 overflow-hidden text-white border-r border-ink/5 group">

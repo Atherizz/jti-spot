@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\ScheduleCancellation;
+use App\Models\RoomClaim;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class StudentActionController extends Controller
@@ -52,28 +54,45 @@ class StudentActionController extends Controller
         $classGroupId    = $user->class_group_id;
         $now             = Carbon::now();
 
-        // Jadwal mendatang milik kelas ini
-        $schedules = Schedule::with('room')
-            ->where('class_group_id', $classGroupId)
+        // Ambil jadwal yang dibatalkan dalam 2 hari ke depan
+        $endDate = $now->copy()->addDays(2);
+        
+        $cancellations = ScheduleCancellation::with(['schedule.room', 'schedule.classGroup'])
+            ->whereHas('schedule', function ($query) use ($classGroupId) {
+                $query->where('class_group_id', '!=', $classGroupId);
+            })
+            ->whereBetween('cancellation_date', [$now->toDateString(), $endDate->toDateString()])
             ->get();
 
         $upcomingSchedules = collect();
         
-        foreach ($schedules as $schedule) {
-            // H+1
-            $h1Date = $now->copy()->addDay();
-            if ($h1Date->dayOfWeek == $schedule->day_of_week) {
-                $item = clone $schedule;
-                $item->class_date = $h1Date->toDateString();
-                $upcomingSchedules->push($item);
+        foreach ($cancellations as $cancellation) {
+            $schedule = $cancellation->schedule;
+            if (!$schedule) continue;
+
+            $targetDate = Carbon::parse($cancellation->cancellation_date);
+            
+            // Jika jadwal hari ini, pastikan kelas belum berakhir
+            if ($targetDate->isToday()) {
+                if (Carbon::parse($schedule->end_time)->format('H:i:s') <= $now->format('H:i:s')) {
+                    continue; // Sudah terlewat
+                }
             }
-            // H+2
-            $h2Date = $now->copy()->addDays(2);
-            if ($h2Date->dayOfWeek == $schedule->day_of_week) {
-                $item = clone $schedule;
-                $item->class_date = $h2Date->toDateString();
-                $upcomingSchedules->push($item);
+
+            // Pastikan belum diklaim/direservasi oleh kelas lain
+            $alreadyClaimed = RoomClaim::where('schedule_id', $schedule->id)
+                ->where('claim_date', $targetDate->toDateString())
+                ->whereIn('status', ['pending_quorum', 'locked'])
+                ->exists();
+
+            if ($alreadyClaimed) {
+                continue;
             }
+
+            $item = clone $schedule;
+            $item->class_date = $targetDate->toDateString();
+            $item->reservation_data = $schedule->id . '|' . $targetDate->toDateString();
+            $upcomingSchedules->push($item);
         }
 
         $upcomingSchedules = $upcomingSchedules->sortBy(fn($s) => $s->class_date . ' ' . $s->start_time)->values();
@@ -92,45 +111,85 @@ class StudentActionController extends Controller
     public function storeReservasi(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'schedule_id'      => ['required', 'integer', 'exists:schedules,id'],
-            'room_id'          => ['required', 'integer', 'exists:rooms,id'],
-            'reservation_date' => ['required', 'date', 'after_or_equal:today'],
+            'schedule_data'    => ['required', 'string'],
             'notes'            => ['nullable', 'string', 'max:1000'],
+        ], [
+            'schedule_data.required' => 'Silakan pilih jadwal kelas yang akan direservasi.',
         ]);
 
-        $user     = $request->user();
-        $schedule = Schedule::findOrFail($validated['schedule_id']);
+        $user = $request->user();
 
-        // Validasi: jadwal harus milik kelas mahasiswa ini
-        if ((int) $schedule->class_group_id !== (int) $user->class_group_id) {
-            return back()->withErrors(['schedule_id' => 'Jadwal yang dipilih tidak terdaftar untuk kelas Anda.'])->withInput();
+        $parts = explode('|', $validated['schedule_data']);
+        if (count($parts) !== 2) {
+            return back()->withErrors(['schedule_data' => 'Data jadwal tidak valid.'])->withInput();
         }
 
-        // Validasi jendela waktu H-1 / H-2
-        $reservationDate = Carbon::parse($validated['reservation_date']);
+        $scheduleId = $parts[0];
+        $reservationDateStr = $parts[1];
+
+        $schedule = Schedule::findOrFail($scheduleId);
+
+        // Validasi jendela waktu H s/d H+2
+        $reservationDate = Carbon::parse($reservationDateStr);
         $today           = Carbon::today();
         $diffDays        = $today->diffInDays($reservationDate, false);
 
-        if ($diffDays < 1 || $diffDays > 2) {
+        if ($diffDays < 0 || $diffDays > 2) {
             return back()->withErrors([
-                'reservation_date' => 'Reservasi hanya dapat diajukan untuk jadwal 1–2 hari ke depan (H-1 atau H-2).',
+                'schedule_data' => 'Reservasi hanya dapat diajukan untuk jadwal maksimal 2 hari ke depan.',
             ])->withInput();
         }
 
-        // TODO: Simpan ke tabel `room_reservations` setelah migration dibuat.
-        // Contoh:
-        // RoomReservation::create([
-        //     'user_id'          => $user->id,
-        //     'schedule_id'      => $validated['schedule_id'],
-        //     'room_id'          => $validated['room_id'],
-        //     'reservation_date' => $validated['reservation_date'],
-        //     'notes'            => $validated['notes'],
-        //     'status'           => 'pending',
-        // ]);
+        // Validasi: Pastikan jadwal benar-benar berstatus dibatalkan pada tanggal tersebut
+        $isCancelled = ScheduleCancellation::where('schedule_id', $schedule->id)
+            ->where('cancellation_date', $reservationDateStr)
+            ->exists();
+
+        if (!$isCancelled) {
+            return back()->withErrors(['schedule_data' => 'Jadwal yang dipilih tidak berstatus dibatalkan atau tidak tersedia untuk direservasi.'])->withInput();
+        }
+
+        // Validasi: Pastikan kelas ini bukan kelas yang membatalkan jadwal tersebut
+        if ((int) $schedule->class_group_id === (int) $user->class_group_id) {
+            return back()->withErrors(['schedule_data' => 'Anda tidak dapat mereservasi ruangan dari jadwal kelas Anda sendiri yang telah dibatalkan.'])->withInput();
+        }
+
+        // Validasi: Pastikan jadwal belum diklaim/direservasi oleh kelas lain
+        $alreadyClaimed = RoomClaim::where('schedule_id', $schedule->id)
+            ->where('claim_date', $reservationDateStr)
+            ->whereIn('status', ['pending_quorum', 'locked'])
+            ->exists();
+
+        if ($alreadyClaimed) {
+            return back()->withErrors(['schedule_data' => 'Maaf, jadwal kelas yang dibatalkan tersebut sudah lebih dulu direservasi oleh kelas lain.'])->withInput();
+        }
+
+        // Simpan ke tabel room_claims (mereservasi ruangan dari jadwal kelas lain yang batal)
+        $claimData = [
+            'room_id'          => $schedule->room_id,
+            'schedule_id'      => $schedule->id,
+            'claimer_group_id' => $user->class_group_id,
+            'claim_date'       => $reservationDateStr,
+            'status'           => 'pending_quorum',
+        ];
+
+        if (Schema::hasColumn('room_claims', 'claimed_by_user_id')) {
+            $claimData['claimed_by_user_id'] = $user->id;
+        }
+
+        if (Schema::hasColumn('room_claims', 'start_time')) {
+            $claimData['start_time'] = $schedule->start_time;
+        }
+
+        if (Schema::hasColumn('room_claims', 'end_time')) {
+            $claimData['end_time'] = $schedule->end_time;
+        }
+
+        RoomClaim::create($claimData);
 
         return redirect()
             ->route('student.action.center')
-            ->with('success', 'Permohonan reservasi ruangan berhasil dikirim dan sedang menunggu verifikasi.');
+            ->with('success', 'Reservasi ruangan berhasil! Ruangan telah dikunci untuk kelas Anda pada jadwal tersebut.');
     }
 
     // ─────────────────────────────────────────────────────────────

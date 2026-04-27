@@ -79,10 +79,10 @@
                             Jadwal Kelas yang Dibatalkan
                         </label>
                         <div class="relative">
-                            <select id="schedule_data" name="schedule_data"
+                            <select id="schedule_data" name="schedule_data" required
                                 class="w-full appearance-none bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 hover:border-gray-300 transition-all shadow-sm">
                                 @if(isset($cancelableSchedules) && $cancelableSchedules->count() > 0)
-                                    <option disabled selected>-- Pilih jadwal yang akan dibatalkan --</option>
+                                    <option value="" disabled selected>-- Pilih jadwal yang akan dibatalkan --</option>
                                     @foreach($cancelableSchedules as $schedule)
                                         <option value="{{ $schedule->cancel_id }}" {{ old('schedule_data') == $schedule->cancel_id ? 'selected' : '' }}
                                             data-date="{{ \Carbon\Carbon::parse($schedule->class_date)->translatedFormat('l, d M Y') }}"
@@ -141,9 +141,9 @@
                             Kategori Pembatalan
                         </label>
                         <div class="relative">
-                            <select id="cancellation_type" name="cancellation_type"
+                            <select id="cancellation_type" name="cancellation_type" required
                                 class="w-full appearance-none bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 hover:border-gray-300 transition-all shadow-sm">
-                                <option disabled selected>-- Pilih kategori --</option>
+                                <option value="" disabled selected>-- Pilih kategori --</option>
                                 <option value="sakit" {{ old('cancellation_type') === 'sakit' ? 'selected' : '' }}>Dosen Sakit / Kondisi Medis</option>
                                 <option value="kegiatan_kampus" {{ old('cancellation_type') === 'kegiatan_kampus' ? 'selected' : '' }}>Kegiatan Resmi Kampus</option>
                                 <option value="musibah" {{ old('cancellation_type') === 'musibah' ? 'selected' : '' }}>Musibah</option>
