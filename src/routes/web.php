@@ -43,10 +43,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/schedules', [StudentScheduleController::class, 'index'])
             ->name('student.schedules');
 
-        Route::post('/attendance/confirm', [RoomActionController::class, 'confirmWithoutScan'])
-            ->middleware('check.location') 
-            ->name('student.attendance.confirm');
-
         Route::get('/scan/{qr_token}', [RoomActionController::class, 'scanInitial'])
              ->name('scan.initial');
 

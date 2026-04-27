@@ -85,21 +85,6 @@ class RoomActionController extends Controller
             ->with($flashType, $result['message']);
     }
 
-    public function confirmWithoutScan(Request $request)
-    {
-        $result = $this->roomScanService->confirmWithoutScan($request->user());
-
-        $flashType = $result['status'] === 'success' ? 'success' : 'error';
-
-        if ($result['status'] === 'success' && !empty($result['room_qr_token'])) {
-            return redirect()->route('student.checkin.show', $result['room_qr_token'])
-                ->with($flashType, $result['message']);
-        }
-
-        return redirect()->route('student.dashboard.home')
-            ->with($flashType, $result['message']);
-    }
-
     public function showCheckIn(Request $request, $qrToken)
     {
         $room = Room::where('qr_token', $qrToken)->first();

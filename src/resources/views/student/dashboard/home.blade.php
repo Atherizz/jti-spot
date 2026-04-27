@@ -91,13 +91,9 @@
 
                     <div class="mt-auto">
                         @if($canManualCheckIn && !$alreadyScanned)
-                        <form method="POST" action="{{ route('student.attendance.confirm') }}">
-                            @csrf
-                            <button type="submit" class="w-full bg-white text-ink font-semibold text-sm py-3.5 rounded-xl hover:bg-gray-50 transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] flex items-center justify-center gap-2 group/btn">
-                                Konfirmasi Hadir
-                                <svg class="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                            </button>
-                        </form>
+                        <button class="w-full bg-white/5 text-white/40 border border-white/5 font-medium text-sm py-3.5 rounded-xl cursor-not-allowed">
+                            Silakan Scan QR Code di Ruangan
+                        </button>
                         @elseif($alreadyScanned)
                         <div class="flex items-stretch gap-2">
                             <a href="{{ $checkInPageUrl ?? '#' }}" class="flex-1 bg-white/10 text-white font-medium text-sm py-3 px-4 rounded-xl {{ $checkInPageUrl ? 'hover:bg-white/20 transition-colors' : 'opacity-50 pointer-events-none' }} flex items-center justify-center gap-2 border border-white/10">
@@ -218,4 +214,3 @@
     @endif
 
 @endsection
-
