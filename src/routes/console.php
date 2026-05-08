@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\SimulateCheckin;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -94,9 +95,15 @@ Schedule::call(function () {
             $logAndPrint('Cron: Rooms updated to [waiting] - IDs: ' . implode(', ', array_unique($uniqueWaiting)));
         }
 
+        // Rooms with an active quorum extension (Kelas Terlambat) — excluded from both cancel and available paths
+        $extendedRoomIds = Room::whereNotNull('quorum_extended_until')
+            ->where('quorum_extended_until', '>', $now)
+            ->pluck('id')
+            ->toArray();
+
         if (!empty($uniqueCancel)) {
-            // FILTER: Dont cancel rooms that actually have active claims, or are in waiting for another schedule
-            $finalToCancel = array_diff($uniqueCancel, $activeClaimedRoomIds, $uniqueWaiting);
+            // FILTER: Dont cancel rooms that actually have active claims, in waiting for another schedule, or have active extension
+            $finalToCancel = array_diff($uniqueCancel, $activeClaimedRoomIds, $uniqueWaiting, $extendedRoomIds);
 
             Room::whereIn('id', array_unique($finalToCancel))
                 ->where('current_status', 'waiting')
@@ -105,8 +112,8 @@ Schedule::call(function () {
         }
 
         if (!empty($uniqueAvailable)) {
-            // FILTER: Dont make available rooms that are currently waiting for another schedule, or have active claims
-            $finalToAvailable = array_diff($uniqueAvailable, $activeClaimedRoomIds, $uniqueWaiting);
+            // FILTER: Dont make available rooms that are currently waiting for another schedule, have active claims, or have active extension
+            $finalToAvailable = array_diff($uniqueAvailable, $activeClaimedRoomIds, $uniqueWaiting, $extendedRoomIds);
 
             Room::whereIn('id', $finalToAvailable)
                 ->update(['current_status' => 'available']);
@@ -116,3 +123,8 @@ Schedule::call(function () {
         $logAndPrint('Cron: Skipped (outside class hours/weekend).');
     }
 })->everyMinute();
+
+// ── Simulation: auto check-in for rooms in [waiting] status ──────────
+Schedule::command('simulation:checkin')
+    ->everyMinute()
+    ->when(fn () => (bool) env('SIMULATION_MODE', false));

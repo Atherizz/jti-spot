@@ -55,7 +55,7 @@ class StudentActionController extends Controller
         $now             = Carbon::now();
 
         // Ambil jadwal yang dibatalkan dalam 2 hari ke depan
-        $endDate = $now->copy()->addDays(2);
+        $endDate = $now->copy()->addDays(4);
         
         $cancellations = ScheduleCancellation::with(['schedule.room', 'schedule.classGroup'])
             ->whereHas('schedule', function ($query) use ($classGroupId) {
@@ -134,7 +134,7 @@ class StudentActionController extends Controller
         $today           = Carbon::today();
         $diffDays        = $today->diffInDays($reservationDate, false);
 
-        if ($diffDays < 0 || $diffDays > 2) {
+        if ($diffDays < 0 || $diffDays > 3) {
             return back()->withErrors([
                 'schedule_data' => 'Reservasi hanya dapat diajukan untuk jadwal maksimal 2 hari ke depan.',
             ])->withInput();
@@ -185,7 +185,7 @@ class StudentActionController extends Controller
             $claimData['end_time'] = $schedule->end_time;
         }
 
-        RoomClaim::create($claimData);
+        RoomClaim::query()->create($claimData);
 
         return redirect()
             ->route('student.action.center')
@@ -289,7 +289,7 @@ class StudentActionController extends Controller
                 ->withInput();
         }
 
-        ScheduleCancellation::create([
+        ScheduleCancellation::query()->create([
             'schedule_id'       => $schedule->id,
             'cancelled_by'      => $user->id,
             'cancellation_date' => $cancellationDate,
@@ -311,11 +311,10 @@ class StudentActionController extends Controller
         $user = $request->user();
 
         // Ambil semua pembatalan milik kelas mahasiswa ini
-        $cancellations = ScheduleCancellation::with(['schedule', 'cancelledBy'])
+        $cancellations = ScheduleCancellation::query()->with(['schedule', 'cancelledBy'])
             ->whereHas('schedule', function ($query) use ($user) {
                 $query->where('class_group_id', $user->class_group_id);
             })
-            ->orderByDesc('created_at')
             ->get()
             ->map(fn (ScheduleCancellation $cancellation) => [
                 'type'   => 'Pembatalan Kelas',
@@ -324,10 +323,28 @@ class StudentActionController extends Controller
                 'target' => Carbon::parse($cancellation->cancellation_date)->locale('id')->isoFormat('l, d M Y'),
                 'reason' => $cancellation->reason,
                 'by'     => $cancellation->cancelledBy?->name ?? 'Mahasiswa',
+                'timestamp' => $cancellation->created_at,
             ]);
 
-        // Gabungkan semuanya (nanti bisa ditambah dengan reservasi jika sudah ada tabelnya)
-        $allRequests = collect($cancellations);
+        // Ambil semua reservasi ruangan milik kelas mahasiswa ini
+        $reservations = RoomClaim::query()->with(['schedule', 'claimedByUser', 'room'])
+            ->where('claimer_group_id', $user->class_group_id)
+            ->get()
+            ->map(fn (RoomClaim $claim) => [
+                'type'   => 'Reservasi Ruangan',
+                'title'  => ($claim->schedule?->course_name ?? 'Reservasi') . ' - ' . ($claim->room?->name ?? 'Ruangan Indefinit'),
+                'date'   => $claim->created_at?->locale('id')->isoFormat('D MMMM YYYY, HH:mm') ?? '-',
+                'target' => Carbon::parse($claim->claim_date)->locale('id')->isoFormat('l, d M Y') . ' (' . Carbon::parse($claim->start_time)->format('H:i') . ' - ' . Carbon::parse($claim->end_time)->format('H:i') . ')',
+                'reason' => 'Status: ' . ucwords(str_replace('_', ' ', $claim->status)),
+                'by'     => $claim->claimedByUser?->name ?? 'Mahasiswa',
+                'timestamp' => $claim->created_at,
+            ]);
+
+        // Gabungkan semuanya dan urutkan berdasarkan waktu terbaru
+        $allRequests = collect($cancellations)
+            ->merge($reservations)
+            ->sortByDesc('timestamp')
+            ->values();
 
         return view('student.action.history', [
             'allRequests' => $allRequests,

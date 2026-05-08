@@ -12,6 +12,11 @@ class Room extends Model
         'qr_token',
         'floor',
         'room_code',
+        'quorum_extended_until',
+    ];
+
+    protected $casts = [
+        'quorum_extended_until' => 'datetime',
     ];
 
     /**

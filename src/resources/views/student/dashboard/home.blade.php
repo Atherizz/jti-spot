@@ -106,6 +106,34 @@
                             Tidak Ada Sesi Aktif Saat Ini
                         </button>
                         @endif
+
+                        @if(auth()->user()->role === 'class_rep' && $canManualCheckIn && !$sessionIsOccupied)
+                            @if($quorumExtendedUntil && $quorumExtendedUntil->isFuture())
+                            <div class="mt-3 flex items-center gap-2 px-3 py-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                                <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <span class="text-xs font-medium text-amber-300">Diperpanjang s/d {{ $quorumExtendedUntil->format('H:i') }}</span>
+                            </div>
+                            @else
+                            <button type="button"
+                                onclick="document.getElementById('extendQuorumModal').classList.remove('hidden')"
+                                class="mt-3 w-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/20 font-medium text-sm py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Kelas Terlambat
+                            </button>
+                            @endif
+                        @endif
+
+                        @if(auth()->user()->role === 'class_rep' && $canManualCheckIn && $sessionIsOccupied)
+                        <form id="endSessionForm" action="{{ route('student.session.end') }}" method="POST" class="mt-3">
+                            @csrf
+                            <button type="button"
+                                onclick="document.getElementById('endSessionModal').classList.remove('hidden')"
+                                class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/20 font-medium text-sm py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
+                                Akhiri Sesi Kelas Ini
+                            </button>
+                        </form>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -197,6 +225,73 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Kelas Terlambat --}}
+    @if(auth()->user()->role === 'class_rep' && $canManualCheckIn && !$sessionIsOccupied)
+    <div id="extendQuorumModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('extendQuorumModal').classList.add('hidden')"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-ink text-base">Kelas Terlambat Mulai</h3>
+                    <p class="text-xs text-ink/50">Perpanjang window kuorum</p>
+                </div>
+            </div>
+            <p class="text-sm text-ink/70 mb-5">Ruangan <span class="font-semibold text-ink">{{ $sessionLocation }}</span> akan tetap berstatus <span class="font-semibold text-amber-600">Menunggu</span> selama durasi yang dipilih.</p>
+            <div class="flex flex-col gap-2">
+                @foreach([15, 30, 45] as $minutes)
+                <form action="{{ route('student.session.extend-quorum') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="delay_minutes" value="{{ $minutes }}">
+                    <button type="submit" class="w-full bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-800 font-medium text-sm py-2.5 rounded-xl transition-colors text-left px-4 flex items-center justify-between">
+                        <span>Terlambat +{{ $minutes }} menit</span>
+                        <span class="text-xs text-amber-500">s/d {{ now()->addMinutes($minutes)->format('H:i') }}</span>
+                    </button>
+                </form>
+                @endforeach
+            </div>
+            <button type="button"
+                onclick="document.getElementById('extendQuorumModal').classList.add('hidden')"
+                class="mt-3 w-full bg-gray-100 hover:bg-gray-200 text-ink font-medium text-sm py-2.5 rounded-xl transition-colors">
+                Batal
+            </button>
+        </div>
+    </div>
+    @endif
+
+    {{-- Modal Konfirmasi Akhiri Sesi --}}
+    @if(auth()->user()->role === 'class_rep' && $canManualCheckIn && $sessionIsOccupied)
+    <div id="endSessionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="document.getElementById('endSessionModal').classList.add('hidden')"></div>
+        <div class="relative bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                </div>
+                <div>
+                    <h3 class="font-bold text-ink text-base">Akhiri Sesi Kelas?</h3>
+                    <p class="text-xs text-ink/50">Tindakan ini tidak dapat dibatalkan</p>
+                </div>
+            </div>
+            <p class="text-sm text-ink/70 mb-6">Ruangan <span class="font-semibold text-ink">{{ $sessionLocation }}</span> akan ditandai sebagai <span class="font-semibold text-green-600">Tersedia</span> dan dapat langsung digunakan oleh kelas lain.</p>
+            <div class="flex gap-3">
+                <button type="button"
+                    onclick="document.getElementById('endSessionModal').classList.add('hidden')"
+                    class="flex-1 bg-gray-100 hover:bg-gray-200 text-ink font-medium text-sm py-2.5 rounded-xl transition-colors">
+                    Batal
+                </button>
+                <button type="button"
+                    onclick="document.getElementById('endSessionForm').submit()"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium text-sm py-2.5 rounded-xl transition-colors">
+                    Ya, Akhiri Sesi
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 
     {{-- Auto-dismiss flash messages --}}
     @if(session('error') || session('success'))

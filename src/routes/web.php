@@ -59,6 +59,10 @@ Route::middleware(['auth'])->group(function () {
 
         // ── Pusat Aksi (Hanya Ketua Kelas) ──────────────────────────
         Route::middleware('can:class_rep')->group(function () {
+            Route::post('/session/end', [StudentDashboardController::class, 'endSession'])
+                ->name('student.session.end');
+            Route::post('/session/extend-quorum', [StudentDashboardController::class, 'extendQuorum'])
+                ->name('student.session.extend-quorum');
             Route::get('/action', [StudentActionController::class, 'center'])
                 ->name('student.action.center');
 

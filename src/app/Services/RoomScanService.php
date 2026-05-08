@@ -153,7 +153,7 @@ class RoomScanService
         $quorumSize = env('QUORUM_SIZE', 5);
         $isQuorumReached = false;
         if ($newQuorumCount >= $quorumSize && $room->current_status !== 'occupied') {
-            $room->update(['current_status' => 'occupied']);
+            $room->update(['current_status' => 'occupied', 'quorum_extended_until' => null]);
             $isQuorumReached = true;
         }
 

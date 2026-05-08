@@ -83,8 +83,8 @@
                                 class="w-full bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 hover:border-gray-300 transition-all shadow-sm search-select">
                                 <option disabled selected value="">-- Pilih jadwal yang akan direservasi --</option>
                                 @foreach($upcomingSchedules ?? [] as $schedule)
-                                    <option value="{{ $schedule->reservation_data }}" data-room="{{ $schedule->room->name ?? 'Ruangan Indefinit' }}" {{ old('schedule_data') == $schedule->reservation_data ? 'selected' : '' }}>
-                                        {{ $schedule->classGroup->name ?? 'Umum' }} - {{ $schedule->course_name }} — {{ \Carbon\Carbon::parse($schedule->class_date)->translatedFormat('l, d M Y') }}
+                                    <option value="{{ $schedule->reservation_data }}" data-room="{{ $schedule->room?->name ?? 'Ruangan Indefinit' }}" {{ old('schedule_data') == $schedule->reservation_data ? 'selected' : '' }}>
+                                        {{ $schedule->classGroup?->name ?? 'Umum' }} - {{ $schedule->course_name }} — {{ \Carbon\Carbon::parse($schedule->class_date)->translatedFormat('l, d M Y') }}
                                         ({{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} – {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }})
                                     </option>
                                 @endforeach

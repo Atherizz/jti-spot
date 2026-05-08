@@ -15,13 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(
-            [
+        $this->call([
             ClassGroupSeeder::class,
-            UserSeeder::class,
             RoomSeeder::class,
             ScheduleSeeder::class,
-            ]
-    );
+            UserSeeder::class,  // harus setelah ScheduleSeeder agar join ke schedules tidak kosong
+        ]);
     }
 }
