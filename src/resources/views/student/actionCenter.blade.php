@@ -11,7 +11,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </div>
         <div class="flex-1 min-w-0">
-            <p class="font-semibold text-red-900 text-sm">Sistem Error</p>
+            <p class="font-semibold text-red-900 text-sm">Kesalahan Sistem</p>
             <p class="text-sm text-red-700 mt-0.5">{{ session('error') }}</p>
         </div>
         <button onclick="document.getElementById('flashMessage').remove()" class="text-red-400 hover:text-red-600 transition-colors">

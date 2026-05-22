@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JTI-Spot &mdash; Portal Otentikasi</title>
+    <title>JTI-Spot &mdash; Portal Masuk</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-gray-50 font-sans text-ink p-4 py-8 sm:p-6 relative overflow-x-hidden flex flex-col">
@@ -31,7 +31,7 @@
                 
                 <h1 class="font-display text-4xl font-bold tracking-tight mb-4 leading-tight">Sistem <br>Pemantauan <br>Ruangan Kelas Terpadu</h1>
                 <p class="text-sm font-medium text-white/60 leading-relaxed max-w-[240px]">
-                    Validasi ketersediaan ruang, manajemen batas kuorum kelas, dan optimasi jadwal operasional lingkungan kampus JTI secara seketika (*real-time*).
+                    Validasi ketersediaan ruang, manajemen batas kuorum kelas, dan optimasi jadwal operasional lingkungan kampus JTI secara langsung.
                 </p>
             </div>
             
@@ -56,9 +56,9 @@
                 <div class="mb-10">
                     <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-xs font-bold text-gray-400 hover:text-ink uppercase tracking-widest transition-colors mb-4 group/back">
                         <svg class="w-3 h-3 group-hover/back:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                        Homepage
+                        Beranda
                     </a>
-                    <h2 class="font-display text-2xl md:text-3xl font-bold text-ink mb-2">Otentikasi Identitas</h2>
+                    <h2 class="font-display text-2xl md:text-3xl font-bold text-ink mb-2">Masuk</h2>
                     <p class="text-sm font-medium text-gray-500">Kredensial valid diperlukan untuk mengelola atau mengakses parameter operasional.</p>
                 </div>
 
@@ -93,14 +93,14 @@
                                     <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                                 </svg>
                             </div>
-                            <input type="text" name="reg_number" required placeholder="ID Akademik atau Surel" 
+                            <input type="text" name="reg_number" required placeholder="ID Akademik" 
                                 class="pl-11 block w-full bg-white border border-gray-200 text-ink text-sm rounded-xl py-3.5 focus:ring-2 focus:ring-orange-100 focus:border-orange-400 transition-all shadow-sm placeholder:text-gray-400" value="{{ old('reg_number') }}">
                         </div>
                     </div>
 
                     <div>
                         <div class="flex justify-between items-center mb-2">
-                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest">Kunci Keamanan</label>
+                            <label class="block text-[11px] font-bold text-gray-500 uppercase tracking-widest">Kata Sandi</label>
                             <a href="#" tabindex="-1" class="text-[11px] font-bold text-orange-600 hover:text-orange-800 transition-colors uppercase tracking-widest">Lupa Sandi?</a>
                         </div>
                         <div class="relative">
@@ -109,7 +109,7 @@
                                     <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
                                 </svg>
                             </div>
-                            <input type="password" name="password" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" 
+                            <input type="password" name="password" required placeholder="••••••••" 
                                 class="pl-11 block w-full bg-white border border-gray-200 text-ink text-sm font-medium tracking-widest rounded-xl py-3.5 focus:ring-2 focus:ring-orange-100 focus:border-orange-400 transition-all shadow-sm placeholder:tracking-normal placeholder:text-gray-400">
                         </div>
                     </div>
@@ -130,7 +130,7 @@
 
                     <div class="pt-6 text-center">
                         <p class="text-[11px] font-semibold tracking-widest uppercase text-gray-400">
-                            Kendala Autentikasi? <a href="#" class="text-orange-600 hover:text-orange-800 transition-colors border-b border-orange-200 hover:border-orange-400 pb-0.5">Kontak Administrator</a>
+                            Kendala Masuk? <a href="#" class="text-orange-600 hover:text-orange-800 transition-colors border-b border-orange-200 hover:border-orange-400 pb-0.5">Kontak Administrator</a>
                         </p>
                     </div>
 

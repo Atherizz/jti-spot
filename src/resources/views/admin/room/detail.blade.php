@@ -5,7 +5,7 @@
 @section('content')
     @php
         $roomLabel = $room->room_code ?? ('ROOM-' . $room->id);
-        $buildingLabel = $room->floor ? ('Gedung LT ' . $room->floor) : 'Lantai Indefinit';
+        $buildingLabel = $room->floor ? ('Gedung LT ' . $room->floor) : 'Lantai Tidak Diketahui';
         $scanUrl = route('scan.initial', $room->qr_token);
         $qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' . urlencode($scanUrl);
     @endphp

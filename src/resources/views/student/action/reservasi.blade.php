@@ -44,7 +44,7 @@
                     </li>
                     <li class="text-sm font-medium text-orange-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        Status reservasi bersifat <strong>pending</strong> hingga divalidasi oleh sistem dan pihak administrasi.
+                        Status reservasi bersifat <strong>menunggu</strong> hingga divalidasi oleh sistem dan pihak administrasi.
                     </li>
                     <li class="text-sm font-medium text-orange-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
