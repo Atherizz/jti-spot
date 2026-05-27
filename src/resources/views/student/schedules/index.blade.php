@@ -50,6 +50,14 @@
                                 <div class="flex items-center gap-2 mt-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-widest">
                                     <span class="text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">{{ $item['room_name'] }}</span>
                                 </div>
+                                @if($item['cancellation'])
+                                <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-50 border border-red-200 rounded-lg text-[11px] font-bold text-red-700">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                    </svg>
+                                    DIBATALKAN - {{ $item['cancellation']['date'] }}
+                                </div>
+                                @endif
                             </div>
                         </div>
                         <div class="flex flex-col sm:items-end justify-center">
@@ -63,6 +71,40 @@
                     </div>
                 </div>
                 @endforeach
+
+                {{-- Reservasi ruangan untuk hari ini --}}
+                @if(!empty($day['reservations']))
+                    @foreach($day['reservations'] as $reservation)
+                    <div class="group border border-orange-200 bg-orange-50/30 rounded-xl p-4 sm:p-5 hover:border-orange-300 transition-colors">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div class="flex items-start gap-4">
+                                <div class="hidden sm:flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-orange-100 text-orange-600 shadow-sm shrink-0">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <p class="font-display text-base font-bold text-ink leading-tight">{{ $reservation['course_name'] }}</p>
+                                    <div class="flex items-center gap-2 mt-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-widest">
+                                        <span class="text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">{{ $reservation['room_name'] }}</span>
+                                    </div>
+                                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-100 border border-orange-200 rounded-lg text-[11px] font-bold text-orange-700">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        RUANGAN PENGGANTI - {{ $reservation['date'] }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col sm:items-end justify-center">
+                                <div class="font-display text-lg font-bold text-orange-700">
+                                    {{ $reservation['time'] }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                @endif
             </div>
             
         </div>

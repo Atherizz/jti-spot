@@ -57,6 +57,9 @@ Route::middleware(['auth'])->group(function () {
              ->middleware('check.location')
              ->name('scan.claim');
 
+        Route::get('/action/history', [StudentActionController::class, 'history'])
+            ->name('student.action.history');
+
         // ── Pusat Aksi (Hanya Ketua Kelas) ──────────────────────────
         Route::middleware('can:class_rep')->group(function () {
             Route::post('/session/end', [StudentDashboardController::class, 'endSession'])
@@ -75,9 +78,6 @@ Route::middleware(['auth'])->group(function () {
                 ->name('student.action.pembatalan');
             Route::post('/action/pembatalan', [StudentActionController::class, 'storePembatalan'])
                 ->name('student.action.pembatalan.store');
-
-            Route::get('/action/history', [StudentActionController::class, 'history'])
-                ->name('student.action.history');
         });
         Route::post('/claim-class-rep-token', [ClassRepTokenController::class, 'claim'])
             ->name('student.claim.class-rep-token');

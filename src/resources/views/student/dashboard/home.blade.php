@@ -37,7 +37,7 @@
 
     {{-- Page Header --}}
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 stagger-1">
-        <div>   
+        <div>
             <div class="flex items-center gap-2 mb-2">
                 <span class="inline-block w-2.5 h-2.5 rounded-full bg-orange-500"></span>
                 <span class="font-display text-[11px] font-bold uppercase tracking-widest text-ink/50">Terminal Mahasiswa</span>
@@ -48,6 +48,67 @@
             <p class="text-base text-ink/60 mt-3 md:mt-2">Selamat datang kembali, <span class="font-semibold text-ink">{{ auth()->user()->name }}</span>.</p>
         </div>
     </div>
+
+    {{-- Alert Banner: Pembatalan & Reservasi --}}
+    @if(!empty($upcomingAlerts))
+    <div class="mb-8 space-y-3 stagger-1">
+        @foreach($upcomingAlerts as $alert)
+            @if($alert['type'] === 'cancellation')
+            <div class="editorial-panel bg-red-50 border-red-200 p-5 flex items-start gap-4 group hover:bg-red-100/50 transition-colors">
+                <div class="w-12 h-12 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600 group-hover:scale-105 transition-transform">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-red-100 border border-red-200 rounded-md text-[10px] font-bold uppercase tracking-widest text-red-700">
+                            <span class="w-1 h-1 rounded-full bg-red-500"></span>
+                            Kelas Dibatalkan
+                        </span>
+                        @if($alert['urgency'] === 0)
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-red-600">Hari Ini</span>
+                        @elseif($alert['urgency'] === 1)
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-red-600">Besok</span>
+                        @endif
+                    </div>
+                    <p class="font-display text-base font-bold text-red-900 leading-tight">{{ $alert['title'] }}</p>
+                    <p class="text-sm font-medium text-red-700 mt-1">{{ $alert['date'] }}</p>
+                </div>
+                <a href="{{ route('student.action.history') }}" class="shrink-0 w-8 h-8 rounded-full bg-red-100 border border-red-200 flex items-center justify-center text-red-600 hover:bg-red-200 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            @else
+            <div class="editorial-panel bg-orange-50 border-orange-200 p-5 flex items-start gap-4 group hover:bg-orange-100/50 transition-colors">
+                <div class="w-12 h-12 rounded-xl bg-orange-100 border border-orange-200 flex items-center justify-center shrink-0 text-orange-600 group-hover:scale-105 transition-transform">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-orange-100 border border-orange-200 rounded-md text-[10px] font-bold uppercase tracking-widest text-orange-700">
+                            <span class="w-1 h-1 rounded-full bg-orange-500"></span>
+                            Ruangan Direservasi
+                        </span>
+                        @if($alert['urgency'] === 0)
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-orange-600">Hari Ini</span>
+                        @elseif($alert['urgency'] === 1)
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-orange-600">Besok</span>
+                        @endif
+                    </div>
+                    <p class="font-display text-base font-bold text-orange-900 leading-tight">{{ $alert['title'] }} - {{ $alert['room'] }}</p>
+                    <p class="text-sm font-medium text-orange-700 mt-1">{{ $alert['date'] }} • {{ $alert['time'] }}</p>
+                </div>
+                <a href="{{ route('student.action.history') }}" class="shrink-0 w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-orange-600 hover:bg-orange-200 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            @endif
+        @endforeach
+    </div>
+    @endif
 
     {{-- Grid Utama (Formal Panels) --}}
     <div class="flex flex-col xl:flex-row gap-6 mb-8 stagger-2">

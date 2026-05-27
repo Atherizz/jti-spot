@@ -6,6 +6,7 @@ use App\Models\ActivityLog;
 use App\Models\QuorumScan;
 use App\Models\RoomClaim;
 use App\Models\Schedule;
+use App\Models\ScheduleCancellation;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -146,6 +147,9 @@ class StudentDashboardController extends Controller
 
         $streakDays = $this->calculateStreakDays($user->id, $currentDate);
 
+        // Alert banner: pembatalan & reservasi H-7 ke depan
+        $upcomingAlerts = $this->getUpcomingAlerts($classGroupId, $now);
+
         return view('student.dashboard.home', [
             'activities' => $activities,
             'totalActivities' => $totalActivities,
@@ -164,6 +168,7 @@ class StudentDashboardController extends Controller
             'weeklyScans' => $weeklyScans,
             'verifiedRooms' => $verifiedRooms,
             'streakDays' => $streakDays,
+            'upcomingAlerts' => $upcomingAlerts,
         ]);
     }
 
@@ -262,6 +267,56 @@ class StudentDashboardController extends Controller
     private function successfulScanEventTypes(): array
     {
         return ['SCAN_SUCCESS', 'SCAN_SUCCEED', 'Scan_Succeed'];
+    }
+
+    private function getUpcomingAlerts(int $classGroupId, Carbon $now): array
+    {
+        $sevenDaysAhead = $now->copy()->addDays(7)->toDateString();
+        $alerts = [];
+
+        // Pembatalan kelas
+        $cancellations = ScheduleCancellation::with('schedule')
+            ->whereHas('schedule', function ($query) use ($classGroupId) {
+                $query->where('class_group_id', $classGroupId);
+            })
+            ->where('cancellation_date', '>=', $now->toDateString())
+            ->where('cancellation_date', '<=', $sevenDaysAhead)
+            ->orderBy('cancellation_date')
+            ->get();
+
+        foreach ($cancellations as $cancellation) {
+            $alerts[] = [
+                'type' => 'cancellation',
+                'title' => $cancellation->schedule?->course_name ?? 'Kelas',
+                'date' => Carbon::parse($cancellation->cancellation_date)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+                'urgency' => Carbon::parse($cancellation->cancellation_date)->diffInDays($now),
+            ];
+        }
+
+        // Reservasi ruangan
+        $reservations = RoomClaim::with(['schedule', 'room'])
+            ->where('claimer_group_id', $classGroupId)
+            ->where('claim_date', '>=', $now->toDateString())
+            ->where('claim_date', '<=', $sevenDaysAhead)
+            ->whereIn('status', ['pending_quorum', 'locked'])
+            ->orderBy('claim_date')
+            ->get();
+
+        foreach ($reservations as $claim) {
+            $alerts[] = [
+                'type' => 'reservation',
+                'title' => $claim->schedule?->course_name ?? 'Kelas',
+                'room' => $claim->room?->name ?? 'Ruangan',
+                'date' => Carbon::parse($claim->claim_date)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+                'time' => Carbon::parse($claim->start_time)->format('H:i') . ' - ' . Carbon::parse($claim->end_time)->format('H:i'),
+                'urgency' => Carbon::parse($claim->claim_date)->diffInDays($now),
+            ];
+        }
+
+        // Sort by urgency (semakin dekat semakin prioritas)
+        usort($alerts, fn($a, $b) => $a['urgency'] <=> $b['urgency']);
+
+        return array_slice($alerts, 0, 3);
     }
 
     public function extendQuorum(Request $request): RedirectResponse

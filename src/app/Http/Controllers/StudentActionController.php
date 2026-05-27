@@ -21,23 +21,40 @@ class StudentActionController extends Controller
     {
         $user = $request->user();
 
-        // 5 pengajuan pembatalan terbaru milik kelas mahasiswa ini
-        $recentCancellations = ScheduleCancellation::with('schedule')
+        // Pembatalan kelas milik kelas mahasiswa ini
+        $cancellations = ScheduleCancellation::with('schedule')
             ->whereHas('schedule', function ($query) use ($user) {
                 $query->where('class_group_id', $user->class_group_id);
             })
-            ->orderByDesc('created_at')
-            ->take(5)
             ->get()
             ->map(fn (ScheduleCancellation $cancellation) => [
-                'type'   => 'pembatalan',
-                'title'  => $cancellation->schedule?->course_name ?? 'Pembatalan Kelas',
-                'date'   => $cancellation->created_at?->locale('id')->isoFormat('D MMMM YYYY, HH:mm') ?? '-',
-            ])
+                'type'      => 'pembatalan',
+                'title'     => $cancellation->schedule?->course_name ?? 'Pembatalan Kelas',
+                'date'      => $cancellation->created_at?->locale('id')->isoFormat('D MMMM YYYY, HH:mm') ?? '-',
+                'timestamp' => $cancellation->created_at,
+            ]);
+
+        // Reservasi ruangan milik kelas mahasiswa ini
+        $reservations = RoomClaim::with('schedule')
+            ->where('claimer_group_id', $user->class_group_id)
+            ->get()
+            ->map(fn (RoomClaim $claim) => [
+                'type'      => 'reservasi',
+                'title'     => $claim->schedule?->course_name ?? 'Reservasi Ruangan',
+                'date'      => $claim->created_at?->locale('id')->isoFormat('D MMMM YYYY, HH:mm') ?? '-',
+                'timestamp' => $claim->created_at,
+            ]);
+
+        // Gabungkan, urutkan berdasarkan waktu terbaru, ambil 5 teratas
+        $recentRequests = $cancellations
+            ->merge($reservations)
+            ->sortByDesc('timestamp')
+            ->take(5)
+            ->values()
             ->all();
 
         return view('student.actionCenter', [
-            'recentRequests' => $recentCancellations,
+            'recentRequests' => $recentRequests,
         ]);
     }
 

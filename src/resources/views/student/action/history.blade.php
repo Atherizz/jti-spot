@@ -6,7 +6,7 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 relative z-10">
             <div class="max-w-2xl text-ink">
                 <div class="flex items-center gap-3 mb-3">
-                    <a href="{{ route('student.action.center') }}" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-ink hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
+                    <a href="{{ route('student.dashboard.home') }}" class="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-ink hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                         </svg>
