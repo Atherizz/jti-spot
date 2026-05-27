@@ -72,6 +72,7 @@ class AuthController extends Controller
                 'email' => $studentBio['email'],
                 'email_verified_at' => now(),
                 'reg_number' => $request->reg_number,
+                'phone_number' => $studentBio['phone_number'] ?? null,
                 'role' => 'student',
                 'class_group_id' => $classGroup->id,
                 'password' => Hash::make($request->password),

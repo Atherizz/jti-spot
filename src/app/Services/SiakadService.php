@@ -173,6 +173,17 @@ class SiakadService
                 error_log("Failed to extract email: " . $e->getMessage());
             }
 
+            $phoneNumber = null;
+
+            try {
+                $phoneNode = $crawlerBio->filter('.form-body > div:nth-child(2) > div:nth-child(7) > div:nth-child(1) > div:nth-child(1) > div:nth-child(2) > p:nth-child(1)');
+                if ($phoneNode->count() > 0) {
+                    $phoneNumber = trim($phoneNode->text());
+                }
+            } catch (\Exception $e) {
+                error_log("Failed to extract phone number: " . $e->getMessage());
+            }
+
             // Extract student class from history status page using native Regex
             $historyResponse = $this->fetchWithCookies("$this->siakadUrl/mahasiswa/riwayat_status");
             $historyHtml = $historyResponse->getBody()->getContents();
@@ -196,7 +207,8 @@ class SiakadService
                 'fullname' => $fullname,
                 'email' => $email,
                 'class' => $currentClass,
-                'major' => $major
+                'major' => $major,
+                'phone_number' => $phoneNumber,
             ];
 
         } catch (\Throwable $th) {
