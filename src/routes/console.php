@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\RoomClaim;
 use App\Models\Schedule as ScheduleModel;
+use App\Models\ScheduleCancellation;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -27,10 +28,20 @@ Schedule::call(function () {
     if ($now->hour >= 7 && $now->hour <= 18 && $now->isWeekday()) {
         $currentDay = $now->dayOfWeek;
 
+        // Cleanup expired quorum extensions
+        Room::whereNotNull('quorum_extended_until')
+            ->where('quorum_extended_until', '<=', $now)
+            ->update(['quorum_extended_until' => null]);
+
         // Get today's schedules
         $schedulesToday = ScheduleModel::where('day_of_week', $currentDay)
             ->select('id', 'room_id', 'start_time', 'end_time')
             ->get();
+
+        // Get today's cancellations
+        $cancellationsToday = ScheduleCancellation::where('cancellation_date', $now->toDateString())
+            ->pluck('schedule_id')
+            ->toArray();
 
         $claimsToday = RoomClaim::where('claim_date', $now->toDateString())
             ->whereIn('status', ['pending_quorum', 'locked'])
@@ -44,6 +55,27 @@ Schedule::call(function () {
         // Process schedules in memory
         foreach ($schedulesToday as $schedule) {
 
+            // Check if this schedule is cancelled today
+            $isCancelled = in_array($schedule->id, $cancellationsToday);
+
+            if ($isCancelled) {
+                // Check if another class has claimed this room at this time
+                $hasClaim = $claimsToday->first(function ($claim) use ($schedule, $now) {
+                    return $claim->room_id === $schedule->room_id
+                        && Carbon::parse($claim->start_time) <= $now
+                        && Carbon::parse($claim->end_time) >= $now;
+                });
+
+                if (!$hasClaim) {
+                    // No claim exists, make room available immediately
+                    array_push($toAvailable, $schedule->room_id);
+                    continue; // Skip normal schedule processing
+                }
+                // If claim exists, let it be processed by claimsToday loop below
+                continue;
+            }
+
+            // Normal schedule processing (not cancelled)
             $startTime = Carbon::parse($schedule->start_time);
             $endTime = Carbon::parse($schedule->end_time);
             $limitQuorumTime = $startTime->copy()->addMinutes(15);

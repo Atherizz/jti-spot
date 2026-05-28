@@ -46,7 +46,7 @@ class StudentActionController extends Controller
             ]);
 
         // Gabungkan, urutkan berdasarkan waktu terbaru, ambil 5 teratas
-        $recentRequests = $cancellations
+        $recentRequests = collect($cancellations)
             ->merge($reservations)
             ->sortByDesc('timestamp')
             ->take(5)
@@ -179,6 +179,36 @@ class StudentActionController extends Controller
 
         if ($alreadyClaimed) {
             return back()->withErrors(['schedule_data' => 'Maaf, jadwal kelas yang dibatalkan tersebut sudah lebih dulu direservasi oleh kelas lain.'])->withInput();
+        }
+
+        // Validasi: Pastikan jadwal yang direservasi tidak bertabrakan dengan jadwal asli
+        $conflictingSchedules = Schedule::where('class_group_id', $user->class_group_id)
+            ->where('day_of_week', $reservationDate->dayOfWeek)
+            ->where(function ($query) use ($schedule) {
+                // Overlap detection: (StartA < EndB) AND (EndA > StartB)
+                $query->where('start_time', '<', $schedule->end_time)
+                      ->where('end_time', '>', $schedule->start_time);
+            })
+            ->pluck('id')
+            ->toArray();
+
+        if (!empty($conflictingSchedules)) {
+            // Cek apakah jadwal yang bentrok sudah dibatalkan di tanggal reservasi
+            $cancelledScheduleIds = ScheduleCancellation::whereIn('schedule_id', $conflictingSchedules)
+                ->where('cancellation_date', $reservationDateStr)
+                ->pluck('schedule_id')
+                ->toArray();
+
+            // Filter: jadwal yang bentrok TAPI BELUM dibatalkan
+            $activeConflicts = array_diff($conflictingSchedules, $cancelledScheduleIds);
+
+            if (!empty($activeConflicts)) {
+                $conflictSchedule = Schedule::find($activeConflicts[0]);
+
+                return back()->withErrors([
+                    'schedule_data' => "Kelas Anda memiliki jadwal asli yang bentrok: {$conflictSchedule->course_name} (" . substr($conflictSchedule->start_time, 0, 5) . " - " . substr($conflictSchedule->end_time, 0, 5) . "). Batalkan jadwal tersebut terlebih dahulu jika ingin reservasi slot ini."
+                ])->withInput();
+            }
         }
 
         // Simpan ke tabel room_claims (mereservasi ruangan dari jadwal kelas lain yang batal)

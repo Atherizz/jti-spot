@@ -84,7 +84,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="font-display text-base font-bold text-ink leading-tight">{{ $reservation['course_name'] }}</p>
+                                    <p class="font-display text-base font-bold text-ink leading-tight">Reservasi Ruangan</p>
                                     <div class="flex items-center gap-2 mt-1.5 text-[11px] font-semibold text-gray-500 uppercase tracking-widest">
                                         <span class="text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">{{ $reservation['room_name'] }}</span>
                                     </div>

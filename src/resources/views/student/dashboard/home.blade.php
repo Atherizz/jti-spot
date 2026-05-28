@@ -98,7 +98,7 @@
                         <span class="text-[10px] font-bold uppercase tracking-widest text-orange-600">Besok</span>
                         @endif
                     </div>
-                    <p class="font-display text-base font-bold text-orange-900 leading-tight">{{ $alert['title'] }} - {{ $alert['room'] }}</p>
+                    <p class="font-display text-base font-bold text-orange-900 leading-tight">{{ $alert['room'] }}</p>
                     <p class="text-sm font-medium text-orange-700 mt-1">{{ $alert['date'] }} • {{ $alert['time'] }}</p>
                 </div>
                 <a href="{{ route('student.action.history') }}" class="shrink-0 w-8 h-8 rounded-full bg-orange-100 border border-orange-200 flex items-center justify-center text-orange-600 hover:bg-orange-200 transition-colors">

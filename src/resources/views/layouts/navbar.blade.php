@@ -17,9 +17,6 @@
                     <a href="{{ route('map') }}" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out {{ request()->routeIs('map') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
                         Peta Ruang
                     </a>
-                    <a href="#" class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out {{ request()->is('laporan*') ? 'border-orange-500 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
-                        Laporan
-                    </a>
                 </div>
             </div>
 
@@ -43,7 +40,7 @@
                         <!-- Dropdown menu -->
                         <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 transition-all">
                             <a href="{{ $dashboardRoute }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors">Dasbor</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors">Profil</a>
+                            <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors">Profil</a>
                             <div class="border-t border-gray-100 my-1"></div>
                             <button type="button" onclick="document.getElementById('navbar-logout-modal').classList.remove('hidden')" class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
                                 Keluar
@@ -79,9 +76,6 @@
             <a href="{{ route('map') }}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out {{ request()->routeIs('map') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }}">
                 Peta Ruang
             </a>
-            <a href="#" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out {{ request()->is('laporan*') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }}">
-                Laporan
-            </a>
         </div>
         <div class="pt-4 pb-4 border-t border-gray-200">
             @auth
@@ -101,7 +95,7 @@
                     <a href="{{ $dashboardRoute }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
                         Dasbor
                     </a>
-                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                    <a href="{{ route('profile.show') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
                         Profil
                     </a>
                     <button type="button" onclick="document.getElementById('mobile-menu').classList.add('hidden'); document.getElementById('navbar-logout-modal').classList.remove('hidden')" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors">
