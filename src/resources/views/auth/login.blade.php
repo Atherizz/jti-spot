@@ -123,11 +123,10 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center">
-                        <div class="flex items-center h-5">
-                            <input id="remember_me" name="remember" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-orange-300 text-orange-600 cursor-pointer">
-                        </div>
-                        <label for="remember_me" class="ml-2 text-sm font-medium text-gray-500 cursor-pointer">Pertahankan sesi selama 30 hari</label>
+                    <div class="rounded-xl border border-orange-100 bg-orange-50/70 px-4 py-3">
+                        <p class="text-xs font-semibold text-orange-900/80 leading-relaxed">
+                            Sesi perangkat ini otomatis aktif hingga 30 hari selama Anda tidak keluar dari sistem.
+                        </p>
                     </div>
 
                     <div class="pt-2">

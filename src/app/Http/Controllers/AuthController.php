@@ -35,8 +35,7 @@ class AuthController extends Controller
             
             if ($existingUser) {
                 // User exists, attempt login with reg_number
-                $remember = $request->boolean('remember');
-                if (Auth::attempt(['reg_number' => $request->reg_number, 'password' => $request->password], $remember)) {
+                if (Auth::attempt(['reg_number' => $request->reg_number, 'password' => $request->password])) {
                     $request->session()->regenerate();
                     return $this->redirectBasedOnRole(Auth::user());
                 }
@@ -78,8 +77,8 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            $remember = $request->boolean('remember');
-            Auth::login($user, $remember);
+            Auth::login($user);
+            $request->session()->regenerate();
             event(new Registered($user));
 
             return $this->redirectBasedOnRole($user);
