@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app-jti-spot
     env_file:
       - .env
     depends_on:
@@ -17,9 +16,6 @@ services:
 
   web-jti-spot:
     image: nginx:alpine
-    container_name: web-jti-spot
-    ports:
-      - "127.0.0.1:8000:80"
     volumes:
       - ./docker/nginx/jti-spot.conf:/etc/nginx/conf.d/default.conf
       - public_data:/var/www/html/public
@@ -31,7 +27,6 @@ services:
 
   postgres-db-jti-spot:
     image: postgres:15-alpine
-    container_name: postgres-db-jti-spot
     env_file:
       - .env
     environment:
@@ -41,7 +36,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$DB_USERNAME -d $$DB_DATABASE"] 
+      test: ["CMD-SHELL", "pg_isready -U $$DB_USERNAME -d $$DB_DATABASE"]
       interval: 5s
       timeout: 5s
       retries: 5
