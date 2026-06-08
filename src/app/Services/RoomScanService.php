@@ -17,72 +17,6 @@ use Illuminate\Support\Facades\Schema;
 
 class RoomScanService
 {
-    public function confirmWithoutScan($user)
-    {
-        try {
-            return DB::transaction(function () use ($user) {
-                $classGroup = $user->classGroup;
-
-                if (!$classGroup) {
-                    return $this->handleFailedScan($user, 'MANUAL_CHECKIN', 'Kelas tidak ditemukan!');
-                }
-
-                $now = Carbon::now();
-                $currentDay = $now->dayOfWeek;
-                $currentTime = $now->format('H:i:s');
-                $currentDate = $now->toDateString();
-
-                $schedule = Schedule::where('class_group_id', $classGroup->id)
-                    ->where('day_of_week', $currentDay)
-                    ->where('start_time', '<=', $currentTime)
-                    ->where('end_time', '>=', $currentTime)
-                    ->first();
-
-                if ($schedule) {
-                    $room = Room::whereKey($schedule->room_id)->lockForUpdate()->first();
-
-                    if (!$room) {
-                        return $this->handleFailedScan($user, 'MANUAL_CHECKIN', 'Ruangan tidak ditemukan untuk sesi aktif.');
-                    }
-
-                    return $this->processAttendance($user, 'MANUAL_CHECKIN', $room, $classGroup, $schedule);
-                }
-
-                $activeClaimQuery = RoomClaim::where('claimer_group_id', $classGroup->id)
-                    ->where('claim_date', $currentDate)
-                    ->whereIn('status', ['pending_quorum', 'locked']);
-
-                if (Schema::hasColumn('room_claims', 'start_time') && Schema::hasColumn('room_claims', 'end_time')) {
-                    $activeClaimQuery
-                        ->whereTime('start_time', '<=', $currentTime)
-                        ->whereTime('end_time', '>=', $currentTime);
-                } else {
-                    $activeClaimQuery->whereHas('schedule', function ($query) use ($currentDay, $currentTime) {
-                        $query->where('day_of_week', $currentDay)
-                            ->where('start_time', '<=', $currentTime)
-                            ->where('end_time', '>=', $currentTime);
-                    });
-                }
-
-                $activeClaim = $activeClaimQuery->first();
-
-                if ($activeClaim) {
-                    $room = Room::whereKey($activeClaim->room_id)->lockForUpdate()->first();
-
-                    if (!$room) {
-                        return $this->handleFailedScan($user, 'MANUAL_CHECKIN', 'Ruangan tidak ditemukan untuk sesi klaim.');
-                    }
-
-                    return $this->processAttendance($user, 'MANUAL_CHECKIN', $room, $classGroup, null, $activeClaim);
-                }
-
-                return $this->handleFailedScan($user, 'MANUAL_CHECKIN', 'Tidak ada sesi aktif yang bisa diverifikasi saat ini.');
-            });
-        } catch (\Exception $e) {
-            return $this->handleFailedScan($user, 'MANUAL_CHECKIN', $e->getMessage());
-        }
-    }
-
     public function confirmScan($user, $qrToken)
     {
         try {
@@ -219,7 +153,7 @@ class RoomScanService
         $quorumSize = env('QUORUM_SIZE', 5);
         $isQuorumReached = false;
         if ($newQuorumCount >= $quorumSize && $room->current_status !== 'occupied') {
-            $room->update(['current_status' => 'occupied']);
+            $room->update(['current_status' => 'occupied', 'quorum_extended_until' => null]);
             $isQuorumReached = true;
         }
 

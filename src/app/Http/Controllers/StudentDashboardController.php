@@ -6,7 +6,9 @@ use App\Models\ActivityLog;
 use App\Models\QuorumScan;
 use App\Models\RoomClaim;
 use App\Models\Schedule;
+use App\Models\ScheduleCancellation;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -58,12 +60,17 @@ class StudentDashboardController extends Controller
         $sessionRoomUrl = null;
         $checkInPageUrl = null;
 
+        $sessionIsOccupied      = false;
+        $quorumExtendedUntil    = null;
+
         if ($activeSchedule) {
             $targetColumn = 'schedule_id';
             $targetId = $activeSchedule->id;
             $sessionTitle = $activeSchedule->course_name;
             $sessionMeta = ($activeSchedule->classGroup->name ?? '-') . ' • Sesi resmi';
             $sessionLocation = $activeSchedule->room?->name ?? '-';
+            $sessionIsOccupied = $activeSchedule->room?->current_status === 'occupied';
+            $quorumExtendedUntil = $activeSchedule->room?->quorum_extended_until;
             if (!empty($activeSchedule->room?->qr_token)) {
                 $sessionRoomUrl = route('scan.initial', $activeSchedule->room->qr_token);
                 $checkInPageUrl = route('student.checkin.show', $activeSchedule->room->qr_token);
@@ -74,6 +81,7 @@ class StudentDashboardController extends Controller
             $sessionTitle = $activeClaim->schedule?->course_name ?? 'Klaim Ruangan';
             $sessionMeta = ($activeClaim->claimerGroup->name ?? '-') . ' • Sesi klaim';
             $sessionLocation = $activeClaim->room?->name ?? '-';
+            $sessionIsOccupied = $activeClaim->status === 'locked';
             if (!empty($activeClaim->room?->qr_token)) {
                 $sessionRoomUrl = route('scan.initial', $activeClaim->room->qr_token);
                 $checkInPageUrl = route('student.checkin.show', $activeClaim->room->qr_token);
@@ -139,6 +147,9 @@ class StudentDashboardController extends Controller
 
         $streakDays = $this->calculateStreakDays($user->id, $currentDate);
 
+        // Alert banner: pembatalan & reservasi H-7 ke depan
+        $upcomingAlerts = $this->getUpcomingAlerts($classGroupId, $now);
+
         return view('student.dashboard.home', [
             'activities' => $activities,
             'totalActivities' => $totalActivities,
@@ -151,10 +162,13 @@ class StudentDashboardController extends Controller
             'currentQuorum' => $currentQuorum,
             'progressPercent' => $progressPercent,
             'canManualCheckIn' => (bool) $targetId,
+            'sessionIsOccupied' => $sessionIsOccupied,
+            'quorumExtendedUntil' => $quorumExtendedUntil,
             'alreadyScanned' => $alreadyScanned,
             'weeklyScans' => $weeklyScans,
             'verifiedRooms' => $verifiedRooms,
             'streakDays' => $streakDays,
+            'upcomingAlerts' => $upcomingAlerts,
         ]);
     }
 
@@ -253,5 +267,156 @@ class StudentDashboardController extends Controller
     private function successfulScanEventTypes(): array
     {
         return ['SCAN_SUCCESS', 'SCAN_SUCCEED', 'Scan_Succeed'];
+    }
+
+    private function getUpcomingAlerts(int $classGroupId, Carbon $now): array
+    {
+        $sevenDaysAhead = $now->copy()->addDays(7)->toDateString();
+        $alerts = [];
+
+        // Pembatalan kelas
+        $cancellations = ScheduleCancellation::with('schedule')
+            ->whereHas('schedule', function ($query) use ($classGroupId) {
+                $query->where('class_group_id', $classGroupId);
+            })
+            ->where('cancellation_date', '>=', $now->toDateString())
+            ->where('cancellation_date', '<=', $sevenDaysAhead)
+            ->orderBy('cancellation_date')
+            ->get();
+
+        foreach ($cancellations as $cancellation) {
+            $alerts[] = [
+                'type' => 'cancellation',
+                'title' => $cancellation->schedule?->course_name ?? 'Kelas',
+                'date' => Carbon::parse($cancellation->cancellation_date)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+                'urgency' => Carbon::parse($cancellation->cancellation_date)->diffInDays($now),
+            ];
+        }
+
+        // Reservasi ruangan
+        $reservations = RoomClaim::with(['schedule', 'room'])
+            ->where('claimer_group_id', $classGroupId)
+            ->where('claim_date', '>=', $now->toDateString())
+            ->where('claim_date', '<=', $sevenDaysAhead)
+            ->whereIn('status', ['pending_quorum', 'locked'])
+            ->orderBy('claim_date')
+            ->get();
+
+        foreach ($reservations as $claim) {
+            $alerts[] = [
+                'type' => 'reservation',
+                'title' => $claim->schedule?->course_name ?? 'Kelas',
+                'room' => $claim->room?->name ?? 'Ruangan',
+                'date' => Carbon::parse($claim->claim_date)->locale('id')->isoFormat('dddd, D MMMM YYYY'),
+                'time' => Carbon::parse($claim->start_time)->format('H:i') . ' - ' . Carbon::parse($claim->end_time)->format('H:i'),
+                'urgency' => Carbon::parse($claim->claim_date)->diffInDays($now),
+            ];
+        }
+
+        // Sort by urgency (semakin dekat semakin prioritas)
+        usort($alerts, fn($a, $b) => $a['urgency'] <=> $b['urgency']);
+
+        return array_slice($alerts, 0, 3);
+    }
+
+    public function extendQuorum(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'delay_minutes' => ['required', 'integer', 'in:15,30,45'],
+        ]);
+
+        $user         = $request->user();
+        $classGroupId = $user->class_group_id;
+        $now          = Carbon::now();
+        $currentTime  = $now->format('H:i:s');
+
+        $activeSchedule = Schedule::with('room')
+            ->where('class_group_id', $classGroupId)
+            ->where('day_of_week', $now->dayOfWeek)
+            ->where('start_time', '<=', $currentTime)
+            ->where('end_time', '>=', $currentTime)
+            ->first();
+
+        if (!$activeSchedule?->room) {
+            return redirect()->route('student.dashboard.home')
+                ->with('error', 'Tidak ada jadwal aktif yang ditemukan untuk kelas Anda.');
+        }
+
+        $room = $activeSchedule->room;
+
+        if ($room->current_status === 'occupied') {
+            return redirect()->route('student.dashboard.home')
+                ->with('error', 'Kelas sudah berjalan (kuorum tercapai), tidak perlu perpanjangan.');
+        }
+
+        $claimedByOther = RoomClaim::where('room_id', $room->id)
+            ->where('claim_date', $now->toDateString())
+            ->whereIn('status', ['pending_quorum', 'locked'])
+            ->where('claimer_group_id', '!=', $classGroupId)
+            ->exists();
+
+        if ($claimedByOther) {
+            return redirect()->route('student.dashboard.home')
+                ->with('error', 'Ruangan sudah diklaim kelas lain. Silakan cari ruangan kosong alternatif.');
+        }
+
+        $extendedUntil = $now->copy()->addMinutes((int) $validated['delay_minutes']);
+
+        $room->update([
+            'quorum_extended_until' => $extendedUntil,
+            'current_status'        => 'waiting',
+        ]);
+
+        return redirect()->route('student.dashboard.home')
+            ->with('success', "Window kuorum diperpanjang hingga {$extendedUntil->format('H:i')}. Ruangan tetap dalam status Menunggu.");
+    }
+
+    public function endSession(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $classGroupId = $user->class_group_id;
+        $now = Carbon::now();
+        $currentTime = $now->format('H:i:s');
+        $currentDate = $now->toDateString();
+
+        $activeSchedule = Schedule::with('room')
+            ->where('class_group_id', $classGroupId)
+            ->where('day_of_week', $now->dayOfWeek)
+            ->where('start_time', '<=', $currentTime)
+            ->where('end_time', '>=', $currentTime)
+            ->first();
+
+        if ($activeSchedule?->room) {
+            if ($activeSchedule->room->current_status !== 'occupied') {
+                return redirect()->route('student.dashboard.home')
+                    ->with('error', 'Sesi belum bisa diakhiri karena ruangan belum berstatus terpakai (kuorum belum tercapai).');
+            }
+            $activeSchedule->room->update(['current_status' => 'available']);
+            return redirect()->route('student.dashboard.home')
+                ->with('success', 'Sesi kelas berhasil diakhiri. Ruangan kini tersedia untuk kelas lain.');
+        }
+
+        $activeClaimQuery = RoomClaim::with('room')
+            ->where('claimer_group_id', $classGroupId)
+            ->where('claim_date', $currentDate)
+            ->where('status', 'locked');
+
+        if (Schema::hasColumn('room_claims', 'start_time') && Schema::hasColumn('room_claims', 'end_time')) {
+            $activeClaimQuery
+                ->whereTime('start_time', '<=', $currentTime)
+                ->whereTime('end_time', '>=', $currentTime);
+        }
+
+        $activeClaim = $activeClaimQuery->first();
+
+        if ($activeClaim?->room) {
+            $activeClaim->room->update(['current_status' => 'available']);
+            $activeClaim->update(['status' => 'completed']);
+            return redirect()->route('student.dashboard.home')
+                ->with('success', 'Sesi kelas berhasil diakhiri. Ruangan kini tersedia untuk kelas lain.');
+        }
+
+        return redirect()->route('student.dashboard.home')
+            ->with('error', 'Tidak ada sesi aktif yang dapat diakhiri saat ini.');
     }
 }

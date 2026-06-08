@@ -22,9 +22,38 @@
         </div>
         <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-ink mb-3 leading-tight">Reservasi Ruangan Kelas</h1>
         <p class="text-sm font-medium text-ink/60 max-w-xl leading-relaxed">
-            Ajukan permintaan reservasi ruangan untuk jadwal kelas mendatang. Pengajuan berlaku untuk sesi <strong class="text-ink">H-1 atau H-2</strong> sebelum kelas dimulai.
+            Ajukan permintaan reservasi ruangan untuk jadwal kelas mendatang. Pengajuan berlaku untuk maksimal <strong class="text-ink">2 hari ke depan</strong> dari hari ini.
         </p>
     </div>
+
+    {{-- Error Alert --}}
+    @if($errors->any())
+    <div id="errorAlert" class="mb-8 editorial-panel bg-red-50 border-red-200 p-5 flex items-start gap-4 stagger-1">
+        <div class="w-10 h-10 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center shrink-0 text-red-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <h3 class="font-display font-bold text-base text-red-900 mb-2">Terjadi Kesalahan</h3>
+            <ul class="space-y-1">
+                @foreach($errors->all() as $error)
+                <li class="text-sm font-medium text-red-700 leading-relaxed flex items-start gap-2">
+                    <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    {{ $error }}
+                </li>
+                @endforeach
+            </ul>
+        </div>
+        <button onclick="document.getElementById('errorAlert').remove()" class="text-red-400 hover:text-red-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+    @endif
 
     {{-- Formal Alert Panel --}}
     <div class="editorial-panel bg-orange-50/50 relative overflow-hidden mb-8 stagger-2 group">
@@ -40,11 +69,11 @@
                 <ul class="space-y-1">
                     <li class="text-sm font-medium text-orange-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        Reservasi hanya dapat diajukan untuk jadwal kelas <strong>1–2 hari ke depan</strong> (H-1 atau H-2).
+                        Reservasi dapat diajukan untuk jadwal kelas <strong>hari ini hingga 2 hari ke depan</strong>.
                     </li>
                     <li class="text-sm font-medium text-orange-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        Status reservasi bersifat <strong>pending</strong> hingga divalidasi oleh sistem dan pihak administrasi.
+                        Status reservasi bersifat <strong>menunggu</strong> hingga divalidasi oleh sistem dan pihak administrasi.
                     </li>
                     <li class="text-sm font-medium text-orange-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
@@ -75,68 +104,50 @@
 
                     {{-- Jadwal Kelas (Dropdown pilih jadwal yang akan direservasi) --}}
                     <div>
-                        <label for="schedule_id" class="block text-[11px] font-semibold text-ink tracking-widest uppercase mb-2">
+                        <label for="schedule_data" class="block text-[11px] font-semibold text-ink tracking-widest uppercase mb-2">
                             Jadwal Kelas yang Direservasi
                         </label>
                         <div class="relative">
-                            <select id="schedule_id" name="schedule_id"
-                                class="w-full appearance-none bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 hover:border-gray-300 transition-all shadow-sm">
-                                <option disabled selected>-- Pilih jadwal yang akan direservasi --</option>
+                            <select id="schedule_data" name="schedule_data"
+                                class="w-full bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 hover:border-gray-300 transition-all shadow-sm search-select">
+                                <option disabled selected value="">-- Pilih jadwal yang akan direservasi --</option>
                                 @foreach($upcomingSchedules ?? [] as $schedule)
-                                    <option value="{{ $schedule->id }}" {{ old('schedule_id') == $schedule->id ? 'selected' : '' }}>
-                                        {{ $schedule->course_name }} — {{ \Carbon\Carbon::parse($schedule->class_date)->translatedFormat('l, d M Y') }}
+                                    <option value="{{ $schedule->reservation_data }}" data-room="{{ $schedule->room?->name ?? 'Ruangan Indefinit' }}" {{ old('schedule_data') == $schedule->reservation_data ? 'selected' : '' }}>
+                                        {{ $schedule->classGroup?->name ?? 'Umum' }} - {{ $schedule->course_name }} — {{ \Carbon\Carbon::parse($schedule->class_date)->translatedFormat('l, d M Y') }}
                                         ({{ \Carbon\Carbon::parse($schedule->start_time)->format('H:i') }} – {{ \Carbon\Carbon::parse($schedule->end_time)->format('H:i') }})
                                     </option>
                                 @endforeach
                             </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                            </div>
                         </div>
-                        @error('schedule_id')
+                        @error('schedule_data')
                             <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    {{-- Tanggal Reservasi (dipilih, validasi H-1/H-2) --}}
+                    {{-- Tanggal Reservasi (otomatis terisi) --}}
                     <div>
-                        <label for="reservation_date" class="block text-[11px] font-semibold text-ink tracking-widest uppercase mb-2">
+                        <label class="block text-[11px] font-semibold text-ink/40 tracking-widest uppercase mb-2">
                             Tanggal Pengajuan
                         </label>
-                        <div class="relative">
-                            <input type="date" id="reservation_date" name="reservation_date"
-                                value="{{ old('reservation_date', now()->format('Y-m-d')) }}"
-                                min="{{ now()->format('Y-m-d') }}"
-                                class="w-full bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 hover:border-gray-300 transition-all shadow-sm">
+                        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3.5 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-400 shrink-0 shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
+                            <p class="text-sm font-medium text-gray-400" id="date-preview">Otomatis terisi saat jadwal dipilih</p>
                         </div>
-                        @error('reservation_date')
-                            <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>
-                        @enderror
                     </div>
 
-                    {{-- Pilihan Ruangan --}}
+                    {{-- Ruangan Terkait (otomatis terisi) --}}
                     <div>
-                        <label for="room_id" class="block text-[11px] font-semibold text-ink tracking-widest uppercase mb-2">
-                            Ruangan yang Diminta
+                        <label class="block text-[11px] font-semibold text-ink/40 tracking-widest uppercase mb-2">
+                            Ruangan Terkait
                         </label>
-                        <div class="relative">
-                            <select id="room_id" name="room_id"
-                                class="w-full appearance-none bg-white border border-gray-200 text-ink p-3.5 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 hover:border-gray-300 transition-all shadow-sm">
-                                <option disabled selected>-- Pilih ruangan yang tersedia --</option>
-                                @foreach($availableRooms ?? [] as $room)
-                                    <option value="{{ $room->id }}" {{ old('room_id') == $room->id ? 'selected' : '' }}>
-                                        {{ $room->name }}
-                                        @if($room->capacity) (Kapasitas: {{ $room->capacity }}) @endif
-                                    </option>
-                                @endforeach
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-400">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        <div class="bg-gray-50 border border-gray-100 rounded-xl p-3.5 flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-white border border-gray-200 flex items-center justify-center text-gray-400 shrink-0 shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                             </div>
+                            <p class="text-sm font-medium text-gray-400" id="room-preview">Otomatis terisi saat jadwal dipilih</p>
                         </div>
-                        @error('room_id')
-                            <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     {{-- Waktu Mulai --}}
@@ -171,7 +182,7 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <p class="text-[12px] font-medium text-ink/50 leading-relaxed">
-                        Reservasi yang diajukan di luar jendela waktu H-1 / H-2 akan <strong class="text-ink/70">otomatis ditolak</strong> oleh sistem. Pastikan tanggal jadwal yang dipilih sesuai.
+                        Reservasi yang diajukan di luar rentang <strong class="text-ink/70">hari ini hingga 2 hari ke depan</strong> akan otomatis ditolak oleh sistem. Pastikan tanggal jadwal yang dipilih sesuai.
                     </p>
                 </div>
 
@@ -196,22 +207,69 @@
 @endsection
 
 @push('scripts')
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
-    // Update time preview saat jadwal dipilih
-    document.getElementById('schedule_id').addEventListener('change', function() {
-        const selected = this.options[this.selectedIndex];
-        const text = selected.text;
-        const timeMatch = text.match(/\(([^)]+)\)/);
-        const preview = document.getElementById('time-preview');
-        if (timeMatch) {
-            preview.textContent = timeMatch[1];
-            preview.classList.remove('text-gray-400');
-            preview.classList.add('text-ink');
-        } else {
-            preview.textContent = 'Otomatis terisi saat jadwal dipilih';
-            preview.classList.add('text-gray-400');
-            preview.classList.remove('text-ink');
+    document.addEventListener('DOMContentLoaded', function() {
+        new TomSelect('.search-select', {
+            create: false,
+            sortField: {
+                field: "text",
+                direction: "asc"
+            }
+        });
+
+        const selectEl = document.getElementById('schedule_data');
+        
+        function updatePreviews() {
+            const selected = selectEl.options[selectEl.selectedIndex];
+            if (!selected || selected.disabled || !selected.value) return;
+            
+            const text = selected.text;
+            const timeMatch = text.match(/\(([^)]+)\)/);
+            const dateMatch = text.match(/—\s*(.+?)\s*\(/);
+            
+            const timePreview = document.getElementById('time-preview');
+            const datePreview = document.getElementById('date-preview');
+            
+            if (timeMatch) {
+                timePreview.textContent = timeMatch[1];
+                timePreview.classList.remove('text-gray-400');
+                timePreview.classList.add('text-ink');
+            }
+            
+            if (dateMatch) {
+                datePreview.textContent = dateMatch[1];
+                datePreview.classList.remove('text-gray-400');
+                datePreview.classList.add('text-ink');
+            }
+            
+            const roomName = selected.getAttribute('data-room');
+            const roomPreview = document.getElementById('room-preview');
+            if (roomName) {
+                roomPreview.textContent = roomName;
+                roomPreview.classList.remove('text-gray-400');
+                roomPreview.classList.add('text-ink');
+            }
+        }
+
+        selectEl.addEventListener('change', updatePreviews);
+        
+        // Cek jika sudah ada pilihan sebelumnya (old value)
+        if (selectEl.value) {
+            updatePreviews();
         }
     });
 </script>
+<style>
+    .ts-control {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+    .ts-wrapper.search-select {
+        padding: 0.875rem !important;
+    }
+</style>
 @endpush

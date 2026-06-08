@@ -23,6 +23,7 @@ Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip'
 Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
 
 Route::get('/', [GuestController::class, 'index'])->name('home');
+Route::get('/live-data', [GuestController::class, 'liveData'])->name('live.data');
 Route::get('/peta-ruang', [GuestController::class, 'map'])->name('map');
 
 Route::get('/login', [AuthController::class, 'showLogin'])->middleware('guest')->name('login');
@@ -42,10 +43,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/schedules', [StudentScheduleController::class, 'index'])
             ->name('student.schedules');
 
-        Route::post('/attendance/confirm', [RoomActionController::class, 'confirmWithoutScan'])
-            ->middleware('check.location') 
-            ->name('student.attendance.confirm');
-
         Route::get('/scan/{qr_token}', [RoomActionController::class, 'scanInitial'])
              ->name('scan.initial');
 
@@ -60,8 +57,15 @@ Route::middleware(['auth'])->group(function () {
              ->middleware('check.location')
              ->name('scan.claim');
 
+        Route::get('/action/history', [StudentActionController::class, 'history'])
+            ->name('student.action.history');
+
         // ── Pusat Aksi (Hanya Ketua Kelas) ──────────────────────────
         Route::middleware('can:class_rep')->group(function () {
+            Route::post('/session/end', [StudentDashboardController::class, 'endSession'])
+                ->name('student.session.end');
+            Route::post('/session/extend-quorum', [StudentDashboardController::class, 'extendQuorum'])
+                ->name('student.session.extend-quorum');
             Route::get('/action', [StudentActionController::class, 'center'])
                 ->name('student.action.center');
 
@@ -74,9 +78,6 @@ Route::middleware(['auth'])->group(function () {
                 ->name('student.action.pembatalan');
             Route::post('/action/pembatalan', [StudentActionController::class, 'storePembatalan'])
                 ->name('student.action.pembatalan.store');
-
-            Route::get('/action/history', [StudentActionController::class, 'history'])
-                ->name('student.action.history');
         });
         Route::post('/claim-class-rep-token', [ClassRepTokenController::class, 'claim'])
             ->name('student.claim.class-rep-token');

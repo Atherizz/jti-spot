@@ -222,7 +222,7 @@
 					<form id="claim-token-form" method="POST" action="{{ route('student.claim.class-rep-token') }}" class="space-y-5">
 						@csrf
 						<div>
-							<label for="claim-token-input" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Access Token</label>
+							<label for="claim-token-input" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Token Akses</label>
 							<input
 								id="claim-token-input"
 								type="text"

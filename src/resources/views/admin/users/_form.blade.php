@@ -61,7 +61,7 @@
             </div>
 
             <div>
-                <label for="role" class="block text-sm font-semibold text-gray-700 mb-1.5">Role</label>
+                <label for="role" class="block text-sm font-semibold text-gray-700 mb-1.5">Peran</label>
                 @php
                     $selectedRole = old('role', $user->role ?? 'admin');
                 @endphp
@@ -122,7 +122,7 @@
 
             <div>
                 <label for="password" class="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Password {{ $isEdit ? '(kosongkan jika tidak diubah)' : '' }}
+                    Kata Sandi {{ $isEdit ? '(kosongkan jika tidak diubah)' : '' }}
                 </label>
                 <input
                     id="password"
@@ -134,7 +134,7 @@
             </div>
 
             <div>
-                <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1.5">Konfirmasi Password</label>
+                <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1.5">Konfirmasi Kata Sandi</label>
                 <input
                     id="password_confirmation"
                     type="password"

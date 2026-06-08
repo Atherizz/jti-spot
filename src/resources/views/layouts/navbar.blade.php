@@ -39,17 +39,18 @@
 
                         <!-- Dropdown menu -->
                         <div class="hidden origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50 transition-all">
-                            <a href="{{ $dashboardRoute }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors">Dashboard</a>
+                            <a href="{{ $dashboardRoute }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors">Dasbor</a>
+                            <a href="{{ route('profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-orange-600 transition-colors">Profil</a>
                             <div class="border-t border-gray-100 my-1"></div>
                             <button type="button" onclick="document.getElementById('navbar-logout-modal').classList.remove('hidden')" class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer">
-                                Logout
+                                Keluar
                             </button>
                         </div>
                     </div>
                 @else
                     <a href="{{ route('login') }}">
                         <button class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow">
-                            Login
+                            Masuk
                         </button>
                     </a>
                 @endauth
@@ -75,9 +76,6 @@
             <a href="{{ route('map') }}" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out {{ request()->routeIs('map') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }}">
                 Peta Ruang
             </a>
-            <a href="#" class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition duration-150 ease-in-out {{ request()->is('laporan*') ? 'border-orange-500 text-orange-700 bg-orange-50' : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300' }}">
-                Laporan
-            </a>
         </div>
         <div class="pt-4 pb-4 border-t border-gray-200">
             @auth
@@ -95,20 +93,20 @@
                 </div>
                 <div class="px-4 space-y-2 mt-3">
                     <a href="{{ $dashboardRoute }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
-                        Dashboard
+                        Dasbor
                     </a>
-                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                    <a href="{{ route('profile.show') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 transition-colors">
                         Profil
                     </a>
                     <button type="button" onclick="document.getElementById('mobile-menu').classList.add('hidden'); document.getElementById('navbar-logout-modal').classList.remove('hidden')" class="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors">
-                        Logout
+                        Keluar
                     </button>
                 </div>
             @else
                 <div class="flex items-center px-4 gap-4">
                     <a href="{{ route('login') }}" class="w-full">
                         <button class="w-full bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                            Login
+                            Masuk
                         </button>
                     </a>
                 </div>
@@ -128,7 +126,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 mb-2">Konfirmasi Logout</h3>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Konfirmasi Keluar</h3>
             <p class="text-sm text-gray-500 mb-6">Apakah Anda yakin ingin keluar dari aplikasi?</p>
 
             <div class="flex flex-row items-center gap-3 w-full">

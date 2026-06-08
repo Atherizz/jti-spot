@@ -26,5 +26,7 @@
 
         <!-- Footer variant component -->
         @include('layouts.footer')
+
+        @stack('scripts')
     </body>
 </html>

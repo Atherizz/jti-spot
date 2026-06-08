@@ -1,0 +1,176 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- Title -->
+    <mxCell id="2" value="Sequence Diagram - Membuat QR Code (UC-15)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="250" y="20" width="750" height="30" as="geometry" />
+    </mxCell>
+
+    <!-- Lifeline Headers -->
+    <mxCell id="10" value="Admin" style="shape=mxgraph.uml.actor;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="80" y="70" width="60" height="80" as="geometry" />
+    </mxCell>
+    <mxCell id="11" value="UI Detail Ruangan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;arcSize=50;" vertex="1" parent="1">
+      <mxGeometry x="240" y="90" width="150" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="12" value="QR Code Controller" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;arcSize=50;" vertex="1" parent="1">
+      <mxGeometry x="480" y="90" width="150" height="40" as="geometry" />
+    </mxCell>
+    <mxCell id="13" value="QR Generator + DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d6b656;arcSize=50;" vertex="1" parent="1">
+      <mxGeometry x="720" y="90" width="150" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- Lifelines -->
+    <mxCell id="20" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="110" y="150" as="sourcePoint" />
+        <mxPoint x="110" y="1000" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="21" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="315" y="130" as="sourcePoint" />
+        <mxPoint x="315" y="1000" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="22" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="555" y="130" as="sourcePoint" />
+        <mxPoint x="555" y="1000" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="23" value="" style="endArrow=none;dashed=1;html=1;strokeColor=#666666;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="795" y="130" as="sourcePoint" />
+        <mxPoint x="795" y="1000" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- Note: dipicu dari UC-13 -->
+    <mxCell id="24" value="note: Dipicu setelah admin tambah ruangan baru (extend dari UC-13)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="110" y="155" width="380" height="35" as="geometry" />
+    </mxCell>
+
+    <!-- Activation boxes -->
+    <mxCell id="30" value="" style="fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="103" y="200" width="14" height="680" as="geometry" />
+    </mxCell>
+    <mxCell id="31" value="" style="fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+      <mxGeometry x="308" y="215" width="14" height="490" as="geometry" />
+    </mxCell>
+    <mxCell id="32" value="" style="fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+      <mxGeometry x="548" y="240" width="14" height="380" as="geometry" />
+    </mxCell>
+    <mxCell id="33" value="" style="fillColor=#ffe6cc;strokeColor=#d6b656;" vertex="1" parent="1">
+      <mxGeometry x="788" y="270" width="14" height="220" as="geometry" />
+    </mxCell>
+
+    <!-- Messages -->
+    <mxCell id="40" value="1. Klik &quot;Buat QR Code&quot;" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="117" y="215" as="sourcePoint" />
+        <mxPoint x="308" y="215" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="41" value="2. POST /rooms/{id}/qrcode" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="322" y="240" as="sourcePoint" />
+        <mxPoint x="548" y="240" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="50" value="Cek apakah QR aktif sudah ada" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="580" y="248" width="180" height="35" as="geometry" />
+    </mxCell>
+    <mxCell id="42" value="3. Cek QR aktif di DB" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="562" y="295" as="sourcePoint" />
+        <mxPoint x="788" y="295" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="43" value="4. Belum ada QR aktif" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="788" y="320" as="sourcePoint" />
+        <mxPoint x="562" y="320" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="44" value="5. Generate QR unik (ID + nama + lokasi)" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="562" y="355" as="sourcePoint" />
+        <mxPoint x="788" y="355" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="45" value="6. QR data tersimpan" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="788" y="385" as="sourcePoint" />
+        <mxPoint x="562" y="385" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="46" value="7. Preview QR Code" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="548" y="415" as="sourcePoint" />
+        <mxPoint x="322" y="415" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="47" value="8. Konfirmasi &quot;Simpan &amp; Unduh&quot;" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="117" y="445" as="sourcePoint" />
+        <mxPoint x="308" y="445" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="48" value="9. Finalize &amp; mark QR aktif" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="322" y="470" as="sourcePoint" />
+        <mxPoint x="548" y="470" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="49" value="10. Notifikasi berhasil + link unduh PNG/PDF" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="548" y="500" as="sourcePoint" />
+        <mxPoint x="322" y="500" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="51" value="11. QR siap cetak dan tempel di pintu ruangan" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="1">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="308" y="530" as="sourcePoint" />
+        <mxPoint x="117" y="530" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ALT 1: QR sudah ada -->
+    <mxCell id="60" value="alt [QR Code sudah ada sebelumnya]" style="swimlane;startSize=20;fillColor=#f9f9f9;strokeColor=#999999;dashed=1;fontSize=11;fontStyle=2;align=left;" vertex="1" parent="1">
+      <mxGeometry x="120" y="550" width="760" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="61" value="12. Peringatan &quot;QR sudah ada, buat ulang?&quot;" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="60">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="440" y="42" as="sourcePoint" />
+        <mxPoint x="198" y="42" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="62" value="13. Konfirmasi buat ulang" style="html=1;verticalAlign=bottom;endArrow=block;endFill=1;strokeColor=#333333;fontSize=11;" edge="1" parent="60">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="-10" y="67" as="sourcePoint" />
+        <mxPoint x="198" y="67" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+    <!-- ALT 2: gagal generate -->
+    <mxCell id="63" value="alt [Gagal generate QR]" style="swimlane;startSize=20;fillColor=#f9f9f9;strokeColor=#999999;dashed=1;fontSize=11;fontStyle=2;align=left;" vertex="1" parent="1">
+      <mxGeometry x="120" y="655" width="760" height="90" as="geometry" />
+    </mxCell>
+    <mxCell id="64" value="14. Pesan error &quot;Gagal membuat QR Code&quot;" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="63">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="440" y="42" as="sourcePoint" />
+        <mxPoint x="198" y="42" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+    <mxCell id="65" value="15. Tampilkan error, admin coba lagi" style="html=1;verticalAlign=bottom;endArrow=open;endFill=0;dashed=1;strokeColor=#333333;fontSize=11;" edge="1" parent="63">
+      <mxGeometry relative="1" as="geometry">
+        <mxPoint x="198" y="67" as="sourcePoint" />
+        <mxPoint x="-10" y="67" as="targetPoint" />
+      </mxGeometry>
+    </mxCell>
+
+  </root>
+</mxGraphModel>

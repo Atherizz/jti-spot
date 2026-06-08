@@ -24,9 +24,9 @@
 
         $statusLabel = function (string $status): string {
             return match ($status) {
-                'available' => 'Available',
-                'occupied' => 'Occupied',
-                'waiting' => 'Waiting',
+                'available' => 'Tersedia',
+                'occupied' => 'Terpakai',
+                'waiting' => 'Menunggu',
                 default => ucwords(str_replace('_', ' ', $status)),
             };
         };
@@ -124,7 +124,7 @@
                 <div class="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 border border-orange-100">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
-                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 tracking-widest uppercase">Standby</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-500 tracking-widest uppercase">Menunggu</span>
             </div>
             <p class="font-display text-3xl font-bold text-ink">{{ $stats['waiting'] }}</p>
         </div>

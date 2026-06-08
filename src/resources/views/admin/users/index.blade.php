@@ -64,7 +64,7 @@
 
                 <div class="w-full md:w-auto flex items-center gap-2.5">
                     <a href="{{ route('admin.users.create') }}" class="inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-orange-900 rounded-xl hover:bg-orange-800 transition-colors whitespace-nowrap">
-                        + Tambah User
+                        + Tambah Pengguna
                     </a>
 
                     <form method="GET" action="{{ route('admin.users.index') }}" class="w-full">
@@ -183,7 +183,7 @@
                         href="{{ $users->previousPageUrl() ?? '#' }}"
                         class="inline-flex items-center px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border transition-colors {{ $users->onFirstPage() ? 'border-gray-200 text-gray-400 bg-gray-100 pointer-events-none' : 'border-gray-200 text-gray-700 bg-white hover:bg-gray-50' }}"
                     >
-                        Prev
+                        Sebelumnya
                     </a>
 
                     <span class="text-xs sm:text-sm text-gray-500 px-1">
@@ -194,7 +194,7 @@
                         href="{{ $users->hasMorePages() ? $users->nextPageUrl() : '#' }}"
                         class="inline-flex items-center px-3 py-2 text-xs sm:text-sm font-semibold rounded-lg border transition-colors {{ $users->hasMorePages() ? 'border-orange-200 text-orange-700 bg-orange-50 hover:bg-orange-100' : 'border-gray-200 text-gray-400 bg-gray-100 pointer-events-none' }}"
                     >
-                        Next
+                        Berikutnya
                     </a>
                 </div>
             </div>
