@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
 class RoomImportController extends Controller
@@ -294,5 +299,64 @@ class RoomImportController extends Controller
         }
 
         return (int) $value;
+    }
+
+    public function downloadTemplate(): StreamedResponse
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set headers
+        $headers = [
+            'No', 'Room', 'Class Name', 'Day', 'Day Name', 'Start Period', 'End Period', 'Start Time', 'End Time', 'Course Code', 'Lecturer'
+        ];
+
+        foreach ($headers as $colIndex => $header) {
+            $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex + 1) . '1';
+            $sheet->setCellValue($cellCoordinate, $header);
+        }
+
+        // Set example data
+        $exampleData = [
+            [1, 'LPR2', 'TI2B', 1, 'Senin', 1, 6, '07:00', '12:10', 'PWL_TI', 'Dosen Pengampu 1'],
+            [2, 'LPR4', 'TI2G', 1, 'Senin', 1, 4, '07:00', '10:30', 'SK_TI', 'Dosen Pengampu 2']
+        ];
+
+        foreach ($exampleData as $rowIndex => $rowData) {
+            foreach ($rowData as $colIndex => $value) {
+                $cellCoordinate = Coordinate::stringFromColumnIndex($colIndex + 1) . ($rowIndex + 2);
+                $sheet->setCellValue($cellCoordinate, $value);
+            }
+        }
+
+        // Auto size columns
+        foreach (range(1, count($headers)) as $colIndex) {
+            $colLetter = Coordinate::stringFromColumnIndex($colIndex);
+            $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+        }
+
+        // Format headers
+        $headerRange = 'A1:' . Coordinate::stringFromColumnIndex(count($headers)) . '1';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getFill()
+            ->setFillType(Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FF1F4E78');
+        $sheet->getStyle($headerRange)->getFont()->getColor()->setARGB('FFFFFFFF');
+
+        $writer = new Xlsx($spreadsheet);
+
+        $fileName = 'template-jadwal.xlsx';
+
+        return response()->stream(
+            function () use ($writer) {
+                $writer->save('php://output');
+            },
+            200,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+                'Cache-Control' => 'max-age=0',
+            ]
+        );
     }
 }

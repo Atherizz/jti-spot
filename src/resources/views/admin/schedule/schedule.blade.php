@@ -100,6 +100,12 @@
                     {{-- Importer Form --}}
                     <form method="POST" action="{{ route('admin.schedules.import') }}" enctype="multipart/form-data" class="flex flex-col sm:flex-row sm:items-center gap-3 w-full justify-end">
                         @csrf
+                        <button type="button" onclick="openExcelTemplateModal()" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-gray-700 hover:text-ink text-sm font-semibold hover:bg-gray-50 transition-colors shadow-sm shrink-0">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Format Excel</span>
+                        </button>
                         <div class="relative w-full sm:w-auto">
                             <input type="file" name="excel_file" accept=".xlsx,.xls,.csv" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-ink hover:file:bg-gray-200 transition-colors bg-white border border-gray-200 rounded-xl" />
                         </div>
@@ -109,28 +115,70 @@
                     </form>
 
                     {{-- Data Filter --}}
-                    <form method="GET" action="{{ route('admin.schedules') }}" class="flex flex-col bg-white border border-gray-200 p-2 rounded-xl sm:flex-row sm:items-center gap-2 w-full shadow-sm">
+                    <form method="GET" action="{{ route('admin.schedules') }}" class="flex flex-col bg-white border border-gray-200 p-2 rounded-xl lg:flex-row lg:items-center gap-2 w-full shadow-sm">
                         
-                        <div class="relative w-full sm:w-72 flex-none">
+                        <div class="relative w-full lg:w-64 flex-none">
                             <svg class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" /></svg>
-                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari entitas kelas/ruang..."
+                            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari kelas, ruang, atau matkul..."
                                 class="w-full pl-10 pr-3 py-2 text-sm font-medium border-0 focus:ring-0 outline-none placeholder:text-gray-400 text-ink bg-transparent" />
                         </div>
 
-                        <div class="hidden sm:block w-px h-6 bg-gray-200"></div>
+                        <div class="hidden lg:block w-px h-6 bg-gray-200"></div>
 
-                        <select name="room_id" class="w-full sm:w-48 flex-none px-3 py-2 text-sm font-medium bg-transparent border-0 focus:ring-0 outline-none text-ink cursor-pointer">
-                            <option value="">-- Dimensi Fasilitas --</option>
-                            @foreach ($rooms as $room)
-                                <option value="{{ $room->id }}" {{ (string) $selectedRoomId === (string) $room->id ? 'selected' : '' }}>
-                                    {{ $room->room_code ?? $room->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full lg:w-auto flex-1">
+                            <!-- Ruang -->
+                            <select name="room_id" class="w-full px-3 py-2 text-sm font-medium bg-transparent border border-gray-100 lg:border-0 rounded-lg lg:rounded-none focus:ring-0 outline-none text-ink cursor-pointer">
+                                <option value="">-- Ruangan --</option>
+                                @foreach ($rooms as $room)
+                                    <option value="{{ $room->id }}" {{ (string) $selectedRoomId === (string) $room->id ? 'selected' : '' }}>
+                                        {{ $room->room_code ?? $room->name }}
+                                    </option>
+                                @endforeach
+                            </select>
 
-                        <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-100 text-ink hover:bg-gray-200 transition-colors text-sm font-bold shrink-0" title="Proses Data">
-                            Terapkan Saringan
-                        </button>
+                            <!-- Lantai -->
+                            <select name="floor" class="w-full px-3 py-2 text-sm font-medium bg-transparent border border-gray-100 lg:border-0 rounded-lg lg:rounded-none focus:ring-0 outline-none text-ink cursor-pointer">
+                                <option value="">-- Lantai --</option>
+                                @foreach ($floors as $flr)
+                                    <option value="{{ $flr }}" {{ (string) $selectedFloor === (string) $flr ? 'selected' : '' }}>
+                                        Lantai {{ $flr }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <!-- Hari -->
+                            <select name="day" class="w-full px-3 py-2 text-sm font-medium bg-transparent border border-gray-100 lg:border-0 rounded-lg lg:rounded-none focus:ring-0 outline-none text-ink cursor-pointer">
+                                <option value="">-- Hari --</option>
+                                <option value="1" {{ (string) $selectedDay === '1' ? 'selected' : '' }}>Senin</option>
+                                <option value="2" {{ (string) $selectedDay === '2' ? 'selected' : '' }}>Selasa</option>
+                                <option value="3" {{ (string) $selectedDay === '3' ? 'selected' : '' }}>Rabu</option>
+                                <option value="4" {{ (string) $selectedDay === '4' ? 'selected' : '' }}>Kamis</option>
+                                <option value="5" {{ (string) $selectedDay === '5' ? 'selected' : '' }}>Jumat</option>
+                                <option value="6" {{ (string) $selectedDay === '6' ? 'selected' : '' }}>Sabtu</option>
+                                <option value="0" {{ (string) $selectedDay === '0' ? 'selected' : '' }}>Minggu</option>
+                            </select>
+
+                            <!-- Jam Mulai -->
+                            <select name="start_time" class="w-full px-3 py-2 text-sm font-medium bg-transparent border border-gray-100 lg:border-0 rounded-lg lg:rounded-none focus:ring-0 outline-none text-ink cursor-pointer">
+                                <option value="">-- Jam Mulai --</option>
+                                @foreach ($startTimes as $time)
+                                    <option value="{{ $time }}" {{ (string) $selectedTime === (string) $time ? 'selected' : '' }}>
+                                        {{ $time }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="flex items-center gap-1.5 justify-end shrink-0 w-full lg:w-auto mt-2 lg:mt-0">
+                            @if(request()->anyFilled(['q', 'room_id', 'floor', 'day', 'start_time']))
+                                <a href="{{ route('admin.schedules') }}" class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-100 text-gray-500 hover:text-ink hover:bg-gray-200 transition-colors text-xs font-bold shrink-0" title="Reset Filter">
+                                    Reset
+                                </a>
+                            @endif
+                            <button type="submit" class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gray-100 text-ink hover:bg-gray-200 transition-colors text-sm font-bold shrink-0" title="Terapkan Saringan">
+                                Terapkan Saringan
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -232,5 +280,252 @@
             @endif
         </div>
     </div>
+
+    {{-- Modal Excel Template --}}
+    <div id="excelTemplateModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-ink/40 backdrop-blur-sm transition-opacity" onclick="closeExcelTemplateModal()"></div>
+
+        <!-- Modal Container -->
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-5xl border border-gray-100 flex flex-col max-h-[90vh]">
+                <!-- Header -->
+                <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                    <div>
+                        <h3 class="text-lg font-bold text-ink leading-6" id="modal-title">Format Excel Template Jadwal</h3>
+                        <p class="mt-1 text-xs text-gray-500">Sesuaikan struktur kolom file Excel Anda dengan format di bawah ini agar proses sinkronisasi berhasil.</p>
+                    </div>
+                    <button type="button" class="rounded-lg p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" onclick="closeExcelTemplateModal()">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Body (Scrollable) -->
+                <div class="p-6 overflow-y-auto space-y-6 flex-1">
+                    <!-- Excel Preview Table -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400">Pratinjau Lembar Kerja (Excel Grid)</h4>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 uppercase border border-emerald-100">Format Kolom Wajib</span>
+                        </div>
+                        <div class="overflow-x-auto border border-gray-200 rounded-xl shadow-inner bg-gray-50/50 p-1">
+                            <table class="w-full text-xs border-collapse text-left bg-white rounded-lg overflow-hidden">
+                                <thead>
+                                    <!-- Excel Columns Indicator A-K -->
+                                    <tr class="bg-gray-100 text-gray-400 font-mono text-center text-[10px] border-b border-gray-200 divide-x divide-gray-200">
+                                        <th class="w-10 bg-gray-200/40 py-1 font-normal text-center select-none"></th>
+                                        <th class="py-1 font-normal uppercase w-12">A</th>
+                                        <th class="py-1 font-normal uppercase w-28">B</th>
+                                        <th class="py-1 font-normal uppercase w-28">C</th>
+                                        <th class="py-1 font-normal uppercase w-16">D</th>
+                                        <th class="py-1 font-normal uppercase w-24">E</th>
+                                        <th class="py-1 font-normal uppercase w-24">F</th>
+                                        <th class="py-1 font-normal uppercase w-24">G</th>
+                                        <th class="py-1 font-normal uppercase w-24">H</th>
+                                        <th class="py-1 font-normal uppercase w-24">I</th>
+                                        <th class="py-1 font-normal uppercase w-32">J</th>
+                                        <th class="py-1 font-normal uppercase w-36">K</th>
+                                    </tr>
+                                    <!-- Row 1: Headers -->
+                                    <tr class="bg-[#1f4e78] text-white font-semibold text-[11px] divide-x divide-[#2c5b85] border-b border-gray-300">
+                                        <td class="bg-gray-100 text-gray-400 text-center font-mono text-[10px] py-2 w-10 border-r border-gray-200 select-none">1</td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>No</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Room</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Class Name</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Day</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Day Name</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Start Period</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>End Period</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Start Time</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>End Time</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Course Code</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                        <td class="px-3 py-2 font-bold whitespace-nowrap">
+                                            <div class="flex items-center justify-between gap-1">
+                                                <span>Lecturer</span>
+                                                <svg class="w-2.5 h-2.5 text-white/70" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <!-- Row 2 -->
+                                    <tr class="divide-x divide-gray-200 font-mono text-[11px] text-gray-700">
+                                        <td class="bg-gray-100 text-gray-400 text-center py-2 w-10 select-none">2</td>
+                                        <td class="px-3 py-2">1</td>
+                                        <td class="px-3 py-2 bg-emerald-50/20 font-bold text-ink">LPR2</td>
+                                        <td class="px-3 py-2 font-bold text-ink">TI2B</td>
+                                        <td class="px-3 py-2">1</td>
+                                        <td class="px-3 py-2">Senin</td>
+                                        <td class="px-3 py-2">1</td>
+                                        <td class="px-3 py-2">6</td>
+                                        <td class="px-3 py-2">07:00</td>
+                                        <td class="px-3 py-2">12:10</td>
+                                        <td class="px-3 py-2 font-semibold text-gray-800">PWL_TI</td>
+                                        <td class="px-3 py-2 text-gray-500 font-sans">Dosen Pengampu 1</td>
+                                    </tr>
+                                    <!-- Row 3 -->
+                                    <tr class="divide-x divide-gray-200 font-mono text-[11px] text-gray-700">
+                                        <td class="bg-gray-100 text-gray-400 text-center py-2 w-10 select-none">3</td>
+                                        <td class="px-3 py-2">2</td>
+                                        <td class="px-3 py-2 bg-emerald-50/20 font-bold text-ink">LPR4</td>
+                                        <td class="px-3 py-2 font-bold text-ink">TI2G</td>
+                                        <td class="px-3 py-2">1</td>
+                                        <td class="px-3 py-2">Senin</td>
+                                        <td class="px-3 py-2">1</td>
+                                        <td class="px-3 py-2">4</td>
+                                        <td class="px-3 py-2">07:00</td>
+                                        <td class="px-3 py-2">10:30</td>
+                                        <td class="px-3 py-2 font-semibold text-gray-800">SK_TI</td>
+                                        <td class="px-3 py-2 text-gray-500 font-sans">Dosen Pengampu 2</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Column Explanations / Documentation -->
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Panduan Pengisian Kolom</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/30">
+                                <ul class="space-y-2.5 text-xs text-gray-600">
+                                    <li>
+                                        <strong class="text-ink">A. No:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Nomor urut data. Field ini opsional dan diabaikan saat sistem memproses impor.</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">B. Room:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Kode ruang (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">LPR2</code>). Harus cocok dengan kode ruang di sistem.</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">C. Class Name:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Nama kelas (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">TI2B</code>).</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">D. Day:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Kode hari angka: <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">0</code> = Minggu, <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">1</code> = Senin, ..., <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">6</code> = Sabtu.</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">E. Day Name:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Nama hari teks (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">Senin</code>, <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">Selasa</code>).</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="border border-gray-100 rounded-xl p-4 bg-gray-50/30">
+                                <ul class="space-y-2.5 text-xs text-gray-600">
+                                    <li>
+                                        <strong class="text-ink">F & G. Start & End Period:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Jam pelajaran ke-berapa kelas dimulai dan selesai (e.g. Start: <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">1</code>, End: <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">6</code>).</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">H & I. Start & End Time:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Jam operasional mulai dan selesai kelas dengan format <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">HH:MM</code> (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">07:00</code> dan <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">12:10</code>).</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">J. Course Code:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Kode atau nama mata kuliah (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">PWL_TI</code>).</span>
+                                    </li>
+                                    <li>
+                                        <strong class="text-ink">K. Lecturer:</strong>
+                                        <span class="block mt-0.5 text-gray-500">Nama atau inisial Dosen Pengampu (opsional/informasi pelengkap).</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
+                    <span class="text-xs text-gray-500 text-center sm:text-left">Pastikan tidak mengubah nama-nama header pada baris pertama.</span>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <button type="button" class="w-full sm:w-auto px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" onclick="closeExcelTemplateModal()">
+                            Tutup
+                        </button>
+                        <a href="{{ route('admin.schedules.template') }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 transition-colors shadow-sm shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Unduh Template (.xlsx)</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script for Modal -->
+    <script>
+        function openExcelTemplateModal() {
+            const modal = document.getElementById('excelTemplateModal');
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeExcelTemplateModal() {
+            const modal = document.getElementById('excelTemplateModal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Close on ESC keypress
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                closeExcelTemplateModal();
+            }
+        });
+    </script>
 
 @endsection

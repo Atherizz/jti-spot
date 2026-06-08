@@ -215,9 +215,26 @@ class AdminScheduleController extends Controller
         $query = Schedule::query()->with(['room', 'classGroup']);
 
         $selectedRoomId = $request->query('room_id');
+        $selectedFloor = $request->query('floor');
+        $selectedDay = $request->query('day');
+        $selectedTime = $request->query('start_time');
 
         if (!empty($selectedRoomId)) {
             $query->where('room_id', (int) $selectedRoomId);
+        }
+
+        if ($selectedFloor !== null && $selectedFloor !== '') {
+            $query->whereHas('room', function ($roomQuery) use ($selectedFloor) {
+                $roomQuery->where('floor', (int) $selectedFloor);
+            });
+        }
+
+        if ($selectedDay !== null && $selectedDay !== '') {
+            $query->where('day_of_week', (int) $selectedDay);
+        }
+
+        if ($selectedTime !== null && $selectedTime !== '') {
+            $query->whereTime('start_time', '=', $selectedTime . ':00');
         }
 
         if ($request->filled('q')) {
@@ -258,11 +275,33 @@ class AdminScheduleController extends Controller
             ->orderBy('name')
             ->get(['id', 'room_code', 'name']);
 
+        $floors = Room::query()
+            ->whereNotNull('floor')
+            ->distinct()
+            ->orderBy('floor')
+            ->pluck('floor');
+
+        $startTimes = Schedule::query()
+            ->whereNotNull('start_time')
+            ->distinct()
+            ->orderBy('start_time')
+            ->pluck('start_time')
+            ->map(function ($time) {
+                return substr((string) $time, 0, 5);
+            })
+            ->unique()
+            ->values();
+
         return view('admin.schedule.schedule', [
             'schedules' => $schedules,
             'stats' => $stats,
             'rooms' => $rooms,
+            'floors' => $floors,
+            'startTimes' => $startTimes,
             'selectedRoomId' => $selectedRoomId,
+            'selectedFloor' => $selectedFloor,
+            'selectedDay' => $selectedDay,
+            'selectedTime' => $selectedTime,
         ]);
     }
 }
