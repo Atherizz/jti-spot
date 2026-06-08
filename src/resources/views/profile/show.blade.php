@@ -6,7 +6,7 @@
 	@php
 		$isStudentRole = $user->role === 'student';
 	@endphp
-	
+
 	{{-- Formal Header --}}
 	<div class="mb-8 stagger-1">
 		<div class="flex items-center gap-2 mb-2">
@@ -33,11 +33,11 @@
 	@endif
 
 	<div class="grid grid-cols-1 xl:grid-cols-12 gap-6 stagger-2">
-		
+
 		{{-- Main ID Card (Editorial Luxury Design) --}}
 		<div class="xl:col-span-8">
 			<div class="editorial-panel bg-white flex flex-col relative overflow-hidden h-full">
-				
+
 				{{-- Header Background --}}
 				<div class="h-32 bg-gradient-to-r from-orange-50 to-emerald-50 border-b border-gray-100 relative">
 					<div class="absolute inset-0 bg-white/20 backdrop-blur-sm"></div>
@@ -64,7 +64,7 @@
 
 					{{-- ID Card Data Grid --}}
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 mt-4">
-						
+
 						{{-- Left Column --}}
 						<div class="space-y-6">
 							<div>
@@ -95,7 +95,7 @@
 								<p class="font-semibold text-ink">{{ $user->created_at ? $user->created_at->format('j F Y, H:i') : '-' }}</p>
 							</div>
 						</div>
-						
+
 					</div>
 				</div>
 			</div>
@@ -103,7 +103,7 @@
 
 		{{-- Right Sidebar --}}
 		<div class="xl:col-span-4 space-y-6 flex flex-col">
-			
+
 			{{-- Completion Status --}}
 			<div class="editorial-panel bg-white p-6 relative overflow-hidden group border-orange-100 bg-white">
 				<div class="absolute -right-8 -top-8 w-32 h-32 bg-orange-50 rounded-full blur-2xl group-hover:bg-orange-100/50 transition-colors"></div>
@@ -116,7 +116,7 @@
 					</div>
 					<h3 class="font-semibold text-sm text-ink mb-1">Status Kelengkapan Profil</h3>
 					<p class="text-xs text-gray-500 mb-4">Lengkapi data Anda untuk membuka fitur analitik penuh.</p>
-					
+
 					<div class="w-full bg-gray-100 rounded-full h-1.5">
 						<div class="bg-orange-500 h-full rounded-full transition-all duration-1000" style="width: {{ $profileCompletion }}%"></div>
 					</div>
@@ -128,7 +128,7 @@
 				<div class="p-5 border-b border-gray-100">
 					<h3 class="font-semibold text-sm text-ink">Verifikasi Keamanan</h3>
 				</div>
-				
+
 				<div class="p-5 flex-1 flex flex-col gap-4">
 					<div class="flex items-center justify-between p-3 rounded-xl bg-gray-50 border border-gray-100">
 						<div class="flex items-center gap-3">
@@ -215,7 +215,7 @@
 						</div>
 						<div>
 							<h3 class="font-display text-2xl font-bold text-ink">Klaim Akses Token</h3>
-							<p class="text-sm font-medium text-gray-500">Masukkan token kelas untuk aktivasi role ketua kelas.</p>
+							<p class="text-sm font-medium text-gray-500">Masukkan token kelas untuk aktivasi peran perwakilan kelas.</p>
 						</div>
 					</div>
 
