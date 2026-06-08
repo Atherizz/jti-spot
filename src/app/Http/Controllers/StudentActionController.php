@@ -189,22 +189,19 @@ class StudentActionController extends Controller
                 $query->where('start_time', '<', $schedule->end_time)
                       ->where('end_time', '>', $schedule->start_time);
             })
-            ->pluck('id')
-            ->toArray();
+            ->orderBy('start_time')
+            ->get();
 
-        if (!empty($conflictingSchedules)) {
+        if ($conflictingSchedules->isNotEmpty()) {
             // Cek apakah jadwal yang bentrok sudah dibatalkan di tanggal reservasi
-            $cancelledScheduleIds = ScheduleCancellation::whereIn('schedule_id', $conflictingSchedules)
+            $cancelledScheduleIds = ScheduleCancellation::whereIn('schedule_id', $conflictingSchedules->pluck('id'))
                 ->where('cancellation_date', $reservationDateStr)
-                ->pluck('schedule_id')
-                ->toArray();
+                ->pluck('schedule_id');
 
-            // Filter: jadwal yang bentrok TAPI BELUM dibatalkan
-            $activeConflicts = array_diff($conflictingSchedules, $cancelledScheduleIds);
+            $conflictSchedule = $conflictingSchedules
+                ->first(fn (Schedule $candidate) => !$cancelledScheduleIds->contains($candidate->id));
 
-            if (!empty($activeConflicts)) {
-                $conflictSchedule = Schedule::find($activeConflicts[0]);
-
+            if ($conflictSchedule) {
                 return back()->withErrors([
                     'schedule_data' => "Kelas Anda memiliki jadwal asli yang bentrok: {$conflictSchedule->course_name} (" . substr($conflictSchedule->start_time, 0, 5) . " - " . substr($conflictSchedule->end_time, 0, 5) . "). Batalkan jadwal tersebut terlebih dahulu jika ingin reservasi slot ini."
                 ])->withInput();

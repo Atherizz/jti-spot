@@ -92,6 +92,18 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/class-groups', [AdminClassGroupController::class, 'index'])->name('admin.class-groups.index');
         Route::post('/class-groups/{classGroup}/generate-token', [AdminClassGroupController::class, 'generateToken'])
             ->name('admin.class-groups.generate-token');
+        Route::post('/majors', [AdminClassGroupController::class, 'storeProdi'])
+            ->name('admin.majors.store');
+        Route::put('/majors/{major}', [AdminClassGroupController::class, 'updateProdi'])
+            ->name('admin.majors.update');
+        Route::delete('/majors/{major}', [AdminClassGroupController::class, 'destroyProdi'])
+            ->name('admin.majors.destroy');
+        Route::post('/class-groups', [AdminClassGroupController::class, 'storeClass'])
+            ->name('admin.class-groups.store');
+        Route::put('/class-groups/{classGroup}', [AdminClassGroupController::class, 'updateClass'])
+            ->name('admin.class-groups.update');
+        Route::delete('/class-groups/{classGroup}', [AdminClassGroupController::class, 'destroyClass'])
+            ->name('admin.class-groups.destroy');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
         Route::get('/schedules/template', [RoomImportController::class, 'downloadTemplate'])->name('admin.schedules.template');
         Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');

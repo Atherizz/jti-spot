@@ -26,7 +26,7 @@
             </div>
             <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-ink leading-tight">Manajemen Kelas</h1>
             <p class="text-sm font-medium text-ink/60 mt-2 max-w-2xl">
-                Pilih prodi dan kelas pada panel berikut untuk melihat access token secara instan tanpa berpindah halaman.
+                Kelola prodi dan pilih kelas pada panel berikut untuk melihat access token secara instan tanpa berpindah halaman.
             </p>
         </div>
     </div>
@@ -48,14 +48,59 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="lg:col-span-1 bg-white editorial-panel p-6">
             <div class="mb-6">
-                <p class="text-xs font-semibold uppercase tracking-widest text-ink/50 mb-3">Pilih Prodi</p>
-                <div class="grid grid-cols-2 gap-2" id="major-selector">
-                    <button type="button" data-major="TI" class="major-button px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-ink/70 hover:bg-gray-50 transition-colors">
-                        TI
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-ink/50">Manajemen Prodi</p>
+                    <button type="button" onclick="showAddProdiForm()" class="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah
                     </button>
-                    <button type="button" data-major="SIB" class="major-button px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-ink/70 hover:bg-gray-50 transition-colors">
-                        SIB
-                    </button>
+                </div>
+
+                <!-- Add Form (hidden by default) -->
+                <form id="add-prodi-form" method="POST" action="{{ route('admin.majors.store') }}" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    @csrf
+                    <div class="flex flex-col gap-2">
+                        <input type="text" name="name" placeholder="Nama Prodi (cth: PPLS)" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                        <div class="flex justify-end gap-1.5">
+                            <button type="button" onclick="hideAddProdiForm()" class="px-2 py-1 text-gray-400 hover:text-ink text-xs font-semibold">Batal</button>
+                            <button type="submit" class="px-3 py-1 bg-ink text-white rounded-lg text-xs font-semibold hover:bg-ink/90">Simpan</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Edit Form (hidden by default) -->
+                <form id="edit-prodi-form" method="POST" action="" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    @csrf
+                    @method('PUT')
+                    <div class="flex flex-col gap-2">
+                        <input type="text" id="edit-prodi-name" name="name" placeholder="Nama Prodi" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                        <div class="flex justify-end gap-1.5">
+                            <button type="button" onclick="hideEditProdiForm()" class="px-2 py-1 text-gray-400 hover:text-ink text-xs font-semibold">Batal</button>
+                            <button type="submit" class="px-3 py-1 bg-ink text-white rounded-lg text-xs font-semibold hover:bg-ink/90">Update</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="grid grid-cols-1 gap-2" id="major-selector">
+                    @foreach($majors as $major)
+                        <div class="flex items-center gap-1.5 group/item">
+                            <button type="button" data-major="{{ strtoupper($major->name) }}" class="major-button flex-1 text-left px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-ink/70 hover:bg-gray-50 transition-colors">
+                                {{ strtoupper($major->name) }}
+                            </button>
+                            <div class="flex items-center gap-1 opacity-60 sm:opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                <button type="button" onclick="showEditProdiForm({{ $major->id }}, '{{ $major->name }}')" class="p-1.5 text-gray-400 hover:text-ink hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
+                                <form method="POST" action="{{ route('admin.majors.destroy', $major) }}" onsubmit="return confirm('Hapus prodi {{ $major->name }}?')" class="m-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -110,9 +155,64 @@
 
         <section class="lg:col-span-3 bg-white editorial-panel p-6">
             <div class="flex items-center justify-between mb-4">
-                <p class="text-xs font-semibold uppercase tracking-widest text-ink/50">Ringkasan Kelas</p>
+                <div class="flex items-center gap-4">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-ink/50">Ringkasan Kelas</p>
+                    <button type="button" onclick="showAddClassForm()" class="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah Kelas
+                    </button>
+                </div>
                 <p id="summary-page-label" class="text-sm font-semibold text-ink">Kelas 1</p>
             </div>
+
+            <!-- Add Class Form -->
+            <form id="add-class-form" method="POST" action="{{ route('admin.class-groups.store') }}" class="hidden mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-ink/50 mb-1.5">Prodi</label>
+                        <select name="major" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                            <option value="">Pilih Prodi</option>
+                            @foreach($majors as $major)
+                                <option value="{{ strtoupper($major->name) }}">{{ strtoupper($major->name) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-ink/50 mb-1.5">Nama Kelas</label>
+                        <input type="text" name="name" placeholder="Cth: 1A" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                    </div>
+                    <div class="flex justify-end gap-1.5">
+                        <button type="button" onclick="hideAddClassForm()" class="px-3 py-2 text-gray-400 hover:text-ink text-xs font-semibold">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-ink text-white rounded-lg text-xs font-semibold hover:bg-ink/90">Simpan Kelas</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Edit Class Form -->
+            <form id="edit-class-form" method="POST" action="" class="hidden mb-6 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-ink/50 mb-1.5">Prodi</label>
+                        <select id="edit-class-major" name="major" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                            <option value="">Pilih Prodi</option>
+                            @foreach($majors as $major)
+                                <option value="{{ strtoupper($major->name) }}">{{ strtoupper($major->name) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-semibold uppercase tracking-widest text-ink/50 mb-1.5">Nama Kelas</label>
+                        <input type="text" id="edit-class-name" name="name" placeholder="Cth: 1A" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                    </div>
+                    <div class="flex justify-end gap-1.5">
+                        <button type="button" onclick="hideEditClassForm()" class="px-3 py-2 text-gray-400 hover:text-ink text-xs font-semibold">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-ink text-white rounded-lg text-xs font-semibold hover:bg-ink/90">Update Kelas</button>
+                    </div>
+                </div>
+            </form>
 
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-100">
@@ -163,6 +263,7 @@
     <script>
         (() => {
             const classGroups = @json($serializedClassGroups);
+            const majors = @json($majors);
             const majorButtons = document.querySelectorAll('.major-button');
             const classSelect = document.getElementById('class-select');
             const emptyState = document.getElementById('empty-state');
@@ -181,7 +282,47 @@
             const summaryPageButtons = document.querySelectorAll('.summary-page-button');
             const summaryTableBody = document.getElementById('summary-table-body');
 
-            let selectedMajor = 'TI';
+            // Setup global form triggers
+            window.showAddProdiForm = () => {
+                document.getElementById('add-prodi-form').classList.remove('hidden');
+                document.getElementById('edit-prodi-form').classList.add('hidden');
+                document.querySelector('#add-prodi-form input[name="name"]').focus();
+            };
+            window.hideAddProdiForm = () => {
+                document.getElementById('add-prodi-form').classList.add('hidden');
+            };
+            window.showEditProdiForm = (id, name) => {
+                const form = document.getElementById('edit-prodi-form');
+                form.action = `/admin/majors/${id}`;
+                document.getElementById('edit-prodi-name').value = name;
+                form.classList.remove('hidden');
+                document.getElementById('add-prodi-form').classList.add('hidden');
+                document.getElementById('edit-prodi-name').focus();
+            };
+            window.hideEditProdiForm = () => {
+                document.getElementById('edit-prodi-form').classList.add('hidden');
+            };
+            
+            window.showAddClassForm = () => {
+                document.getElementById('add-class-form').classList.remove('hidden');
+                document.getElementById('edit-class-form').classList.add('hidden');
+            };
+            window.hideAddClassForm = () => {
+                document.getElementById('add-class-form').classList.add('hidden');
+            };
+            window.showEditClassForm = (id, major, name) => {
+                const form = document.getElementById('edit-class-form');
+                form.action = `/admin/class-groups/${id}`;
+                document.getElementById('edit-class-major').value = major;
+                document.getElementById('edit-class-name').value = name;
+                form.classList.remove('hidden');
+                document.getElementById('add-class-form').classList.add('hidden');
+            };
+            window.hideEditClassForm = () => {
+                document.getElementById('edit-class-form').classList.add('hidden');
+            };
+
+            let selectedMajor = majors.length > 0 ? String(majors[0].name).toUpperCase() : '';
             let currentSummaryPage = 1;
 
             const byNameSorter = (left, right) => left.name.localeCompare(right.name, 'id');
@@ -193,13 +334,18 @@
                     { page: 3, label: 'Kelas 3', items: [] },
                     { page: 4, label: 'Kelas 4 + AJ', items: [] },
                 ];
-                const majorOrder = {
-                    TI: 0,
-                    SIB: 1,
-                    UMUM: 2,
-                };
+
+                // Build dynamic majorOrder based on DB list
+                const majorOrder = {};
+                majors.forEach((major, index) => {
+                    majorOrder[String(major.name).toUpperCase()] = index;
+                });
+                majorOrder['UMUM'] = majors.length;
 
                 classGroups.forEach((item) => {
+                    if (selectedMajor && item.major !== selectedMajor) {
+                        return;
+                    }
                     const className = String(item.name ?? '').toUpperCase();
                     const level = className === 'AJ' ? 4 : Number.parseInt(className.charAt(0), 10);
                     const targetPage = Number.isInteger(level) && level >= 1 && level <= 4 ? level : 4;
@@ -233,7 +379,7 @@
                 return pages;
             };
 
-            const summaryPages = buildSummaryPages();
+            let summaryPages = buildSummaryPages();
 
             const getClassesByMajor = (major) => {
                 return classGroups
@@ -305,15 +451,26 @@
                         <td class="px-4 py-3 text-sm font-mono text-ink/80">${item.access_token ?? '-'}</td>
                         <td class="px-4 py-3 text-sm font-semibold text-emerald-700">${Number(item.token_quota ?? 0)}/3</td>
                         <td class="px-4 py-3">
-                            <form method="POST" action="${generateTokenRouteTemplate.replace('__CLASS_GROUP_ID__', String(item.id))}" onsubmit="return confirm('Generate ulang token untuk kelas ${item.major}${item.name}?')">
-                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-ink hover:bg-ink/90 transition-colors">
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                    Generate Ulang
+                            <div class="flex items-center gap-1.5">
+                                <form method="POST" action="${generateTokenRouteTemplate.replace('__CLASS_GROUP_ID__', String(item.id))}" onsubmit="return confirm('Generate ulang token untuk kelas ${item.major}${item.name}?')" class="m-0">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-ink hover:bg-ink/90 transition-colors" title="Generate Ulang Token">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                        </svg>
+                                    </button>
+                                </form>
+                                <button type="button" onclick="showEditClassForm(${item.id}, '${item.major}', '${item.name}')" class="inline-flex items-center justify-center p-1.5 text-gray-400 hover:text-ink hover:bg-gray-100 rounded-lg transition-colors" title="Edit Kelas">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                 </button>
-                            </form>
+                                <form method="POST" action="/admin/class-groups/${item.id}" onsubmit="return confirm('Hapus kelas ${item.major} ${item.name}? Pastikan tidak ada mahasiswa/jadwal yang terkait.')" class="m-0">
+                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="_method" value="DELETE">
+                                    <button type="submit" class="inline-flex items-center justify-center p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus Kelas">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
@@ -336,9 +493,11 @@
 
             majorButtons.forEach((button) => {
                 button.addEventListener('click', () => {
-                    selectedMajor = button.dataset.major ?? 'TI';
+                    selectedMajor = button.dataset.major ?? '';
                     setMajorButtonState();
                     buildClassOptions();
+                    summaryPages = buildSummaryPages();
+                    renderSummaryPage();
                 });
             });
 

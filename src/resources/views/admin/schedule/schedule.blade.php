@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Semua Jadwal')
+@section('title', 'Manajemen Jadwal')
 
 @section('content')
 
@@ -37,7 +37,7 @@
                 <div>
                     <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-ink leading-tight mb-2">Pusat Jadwal Akademik</h1>
                     <p class="text-sm font-medium text-ink/60 max-w-xl leading-relaxed">
-                        Kelola agregasi jadwal kelas seluruh program studi, konfirmasi slot ketersediaan ruang, dan pembaruan masal (*batch update*) via konfigurasi Excel.
+                        Kelola agregasi jadwal kelas seluruh program studi, konfirmasi slot ketersediaan ruang, dan pembaruan massal via konfigurasi Excel.
                     </p>
                 </div>
             </div>
@@ -116,7 +116,7 @@
 
                     {{-- Data Filter --}}
                     <form method="GET" action="{{ route('admin.schedules') }}" class="flex flex-col bg-white border border-gray-200 p-2 rounded-xl lg:flex-row lg:items-center gap-2 w-full shadow-sm">
-                        
+
                         <div class="relative w-full lg:w-64 flex-none">
                             <svg class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" /></svg>
                             <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari kelas, ruang, atau matkul..."

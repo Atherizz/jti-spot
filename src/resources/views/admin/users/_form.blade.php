@@ -82,7 +82,7 @@
                         required
                         class="w-full px-3.5 py-2.5 text-sm border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                     >
-                        <option value="class_rep" {{ $selectedRole === 'class_rep' ? 'selected' : '' }}>Ketua Kelas</option>
+                        <option value="class_rep" {{ $selectedRole === 'class_rep' ? 'selected' : '' }}>Perwakilan Kelas</option>
                         <option value="student" {{ $selectedRole === 'student' ? 'selected' : '' }}>Mahasiswa</option>
                     </select>
                 @else

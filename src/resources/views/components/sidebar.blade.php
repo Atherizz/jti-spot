@@ -14,7 +14,7 @@
 <aside id="sidebar"
     class="fixed top-0 left-0 h-full w-60 bg-ink text-white flex flex-col z-30
            -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-2xl lg:shadow-none border-r border-white/5 overflow-hidden">
-    
+
     {{-- Elegant Background Texture --}}
     <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 70%);"></div>
 
@@ -48,7 +48,7 @@
             </svg>
             Profil
         </a>
-        
+
         <div class="h-px bg-white/5 my-4 mx-2"></div>
 
         {{-- Menu Admin --}}
@@ -80,12 +80,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                Semua Jadwal
+                Manajemen Jadwal
             </a>
-            
+
             <div class="h-px bg-white/5 my-4 mx-2"></div>
             <div class="px-3 mb-2 font-display text-[10px] font-semibold uppercase tracking-widest text-white/40">Administrasi</div>
-            
+
             <a href="{{ route('admin.users.index') }}" class="{{ $userNavClass }}">
                 <svg class="w-5 h-5 shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
@@ -94,7 +94,7 @@
                 Pengguna
             </a>
         @endcan
-        
+
         {{-- Menu Student & Class Rep --}}
         @can('student')
             <div class="px-3 mb-2 font-display text-[10px] font-semibold uppercase tracking-widest text-white/40">Akademik</div>
@@ -124,15 +124,15 @@
                 </svg>
                 Jadwal Kelas
             </a>
-            
+
             <div class="h-px bg-white/5 my-4 mx-2"></div>
             <div class="px-3 mb-2 font-display text-[10px] font-semibold uppercase tracking-widest text-white/40">Aktivitas</div>
-            
+
             <a href="{{ route('student.activity.log') }}" class="{{ $navClass('student.activity.log') }}">
                 <svg class="w-5 h-5 shrink-0 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                Log Crowdsourcing
+                Log Aktivitas
             </a>
         @endcan
     </nav>
@@ -146,9 +146,9 @@
             <div class="flex-1 min-w-0">
                 <div class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</div>
                 <div class="text-[11px] font-medium text-gray-400 truncate">
-                    @can('admin') 
+                    @can('admin')
                         Administrator Utama
-                    @elsecan('class_rep') 
+                    @elsecan('class_rep')
                         @if(auth()->user()->classGroup)
                             {{ auth()->user()->classGroup->name }} &bull; Perwakilan Kelas
                         @else
@@ -180,7 +180,7 @@
     <div class="relative editorial-panel bg-white shadow-2xl w-[90%] md:w-full mx-auto p-8 overflow-hidden transform transition-all" style="max-width: 400px;">
         <!-- Decorative abstract background -->
         <div class="absolute right-0 top-0 w-32 h-32 bg-red-50 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
-        
+
         <div class="flex flex-col items-center text-center relative z-10">
             <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-5 ring-4 ring-white border border-red-100">
                 <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
