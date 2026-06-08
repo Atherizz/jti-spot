@@ -22,7 +22,7 @@
         </div>
         <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-ink mb-3 leading-tight">Pembatalan Jadwal Kelas</h1>
         <p class="text-sm font-medium text-ink/60 max-w-xl leading-relaxed">
-            Ajukan permohonan pembatalan sesi kelas yang terdaftar. Setiap pengajuan memerlukan justifikasi yang valid dan akan diproses oleh pihak akademik.
+            Catat pembatalan sesi kelas yang terdaftar secara langsung di sistem. Tidak ada persetujuan admin untuk proses ini, sehingga setiap pembatalan menjadi tanggung jawab penuh mahasiswa yang mengajukan.
         </p>
     </div>
 
@@ -40,15 +40,15 @@
                 <ul class="space-y-1">
                     <li class="text-sm font-medium text-red-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        Pengajuan pembatalan harus diajukan <strong>minimal 24 jam</strong> sebelum jadwal kelas dimulai.
+                        Pembatalan kelas harus dilakukan <strong>minimal 24 jam</strong> sebelum jadwal kelas dimulai.
                     </li>
                     <li class="text-sm font-medium text-red-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        Permohonan yang telah dikirim <strong>tidak dapat ditarik kembali</strong> secara mandiri — hubungi admin jika terjadi kesalahan.
+                        Pembatalan yang telah dikirim akan <strong>langsung tercatat di sistem</strong> dan tidak dapat dibatalkan secara mandiri.
                     </li>
                     <li class="text-sm font-medium text-red-800/80 leading-relaxed flex items-start gap-2">
                         <svg class="w-3.5 h-3.5 mt-0.5 shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                        Pembatalan yang tidak berdasar dapat mempengaruhi rekam jejak akademik Anda.
+                        Mahasiswa bertanggung jawab penuh atas alasan dan konsekuensi dari pembatalan kelas yang diajukan.
                     </li>
                 </ul>
             </div>
@@ -167,7 +167,7 @@
                         <span class="normal-case tracking-normal text-red-500 ml-1">*Wajib</span>
                     </label>
                     <textarea id="reason" name="reason" rows="4" required
-                        placeholder="Deskripsikan secara rinci alasan pembatalan kelas ini. Sertakan bukti pendukung apabila tersedia (nomor surat, kode kegiatan, dsb)..."
+                        placeholder="Deskripsikan secara rinci alasan pembatalan kelas ini. Informasi yang Anda isi akan langsung tersimpan sebagai catatan pembatalan di sistem..."
                         class="w-full bg-white border border-gray-200 text-ink p-4 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 hover:border-gray-300 transition-all shadow-sm resize-none placeholder:text-gray-400">{{ old('reason') }}</textarea>
                     @error('reason')
                         <p class="mt-1.5 text-xs font-medium text-red-500">{{ $message }}</p>
@@ -180,7 +180,7 @@
                         <input type="checkbox" id="confirm_cancellation" name="confirm_cancellation" value="1" required
                             class="mt-0.5 w-4 h-4 rounded border-red-300 text-red-600 focus:ring-red-500 shrink-0">
                         <span class="text-sm font-medium text-red-800/80 leading-relaxed">
-                            Saya memahami bahwa pengajuan ini <strong>bersifat final</strong> dan tidak dapat dibatalkan secara mandiri. Data pengajuan ini akan tercatat dalam sistem dan diverifikasi oleh pihak akademik.
+                            Saya memahami bahwa pembatalan ini <strong>bersifat final</strong>, akan langsung tercatat di sistem, dan menjadi tanggung jawab saya sepenuhnya tanpa proses persetujuan admin.
                         </span>
                     </label>
                 </div>
@@ -196,7 +196,7 @@
                         <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                         </svg>
-                        Kirim Permohonan Pembatalan
+                        Simpan Pembatalan Kelas
                     </button>
                 </div>
             </form>
