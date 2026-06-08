@@ -26,7 +26,7 @@
             </div>
             <h1 class="font-display text-3xl sm:text-4xl font-bold tracking-tight text-ink leading-tight">Manajemen Kelas</h1>
             <p class="text-sm font-medium text-ink/60 mt-2 max-w-2xl">
-                Pilih prodi dan kelas pada panel berikut untuk melihat access token secara instan tanpa berpindah halaman.
+                Kelola prodi dan pilih kelas pada panel berikut untuk melihat access token secara instan tanpa berpindah halaman.
             </p>
         </div>
     </div>
@@ -48,14 +48,59 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <section class="lg:col-span-1 bg-white editorial-panel p-6">
             <div class="mb-6">
-                <p class="text-xs font-semibold uppercase tracking-widest text-ink/50 mb-3">Pilih Prodi</p>
-                <div class="grid grid-cols-2 gap-2" id="major-selector">
-                    <button type="button" data-major="TI" class="major-button px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-ink/70 hover:bg-gray-50 transition-colors">
-                        TI
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-xs font-semibold uppercase tracking-widest text-ink/50">Manajemen Prodi</p>
+                    <button type="button" onclick="showAddProdiForm()" class="text-xs font-semibold text-orange-600 hover:text-orange-700 flex items-center gap-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Tambah
                     </button>
-                    <button type="button" data-major="SIB" class="major-button px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-ink/70 hover:bg-gray-50 transition-colors">
-                        SIB
-                    </button>
+                </div>
+
+                <!-- Add Form (hidden by default) -->
+                <form id="add-prodi-form" method="POST" action="{{ route('admin.majors.store') }}" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    @csrf
+                    <div class="flex flex-col gap-2">
+                        <input type="text" name="name" placeholder="Nama Prodi (cth: PPLS)" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                        <div class="flex justify-end gap-1.5">
+                            <button type="button" onclick="hideAddProdiForm()" class="px-2 py-1 text-gray-400 hover:text-ink text-xs font-semibold">Batal</button>
+                            <button type="submit" class="px-3 py-1 bg-ink text-white rounded-lg text-xs font-semibold hover:bg-ink/90">Simpan</button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Edit Form (hidden by default) -->
+                <form id="edit-prodi-form" method="POST" action="" class="hidden mb-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    @csrf
+                    @method('PUT')
+                    <div class="flex flex-col gap-2">
+                        <input type="text" id="edit-prodi-name" name="name" placeholder="Nama Prodi" required class="w-full rounded-lg border-gray-200 text-xs font-semibold uppercase focus:border-orange-300 focus:ring-orange-200">
+                        <div class="flex justify-end gap-1.5">
+                            <button type="button" onclick="hideEditProdiForm()" class="px-2 py-1 text-gray-400 hover:text-ink text-xs font-semibold">Batal</button>
+                            <button type="submit" class="px-3 py-1 bg-ink text-white rounded-lg text-xs font-semibold hover:bg-ink/90">Update</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="grid grid-cols-1 gap-2" id="major-selector">
+                    @foreach($majors as $major)
+                        <div class="flex items-center gap-1.5 group/item">
+                            <button type="button" data-major="{{ strtoupper($major->name) }}" class="major-button flex-1 text-left px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-ink/70 hover:bg-gray-50 transition-colors">
+                                {{ strtoupper($major->name) }}
+                            </button>
+                            <div class="flex items-center gap-1 opacity-60 sm:opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                <button type="button" onclick="showEditProdiForm({{ $major->id }}, '{{ $major->name }}')" class="p-1.5 text-gray-400 hover:text-ink hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                </button>
+                                <form method="POST" action="{{ route('admin.majors.destroy', $major) }}" onsubmit="return confirm('Hapus prodi {{ $major->name }}?')" class="m-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="p-1.5 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors" title="Hapus">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -163,6 +208,7 @@
     <script>
         (() => {
             const classGroups = @json($serializedClassGroups);
+            const majors = @json($majors);
             const majorButtons = document.querySelectorAll('.major-button');
             const classSelect = document.getElementById('class-select');
             const emptyState = document.getElementById('empty-state');
@@ -181,7 +227,28 @@
             const summaryPageButtons = document.querySelectorAll('.summary-page-button');
             const summaryTableBody = document.getElementById('summary-table-body');
 
-            let selectedMajor = 'TI';
+            // Setup global form triggers
+            window.showAddProdiForm = () => {
+                document.getElementById('add-prodi-form').classList.remove('hidden');
+                document.getElementById('edit-prodi-form').classList.add('hidden');
+                document.querySelector('#add-prodi-form input[name="name"]').focus();
+            };
+            window.hideAddProdiForm = () => {
+                document.getElementById('add-prodi-form').classList.add('hidden');
+            };
+            window.showEditProdiForm = (id, name) => {
+                const form = document.getElementById('edit-prodi-form');
+                form.action = `/admin/majors/${id}`;
+                document.getElementById('edit-prodi-name').value = name;
+                form.classList.remove('hidden');
+                document.getElementById('add-prodi-form').classList.add('hidden');
+                document.getElementById('edit-prodi-name').focus();
+            };
+            window.hideEditProdiForm = () => {
+                document.getElementById('edit-prodi-form').classList.add('hidden');
+            };
+
+            let selectedMajor = majors.length > 0 ? String(majors[0].name).toUpperCase() : '';
             let currentSummaryPage = 1;
 
             const byNameSorter = (left, right) => left.name.localeCompare(right.name, 'id');
@@ -193,13 +260,18 @@
                     { page: 3, label: 'Kelas 3', items: [] },
                     { page: 4, label: 'Kelas 4 + AJ', items: [] },
                 ];
-                const majorOrder = {
-                    TI: 0,
-                    SIB: 1,
-                    UMUM: 2,
-                };
+
+                // Build dynamic majorOrder based on DB list
+                const majorOrder = {};
+                majors.forEach((major, index) => {
+                    majorOrder[String(major.name).toUpperCase()] = index;
+                });
+                majorOrder['UMUM'] = majors.length;
 
                 classGroups.forEach((item) => {
+                    if (selectedMajor && item.major !== selectedMajor) {
+                        return;
+                    }
                     const className = String(item.name ?? '').toUpperCase();
                     const level = className === 'AJ' ? 4 : Number.parseInt(className.charAt(0), 10);
                     const targetPage = Number.isInteger(level) && level >= 1 && level <= 4 ? level : 4;
@@ -233,7 +305,7 @@
                 return pages;
             };
 
-            const summaryPages = buildSummaryPages();
+            let summaryPages = buildSummaryPages();
 
             const getClassesByMajor = (major) => {
                 return classGroups
@@ -336,9 +408,11 @@
 
             majorButtons.forEach((button) => {
                 button.addEventListener('click', () => {
-                    selectedMajor = button.dataset.major ?? 'TI';
+                    selectedMajor = button.dataset.major ?? '';
                     setMajorButtonState();
                     buildClassOptions();
+                    summaryPages = buildSummaryPages();
+                    renderSummaryPage();
                 });
             });
 
