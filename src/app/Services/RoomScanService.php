@@ -6,6 +6,7 @@ use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\RoomClaim;
 use App\Models\QuorumScan;
+use App\Models\ScheduleCancellation;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Events\ScanAttempted;
@@ -92,6 +93,53 @@ class RoomScanService
 
                     if ($room->current_status !== 'available') {
                         return $this->handleFailedScan($user, $qrToken, 'Ruangan sedang digunakan oleh kelas lain. Anda tidak bisa mengklaimnya saat ini!');
+                    }
+
+                    $claimedSchedule = Schedule::where('room_id', $room->id)
+                        ->where('day_of_week', $currentDay)
+                        ->where('start_time', '<=', $currentTime)
+                        ->where('end_time', '>=', $currentTime)
+                        ->first();
+
+                    if ($claimedSchedule) {
+                        $roomClaimConflict = $this->findActiveRoomClaimConflict(
+                            $room->id,
+                            $classGroup->id,
+                            $currentDate,
+                            $currentDay,
+                            $currentTime,
+                            $claimedSchedule->end_time
+                        );
+
+                        if ($roomClaimConflict) {
+                            return $this->handleFailedScan(
+                                $user,
+                                $qrToken,
+                                $this->roomClaimConflictMessage(),
+                                $room->id,
+                                $claimedSchedule->id,
+                                $classGroup->id
+                            );
+                        }
+
+                        $conflictSchedule = $this->findActiveScheduleConflict(
+                            $classGroup->id,
+                            $currentDate,
+                            $currentDay,
+                            $currentTime,
+                            $claimedSchedule->end_time
+                        );
+
+                        if ($conflictSchedule) {
+                            return $this->handleFailedScan(
+                                $user,
+                                $qrToken,
+                                $this->scheduleConflictMessage($conflictSchedule),
+                                $room->id,
+                                $conflictSchedule->id,
+                                $classGroup->id
+                            );
+                        }
                     }
 
                     return [
@@ -216,6 +264,19 @@ class RoomScanService
         if (!$claimedSchedule) return $this->handleFailedScan($user, $qrToken, 'Jadwal yang diklaim tidak ditemukan!');
 
         $now = Carbon::now();
+        $classGroup = $user->classGroup;
+
+        if (!$classGroup) {
+            return $this->handleFailedScan($user, $qrToken, 'Kelas tidak ditemukan!');
+        }
+
+        if ((int) $originalSchedule->class_group_id !== (int) $classGroup->id) {
+            return $this->handleFailedScan($user, $qrToken, 'Jadwal asli tidak terdaftar untuk kelas Anda!');
+        }
+
+        if ((int) $claimedSchedule->room_id !== (int) $room->id) {
+            return $this->handleFailedScan($user, $qrToken, 'Jadwal yang diklaim tidak sesuai dengan ruangan yang dipindai!');
+        }
 
         if ($claimedSchedule->day_of_week !== $now->dayOfWeek) {
             return $this->handleFailedScan($user, $qrToken, 'Jadwal yang ingin diclaim tidak berada di hari yang sama dengan hari ini!');
@@ -227,6 +288,45 @@ class RoomScanService
 
         if ($now >= Carbon::parse($claimedSchedule->end_time)) {
             return $this->handleFailedScan($user, $qrToken, 'Jadwal yang ingin diklaim sudah berakhir!');
+        }
+
+        $roomClaimConflict = $this->findActiveRoomClaimConflict(
+            $room->id,
+            $classGroup->id,
+            $now->toDateString(),
+            $now->dayOfWeek,
+            $now->format('H:i:s'),
+            $claimedSchedule->end_time
+        );
+
+        if ($roomClaimConflict) {
+            return $this->handleFailedScan(
+                $user,
+                $qrToken,
+                $this->roomClaimConflictMessage(),
+                $room->id,
+                $claimedSchedule->id,
+                $classGroup->id
+            );
+        }
+
+        $conflictSchedule = $this->findActiveScheduleConflict(
+            $classGroup->id,
+            $now->toDateString(),
+            $now->dayOfWeek,
+            $now->format('H:i:s'),
+            $claimedSchedule->end_time
+        );
+
+        if ($conflictSchedule) {
+            return $this->handleFailedScan(
+                $user,
+                $qrToken,
+                $this->scheduleConflictMessage($conflictSchedule),
+                $room->id,
+                $conflictSchedule->id,
+                $classGroup->id
+            );
         }
 
         $claimData = [
@@ -258,6 +358,65 @@ class RoomScanService
             'message' => 'Klaim berhasil! Ruangan telah diklaim dan menunggu kuorum.',
             'claim_id' => $claim->id,
         ];
+    }
+
+    private function findActiveRoomClaimConflict($roomId, $claimerGroupId, $date, $dayOfWeek, $startTime, $endTime): ?RoomClaim
+    {
+        $claimQuery = RoomClaim::where('room_id', $roomId)
+            ->where('claim_date', $date)
+            ->whereIn('status', ['pending_quorum', 'locked'])
+            ->where('claimer_group_id', '!=', $claimerGroupId);
+
+        if (Schema::hasColumn('room_claims', 'start_time') && Schema::hasColumn('room_claims', 'end_time')) {
+            $claimQuery
+                ->whereTime('start_time', '<', $endTime)
+                ->whereTime('end_time', '>', $startTime);
+        } else {
+            $claimQuery->whereHas('schedule', function ($query) use ($dayOfWeek, $startTime, $endTime) {
+                $query->where('day_of_week', $dayOfWeek)
+                    ->where('start_time', '<', $endTime)
+                    ->where('end_time', '>', $startTime);
+            });
+        }
+
+        return $claimQuery->first();
+    }
+
+    private function findActiveScheduleConflict($classGroupId, $date, $dayOfWeek, $startTime, $endTime): ?Schedule
+    {
+        $conflictingSchedules = Schedule::where('class_group_id', $classGroupId)
+            ->where('day_of_week', $dayOfWeek)
+            ->where(function ($query) use ($startTime, $endTime) {
+                $query->where('start_time', '<', $endTime)
+                    ->where('end_time', '>', $startTime);
+            })
+            ->orderBy('start_time')
+            ->get();
+
+        if ($conflictingSchedules->isEmpty()) {
+            return null;
+        }
+
+        $cancelledScheduleIds = ScheduleCancellation::whereIn('schedule_id', $conflictingSchedules->pluck('id'))
+            ->where('cancellation_date', $date)
+            ->pluck('schedule_id');
+
+        return $conflictingSchedules
+            ->first(fn (Schedule $schedule) => !$cancelledScheduleIds->contains($schedule->id));
+    }
+
+    private function scheduleConflictMessage(Schedule $schedule): string
+    {
+        return "Kelas Anda memiliki jadwal asli yang bentrok: {$schedule->course_name} ("
+            . substr($schedule->start_time, 0, 5)
+            . ' - '
+            . substr($schedule->end_time, 0, 5)
+            . '). Batalkan jadwal tersebut terlebih dahulu jika ingin mengklaim ruangan ini.';
+    }
+
+    private function roomClaimConflictMessage(): string
+    {
+        return 'Ruangan sudah direservasi atau diklaim oleh kelas lain pada slot ini. Silakan cari ruangan lain.';
     }
 
     private function handleFailedScan($user, $qrToken, $message, $roomId = null, $scheduleId = null, $classGroupId = null)
