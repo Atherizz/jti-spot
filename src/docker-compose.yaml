@@ -5,11 +5,9 @@ services:
       dockerfile: Dockerfile
     env_file:
       - .env
-    depends_on:
-      postgres-db-jti-spot:
-        condition: service_healthy
     networks:
       - jti-spot-network
+      - dokploy-network
     volumes:
       - public_data:/shared-public
     restart: always
@@ -25,29 +23,11 @@ services:
       - jti-spot-network
     restart: always
 
-  postgres-db-jti-spot:
-    image: postgres:15-alpine
-    env_file:
-      - .env
-    environment:
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_DATABASE}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$DB_USERNAME -d $$DB_DATABASE"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - jti-spot-network
-    restart: always
-
 networks:
   jti-spot-network:
     driver: bridge
+  dokploy-network:
+    external: true
 
 volumes:
-  postgres_data:
   public_data:
