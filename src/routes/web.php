@@ -98,6 +98,12 @@ Route::middleware(['auth'])->group(function () {
             ->name('admin.majors.update');
         Route::delete('/majors/{major}', [AdminClassGroupController::class, 'destroyProdi'])
             ->name('admin.majors.destroy');
+        Route::post('/class-groups', [AdminClassGroupController::class, 'storeClass'])
+            ->name('admin.class-groups.store');
+        Route::put('/class-groups/{classGroup}', [AdminClassGroupController::class, 'updateClass'])
+            ->name('admin.class-groups.update');
+        Route::delete('/class-groups/{classGroup}', [AdminClassGroupController::class, 'destroyClass'])
+            ->name('admin.class-groups.destroy');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
         Route::get('/schedules/template', [RoomImportController::class, 'downloadTemplate'])->name('admin.schedules.template');
         Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');

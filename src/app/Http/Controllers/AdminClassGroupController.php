@@ -173,4 +173,145 @@ class AdminClassGroupController extends Controller
 
         return $candidateToken;
     }
+
+    /**
+     * Store a new class group.
+     */
+    public function storeClass(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'major' => ['required', 'string', 'exists:majors,name'],
+            'name' => ['required', 'string', 'max:50'],
+        ], [
+            'major.required' => 'Prodi wajib dipilih.',
+            'major.exists' => 'Prodi tidak ditemukan.',
+            'name.required' => 'Nama kelas wajib diisi.',
+            'name.max' => 'Nama kelas maksimal 50 karakter.',
+        ]);
+
+        $major = strtoupper(trim($validated['major']));
+        $name = strtoupper(trim($validated['name']));
+
+        $exists = ClassGroup::query()
+            ->where('major', $major)
+            ->where('name', $name)
+            ->exists();
+
+        if ($exists) {
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('error', 'Kelas ' . $name . ' pada prodi ' . $major . ' sudah ada.');
+        }
+
+        try {
+            $classGroup = ClassGroup::create([
+                'major' => $major,
+                'name' => $name,
+            ]);
+
+            // Generate initial token
+            $classGroup->update([
+                'access_token' => $this->generateUniqueToken($classGroup),
+            ]);
+
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('success', 'Kelas ' . $major . ' ' . $name . ' berhasil ditambahkan.');
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('error', 'Gagal menambahkan kelas. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Update an existing class group.
+     */
+    public function updateClass(Request $request, ClassGroup $classGroup): RedirectResponse
+    {
+        $validated = $request->validate([
+            'major' => ['required', 'string', 'exists:majors,name'],
+            'name' => ['required', 'string', 'max:50'],
+        ], [
+            'major.required' => 'Prodi wajib dipilih.',
+            'major.exists' => 'Prodi tidak ditemukan.',
+            'name.required' => 'Nama kelas wajib diisi.',
+            'name.max' => 'Nama kelas maksimal 50 karakter.',
+        ]);
+
+        $major = strtoupper(trim($validated['major']));
+        $name = strtoupper(trim($validated['name']));
+
+        if ($classGroup->major === $major && $classGroup->name === $name) {
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('success', 'Tidak ada perubahan pada kelas ' . $classGroup->major . ' ' . $classGroup->name . '.');
+        }
+
+        $exists = ClassGroup::query()
+            ->where('major', $major)
+            ->where('name', $name)
+            ->whereKeyNot($classGroup->id)
+            ->exists();
+
+        if ($exists) {
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('error', 'Kelas ' . $name . ' pada prodi ' . $major . ' sudah ada.');
+        }
+
+        try {
+            $oldName = $classGroup->major . ' ' . $classGroup->name;
+            $classGroup->update([
+                'major' => $major,
+                'name' => $name,
+            ]);
+
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('success', 'Kelas ' . $oldName . ' berhasil diubah menjadi ' . $major . ' ' . $name . '.');
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('error', 'Gagal memperbarui kelas. Silakan coba lagi.');
+        }
+    }
+
+    /**
+     * Delete a class group.
+     */
+    public function destroyClass(ClassGroup $classGroup): RedirectResponse
+    {
+        $hasUsers = $classGroup->users()->exists();
+        $hasSchedules = $classGroup->schedules()->exists();
+
+        if ($hasUsers || $hasSchedules) {
+            $reason = [];
+            if ($hasUsers) $reason[] = 'mahasiswa';
+            if ($hasSchedules) $reason[] = 'jadwal';
+            
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('error', 'Kelas ' . $classGroup->major . ' ' . $classGroup->name . ' tidak dapat dihapus karena masih terhubung dengan data ' . implode(' dan ', $reason) . '.');
+        }
+
+        try {
+            $deletedName = $classGroup->major . ' ' . $classGroup->name;
+            $classGroup->delete();
+
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('success', 'Kelas ' . $deletedName . ' berhasil dihapus.');
+        } catch (Throwable $throwable) {
+            report($throwable);
+
+            return redirect()
+                ->route('admin.class-groups.index')
+                ->with('error', 'Gagal menghapus kelas. Silakan coba lagi.');
+        }
+    }
 }
