@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dasbor') â€” JTISpot</title>
+    <title>@yield('title', 'Dasbor') &mdash; JTISpot</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
     {{-- Wrapper konten utama: geser ke kanan selebar sidebar di desktop --}}
     <div class="lg:pl-56 flex flex-col min-h-screen">
 
-        {{-- Top Bar â€” hanya tampil di mobile --}}
+        {{-- Top Bar - hanya tampil di mobile --}}
         <header class="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
             <button onclick="toggleSidebar()" class="p-1 text-gray-600 hover:text-gray-900 rounded-md">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@
 
     </div>
 
-    {{-- Bottom Navigation â€” hanya tampil di mobile --}}
+    {{-- Bottom Navigation - hanya tampil di mobile --}}
     <nav class="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 z-10 flex">
         <a href="#" class="flex-1 flex flex-col items-center justify-center py-2.5 gap-1 text-orange-900">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,4 +99,3 @@
 
 </body>
 </html>
-
