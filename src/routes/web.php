@@ -93,6 +93,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/class-groups/{classGroup}/generate-token', [AdminClassGroupController::class, 'generateToken'])
             ->name('admin.class-groups.generate-token');
         Route::get('/schedules', [AdminScheduleController::class, 'index'])->name('admin.schedules');
+        Route::get('/schedules/template', [RoomImportController::class, 'downloadTemplate'])->name('admin.schedules.template');
         Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');
 
         Route::resource('users', AdminUserController::class)->except(['show'])->names('admin.users');
