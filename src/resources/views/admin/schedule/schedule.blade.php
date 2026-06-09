@@ -404,31 +404,31 @@
                                     <tr class="divide-x divide-gray-200 font-mono text-[11px] text-gray-700">
                                         <td class="bg-gray-100 text-gray-400 text-center py-2 w-10 select-none">2</td>
                                         <td class="px-3 py-2">1</td>
-                                        <td class="px-3 py-2 bg-emerald-50/20 font-bold text-ink">LPR2</td>
-                                        <td class="px-3 py-2 font-bold text-ink">TI2B</td>
+                                        <td class="px-3 py-2 bg-emerald-50/20 font-bold text-ink">Ruang Teori 1</td>
+                                        <td class="px-3 py-2 font-bold text-ink">TI1B</td>
                                         <td class="px-3 py-2">1</td>
                                         <td class="px-3 py-2">Senin</td>
                                         <td class="px-3 py-2">1</td>
-                                        <td class="px-3 py-2">6</td>
+                                        <td class="px-3 py-2">3</td>
                                         <td class="px-3 py-2">07:00</td>
-                                        <td class="px-3 py-2">12:10</td>
-                                        <td class="px-3 py-2 font-semibold text-gray-800">PWL_TI</td>
-                                        <td class="px-3 py-2 text-gray-500 font-sans">Dosen Pengampu 1</td>
+                                        <td class="px-3 py-2">09:30</td>
+                                        <td class="px-3 py-2 font-semibold text-gray-800">BD_TI</td>
+                                        <td class="px-3 py-2 text-gray-500 font-sans">ENH</td>
                                     </tr>
                                     <!-- Row 3 -->
                                     <tr class="divide-x divide-gray-200 font-mono text-[11px] text-gray-700">
                                         <td class="bg-gray-100 text-gray-400 text-center py-2 w-10 select-none">3</td>
                                         <td class="px-3 py-2">2</td>
-                                        <td class="px-3 py-2 bg-emerald-50/20 font-bold text-ink">LPR4</td>
-                                        <td class="px-3 py-2 font-bold text-ink">TI2G</td>
+                                        <td class="px-3 py-2 bg-emerald-50/20 font-bold text-ink">Ruang Teori 2</td>
+                                        <td class="px-3 py-2 font-bold text-ink">TI3C</td>
                                         <td class="px-3 py-2">1</td>
                                         <td class="px-3 py-2">Senin</td>
-                                        <td class="px-3 py-2">1</td>
-                                        <td class="px-3 py-2">4</td>
-                                        <td class="px-3 py-2">07:00</td>
-                                        <td class="px-3 py-2">10:30</td>
-                                        <td class="px-3 py-2 font-semibold text-gray-800">SK_TI</td>
-                                        <td class="px-3 py-2 text-gray-500 font-sans">Dosen Pengampu 2</td>
+                                        <td class="px-3 py-2">2</td>
+                                        <td class="px-3 py-2">5</td>
+                                        <td class="px-3 py-2">07:50</td>
+                                        <td class="px-3 py-2">11:20</td>
+                                        <td class="px-3 py-2 font-semibold text-gray-800">KEP_TI</td>
+                                        <td class="px-3 py-2 text-gray-500 font-sans">KPA</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -447,7 +447,7 @@
                                     </li>
                                     <li>
                                         <strong class="text-ink">B. Room:</strong>
-                                        <span class="block mt-0.5 text-gray-500">Kode ruang (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">LPR2</code>). Harus cocok dengan kode ruang di sistem.</span>
+                                        <span class="block mt-0.5 text-gray-500">Nama ruang (e.g. <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">Ruang Teori 1</code> atau <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">Lab Pemrograman 2</code>). Harus sama dengan nama ruang di sistem, bukan kode seperti <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">RT01</code> atau <code class="bg-white px-1 py-0.5 border border-gray-200 rounded">LPR2</code>.</span>
                                     </li>
                                     <li>
                                         <strong class="text-ink">C. Class Name:</strong>

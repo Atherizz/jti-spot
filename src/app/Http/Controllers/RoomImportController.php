@@ -8,6 +8,7 @@ use App\Models\Schedule;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -59,6 +60,7 @@ class RoomImportController extends Controller
             ) {
                 // Hapus data jadwal yang lama sebelum menimpa dengan hasil import baru
                 Schedule::query()->delete();
+                $classGroups = ClassGroup::query()->get();
 
                 foreach (array_slice($rows, 1) as $rowIndex => $rowValues) {
                     $lineNumber = $rowIndex + 2;
@@ -120,11 +122,10 @@ class RoomImportController extends Controller
                         continue;
                     }
 
-                    $classGroup = ClassGroup::firstOrCreate(
-                        [
-                            'name' => $classGroupName,
-                            'major' => $majorName !== '' ? $majorName : 'Umum',
-                        ]
+                    $classGroup = $this->resolveClassGroup(
+                        $classGroups,
+                        $classGroupName,
+                        $majorName !== '' ? $majorName : null
                     );
 
                     $schedule = Schedule::where('room_id', $room->id)
@@ -217,6 +218,74 @@ class RoomImportController extends Controller
         }
 
         return Room::firstOrNew(['name' => trim($roomName)]);
+    }
+
+    private function resolveClassGroup(Collection $classGroups, string $classGroupName, ?string $majorName = null): ClassGroup
+    {
+        $normalizedName = strtoupper(preg_replace('/[^A-Z0-9]+/i', '', $classGroupName) ?? '');
+        $normalizedMajor = strtoupper(trim((string) $majorName));
+
+        if ($normalizedName === '') {
+            return ClassGroup::firstOrCreate([
+                'name' => trim($classGroupName),
+                'major' => $normalizedMajor !== '' ? $normalizedMajor : 'Umum',
+            ]);
+        }
+
+        if ($normalizedMajor !== '' && $normalizedMajor !== 'UMUM') {
+            $exactMatch = $classGroups->first(function (ClassGroup $classGroup) use ($classGroupName, $normalizedMajor) {
+                return strtoupper($classGroup->name) === strtoupper(trim($classGroupName))
+                    && strtoupper($classGroup->major) === $normalizedMajor;
+            });
+
+            if ($exactMatch) {
+                return $exactMatch;
+            }
+        }
+
+        $combinedMatch = $classGroups->first(function (ClassGroup $classGroup) use ($normalizedName, $normalizedMajor) {
+            $classGroupMajor = strtoupper($classGroup->major);
+            $normalizedDbNameMajorFirst = strtoupper(preg_replace('/[^A-Z0-9]+/i', '', $classGroup->major . $classGroup->name) ?? '');
+            $normalizedDbNameNameFirst = strtoupper(preg_replace('/[^A-Z0-9]+/i', '', $classGroup->name . $classGroup->major) ?? '');
+
+            if ($normalizedMajor !== '' && $normalizedMajor !== 'UMUM' && $classGroupMajor !== $normalizedMajor) {
+                return false;
+            }
+
+            return $normalizedName === $normalizedDbNameMajorFirst
+                || $normalizedName === $normalizedDbNameNameFirst;
+        });
+
+        if ($combinedMatch) {
+            return $combinedMatch;
+        }
+
+        $exactNameMatches = $classGroups->filter(function (ClassGroup $classGroup) use ($classGroupName) {
+            return strtoupper($classGroup->name) === strtoupper(trim($classGroupName));
+        })->values();
+
+        if ($exactNameMatches->count() === 1) {
+            return $exactNameMatches->first();
+        }
+
+        if ($normalizedMajor !== '' && $normalizedMajor !== 'UMUM') {
+            $majorNameMatch = $exactNameMatches->first(function (ClassGroup $classGroup) use ($normalizedMajor) {
+                return strtoupper($classGroup->major) === $normalizedMajor;
+            });
+
+            if ($majorNameMatch) {
+                return $majorNameMatch;
+            }
+        }
+
+        $classGroup = ClassGroup::create([
+            'name' => trim($classGroupName),
+            'major' => $normalizedMajor !== '' ? $normalizedMajor : 'Umum',
+        ]);
+
+        $classGroups->push($classGroup);
+
+        return $classGroup;
     }
 
     private function parseDayOfWeek(mixed $value): ?int
@@ -318,8 +387,8 @@ class RoomImportController extends Controller
 
         // Set example data
         $exampleData = [
-            [1, 'LPR2', 'TI2B', 1, 'Senin', 1, 6, '07:00', '12:10', 'PWL_TI', 'Dosen Pengampu 1'],
-            [2, 'LPR4', 'TI2G', 1, 'Senin', 1, 4, '07:00', '10:30', 'SK_TI', 'Dosen Pengampu 2']
+            [1, 'Ruang Teori 1', 'TI1B', 1, 'Senin', 1, 3, '07:00', '09:30', 'BD_TI', 'ENH'],
+            [2, 'Ruang Teori 2', 'TI3C', 1, 'Senin', 2, 5, '07:50', '11:20', 'KEP_TI', 'KPA'],
         ];
 
         foreach ($exampleData as $rowIndex => $rowData) {
