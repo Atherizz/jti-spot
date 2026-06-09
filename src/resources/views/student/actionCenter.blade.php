@@ -65,6 +65,75 @@
         </div>
     </div>
 
+    {{-- Mode Notifikasi Peluang Ruang --}}
+    <div class="editorial-panel bg-white relative overflow-hidden mb-10 stagger-2 group">
+        <div class="absolute -right-14 -top-14 w-52 h-52 bg-orange-50 rounded-full blur-3xl opacity-70 pointer-events-none"></div>
+        <div class="p-6 md:p-7 relative z-10">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="flex gap-4 items-start min-w-0">
+                    <div class="w-12 h-12 rounded-2xl {{ $roomOpportunityAlertEnabled ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-gray-50 text-gray-400 border-gray-100' }} flex items-center justify-center shrink-0 border shadow-sm">
+                        @if($roomOpportunityAlertEnabled)
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0a3 3 0 11-6 0m6 0H9" />
+                            </svg>
+                        @else
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 5.636l-12.728 12.728M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a5.972 5.972 0 00-1.012-3.335M12 5a6 6 0 00-6 6v3.159c0 .538-.214 1.055-.595 1.436L4 17h8m3 0a3 3 0 01-5.236 2" />
+                            </svg>
+                        @endif
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex flex-wrap items-center gap-2 mb-2">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border {{ $roomOpportunityAlertEnabled ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-gray-50 text-gray-500 border-gray-100' }}">
+                                <span class="w-1.5 h-1.5 rounded-full {{ $roomOpportunityAlertEnabled ? 'bg-emerald-500' : 'bg-gray-300' }}"></span>
+                                {{ $roomOpportunityAlertEnabled ? 'Mode Aktif' : 'Mode Nonaktif' }}
+                            </span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-ink/40">WhatsApp Opportunity Alert</span>
+                        </div>
+                        <h2 class="font-display text-xl md:text-2xl font-bold text-ink tracking-tight mb-2">Mode Cari Ruang Kosong</h2>
+                        <p class="text-sm font-medium text-ink/60 leading-relaxed max-w-2xl">
+                            Jika aktif, perwakilan kelas akan menerima WhatsApp saat ada slot ruang dari pembatalan kelas lain. Slot yang bentrok jadwal tetap dikirim, tapi akan diberi label bentrok agar bisa diputuskan oleh kelas Anda.
+                        </p>
+                        @if(!$hasWhatsAppNumber)
+                            <p class="mt-3 text-xs font-semibold text-red-600">
+                                Nomor WhatsApp belum tersedia di profil Anda. Lengkapi nomor sebelum mengaktifkan mode ini.
+                            </p>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="shrink-0 w-full lg:w-auto">
+                    @if($hasWhatsAppNumber)
+                        <form action="{{ route('student.action.opportunity-alert-mode') }}" method="POST" class="w-full lg:w-auto">
+                            @csrf
+                            <input type="hidden" name="enabled" value="{{ $roomOpportunityAlertEnabled ? 0 : 1 }}">
+                            <button type="submit"
+                                aria-pressed="{{ $roomOpportunityAlertEnabled ? 'true' : 'false' }}"
+                                class="w-full lg:w-auto min-h-[48px] px-5 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 border shadow-sm {{ $roomOpportunityAlertEnabled ? 'bg-white hover:bg-gray-50 text-ink border-gray-200' : 'bg-orange-600 hover:bg-orange-700 text-white border-orange-500 shadow-orange-600/20' }}">
+                                @if($roomOpportunityAlertEnabled)
+                                    Nonaktifkan Mode
+                                @else
+                                    Aktifkan Mode
+                                @endif
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('profile.show') }}"
+                            class="w-full lg:w-auto min-h-[48px] px-5 py-3 rounded-xl bg-white hover:bg-gray-50 text-ink border border-gray-200 text-sm font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
+                            Lengkapi Nomor WA
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Action Cards Grid --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 stagger-3">
 

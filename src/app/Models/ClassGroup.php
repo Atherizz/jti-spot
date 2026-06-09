@@ -11,6 +11,11 @@ class ClassGroup extends Model
         'major',
         'access_token',
         'token_quota',
+        'room_opportunity_alert_enabled',
+    ];
+
+    protected $casts = [
+        'room_opportunity_alert_enabled' => 'boolean',
     ];
 
     /**
