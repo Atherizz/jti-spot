@@ -68,6 +68,8 @@ Route::middleware(['auth'])->group(function () {
                 ->name('student.session.extend-quorum');
             Route::get('/action', [StudentActionController::class, 'center'])
                 ->name('student.action.center');
+            Route::post('/action/opportunity-alert-mode', [StudentActionController::class, 'updateOpportunityAlertMode'])
+                ->name('student.action.opportunity-alert-mode');
 
             Route::get('/action/reservasi', [StudentActionController::class, 'showReservasi'])
                 ->name('student.action.reservasi');

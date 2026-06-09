@@ -6,6 +6,7 @@ use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\ScheduleCancellation;
 use App\Models\RoomClaim;
+use App\Services\WhatsAppNotificationService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,6 +56,8 @@ class StudentActionController extends Controller
 
         return view('student.actionCenter', [
             'recentRequests' => $recentRequests,
+            'roomOpportunityAlertEnabled' => (bool) ($user->classGroup?->room_opportunity_alert_enabled ?? false),
+            'hasWhatsAppNumber' => filled($user->phone_number),
         ]);
     }
 
@@ -229,7 +232,9 @@ class StudentActionController extends Controller
             $claimData['end_time'] = $schedule->end_time;
         }
 
-        RoomClaim::query()->create($claimData);
+        $claim = RoomClaim::query()->create($claimData);
+
+        app(WhatsAppNotificationService::class)->queueReservationReminder($claim);
 
         return redirect()
             ->route('student.action.center')
@@ -333,7 +338,7 @@ class StudentActionController extends Controller
                 ->withInput();
         }
 
-        ScheduleCancellation::query()->create([
+        $cancellation = ScheduleCancellation::query()->create([
             'schedule_id'       => $schedule->id,
             'cancelled_by'      => $user->id,
             'cancellation_date' => $cancellationDate,
@@ -342,9 +347,41 @@ class StudentActionController extends Controller
             'created_at'        => now(),
         ]);
 
+        $whatsAppNotifications = app(WhatsAppNotificationService::class);
+        $whatsAppNotifications->queueOpportunityAlert($cancellation);
+        $whatsAppNotifications->sendDueNotifications();
+
         return redirect()
             ->route('student.action.center')
             ->with('success', 'Pembatalan kelas berhasil. Jadwal telah dibatalkan di sistem.');
+    }
+
+    public function updateOpportunityAlertMode(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'enabled' => ['required', 'boolean'],
+        ]);
+
+        $user = $request->user();
+
+        if (! $user->classGroup) {
+            return back()->with('error', 'Kelas Anda tidak ditemukan.');
+        }
+
+        if ((bool) $validated['enabled'] && blank($user->phone_number)) {
+            return back()->with('error', 'Lengkapi nomor WhatsApp terlebih dahulu sebelum mengaktifkan mode cari ruang kosong.');
+        }
+
+        $user->classGroup->update([
+            'room_opportunity_alert_enabled' => (bool) $validated['enabled'],
+        ]);
+
+        return back()->with(
+            'success',
+            (bool) $validated['enabled']
+                ? 'Mode cari ruang kosong berhasil diaktifkan.'
+                : 'Mode cari ruang kosong berhasil dinonaktifkan.'
+        );
     }
 
     /**

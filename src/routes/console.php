@@ -10,6 +10,7 @@ use App\Models\Room;
 use App\Models\RoomClaim;
 use App\Models\Schedule as ScheduleModel;
 use App\Models\ScheduleCancellation;
+use App\Services\WhatsAppNotificationService;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -154,6 +155,12 @@ Schedule::call(function () {
     } else {
         $logAndPrint('Cron: Skipped (outside class hours/weekend).');
     }
+})->everyMinute();
+
+Schedule::call(function () {
+    $service = app(WhatsAppNotificationService::class);
+    $service->queueDueQuorumCriticalAlerts();
+    $service->sendDueNotifications();
 })->everyMinute();
 
 // ── Simulation: auto check-in for rooms in [waiting] status ──────────
