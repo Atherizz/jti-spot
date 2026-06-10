@@ -32,6 +32,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profil/phone', [ProfileController::class, 'updatePhone'])->name('profile.phone.update');
+    Route::post('/profil/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     
     Route::prefix('student')->middleware('can:student')->group(function () {
         Route::get('/dashboard', [StudentDashboardController::class, 'home'])

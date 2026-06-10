@@ -5,6 +5,7 @@
 @section('content')
 	@php
 		$isStudentRole = $user->role === 'student';
+		$isAdminRole = $user->role === 'admin';
 	@endphp
 
 	{{-- Formal Header --}}
@@ -74,6 +75,10 @@
 							<div>
 								<p class="text-xs font-medium text-gray-500 mb-1">Nomor Induk / Identitas Akademik</p>
 								<p class="font-semibold text-ink">{{ $user->reg_number ?? 'Belum Dimasukkan' }}</p>
+							</div>
+							<div>
+								<p class="text-xs font-medium text-gray-500 mb-1">Nomor WhatsApp</p>
+								<p class="font-semibold text-ink">{{ $user->phone_number ?? 'Belum Dimasukkan' }}</p>
 							</div>
 						</div>
 
@@ -161,15 +166,15 @@
 
 	{{-- Quick Settings Menus --}}
 	<div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 stagger-3">
-		<a href="#" class="editorial-panel bg-white p-5 flex items-center gap-4 hover:border-orange-200 transition-colors group cursor-pointer">
+		<button type="button" onclick="document.getElementById('phone-modal').classList.remove('hidden')" class="editorial-panel bg-white p-5 flex items-center gap-4 hover:border-orange-200 transition-colors group cursor-pointer text-left">
 			<div class="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-orange-50 border border-gray-100 group-hover:border-orange-100 flex items-center justify-center text-gray-500 group-hover:text-orange-600 transition-all">
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.684l1.5 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.5a1 1 0 01.684.95V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
 			</div>
 			<div>
-				<p class="text-sm font-semibold text-ink">Perbarui Data Diri</p>
-				<p class="text-xs text-gray-500 mt-0.5">Ubah nama atau pengaturan bio.</p>
+				<p class="text-sm font-semibold text-ink">Ubah / Isi Nomor Telepon</p>
+				<p class="text-xs text-gray-500 mt-0.5">Nomor ini dipakai untuk notifikasi WhatsApp.</p>
 			</div>
-		</a>
+		</button>
 		@if ($isStudentRole)
 			<button type="button" onclick="document.getElementById('claim-token-modal').classList.remove('hidden')" class="editorial-panel bg-white p-5 flex items-center gap-4 hover:border-orange-200 transition-colors group cursor-pointer text-left">
 				<div class="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-orange-50 border border-gray-100 group-hover:border-orange-100 flex items-center justify-center text-gray-500 group-hover:text-orange-600 transition-all">
@@ -191,16 +196,233 @@
 				</div>
 			</a>
 		@endif
-		<a href="#" class="editorial-panel bg-white p-5 flex items-center gap-4 hover:border-orange-200 transition-colors group cursor-pointer">
-			<div class="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-orange-50 border border-gray-100 group-hover:border-orange-100 flex items-center justify-center text-gray-500 group-hover:text-orange-600 transition-all">
-				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-			</div>
-			<div>
-				<p class="text-sm font-semibold text-ink">Ganti Kata Sandi</p>
-				<p class="text-xs text-gray-500 mt-0.5">Perbarui kunci akses keamanan.</p>
-			</div>
-		</a>
+		@if ($isAdminRole)
+			<button type="button" onclick="document.getElementById('password-modal').classList.remove('hidden')" class="editorial-panel bg-white p-5 flex items-center gap-4 hover:border-orange-200 transition-colors group cursor-pointer text-left">
+				<div class="w-10 h-10 rounded-xl bg-gray-50 group-hover:bg-orange-50 border border-gray-100 group-hover:border-orange-100 flex items-center justify-center text-gray-500 group-hover:text-orange-600 transition-all">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+				</div>
+				<div>
+					<p class="text-sm font-semibold text-ink">Ganti Kata Sandi</p>
+					<p class="text-xs text-gray-500 mt-0.5">Khusus administrator sistem.</p>
+				</div>
+			</button>
+		@endif
 	</div>
+
+	<div id="phone-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+		<div class="fixed inset-0 bg-ink/60 backdrop-blur-sm transition-opacity" onclick="document.getElementById('phone-modal').classList.add('hidden')"></div>
+		<div class="relative editorial-panel bg-white shadow-2xl w-[90%] md:w-full mx-auto p-8 overflow-hidden transform transition-all" style="max-width: 480px;">
+			<div class="absolute right-0 top-0 w-32 h-32 bg-orange-50 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+			<div class="relative z-10">
+				<div class="flex items-center gap-3 mb-5">
+					<div class="w-12 h-12 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600">
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.684l1.5 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.5a1 1 0 01.684.95V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+					</div>
+					<div>
+						<h3 class="font-display text-2xl font-bold text-ink">Ubah Nomor Telepon</h3>
+						<p class="text-sm font-medium text-gray-500">Nomor ini digunakan untuk notifikasi WhatsApp JTISpot.</p>
+					</div>
+				</div>
+
+				<form method="POST" action="{{ route('profile.phone.update') }}" class="space-y-5">
+					@csrf
+					<div>
+						<label for="phone-number-input" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Nomor WhatsApp</label>
+						<input
+							id="phone-number-input"
+							type="tel"
+							name="phone_number"
+							value="{{ old('phone_number', $user->phone_number) }}"
+							maxlength="20"
+							required
+							autocomplete="tel"
+							inputmode="tel"
+							placeholder="Contoh: 085235342960"
+							aria-describedby="phone-number-help"
+							class="w-full rounded-xl border {{ $errors->has('phone_number') ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : 'border-gray-300 focus:border-orange-400 focus:ring-orange-200' }} bg-white px-3 py-2.5 text-sm font-medium text-ink shadow-sm outline-none focus:ring-2"
+						>
+						<p id="phone-number-help" class="mt-2 text-xs font-medium {{ $errors->has('phone_number') ? 'text-rose-600' : 'text-gray-500' }}">
+							@error('phone_number')
+								{{ $message }}
+							@else
+								Boleh memakai spasi atau tanda hubung. Sistem akan menyimpan nomor dalam format angka.
+							@enderror
+						</p>
+					</div>
+
+					<div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+						<button type="button" onclick="document.getElementById('phone-modal').classList.add('hidden')" class="w-full sm:w-auto flex-1 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-ink text-sm font-semibold rounded-xl transition-colors border border-gray-200">
+							Batal
+						</button>
+						<button type="submit" class="w-full sm:w-auto flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+							Simpan Nomor
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	@if ($isAdminRole)
+		<div id="password-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+			<div class="fixed inset-0 bg-ink/60 backdrop-blur-sm transition-opacity" onclick="document.getElementById('password-modal').classList.add('hidden')"></div>
+			<div class="relative editorial-panel bg-white shadow-2xl w-[90%] md:w-full mx-auto p-8 overflow-hidden transform transition-all" style="max-width: 500px;">
+				<div class="absolute right-0 top-0 w-32 h-32 bg-orange-50 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+
+				<div class="relative z-10">
+					<div class="flex items-center gap-3 mb-5">
+						<div class="w-12 h-12 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600">
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+						</div>
+						<div>
+							<h3 class="font-display text-2xl font-bold text-ink">Ganti Kata Sandi</h3>
+							<p class="text-sm font-medium text-gray-500">Fitur ini hanya tersedia untuk administrator.</p>
+						</div>
+					</div>
+
+					<form method="POST" action="{{ route('profile.password.update') }}" class="space-y-5">
+						@csrf
+						<div>
+							<label for="current-password" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Kata Sandi Saat Ini</label>
+							<div class="relative">
+								<input
+									id="current-password"
+									type="password"
+									name="current_password"
+									required
+									autocomplete="current-password"
+									class="w-full rounded-xl border {{ $errors->has('current_password') ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : 'border-gray-300 focus:border-orange-400 focus:ring-orange-200' }} bg-white px-3 py-2.5 pr-12 text-sm font-medium text-ink shadow-sm outline-none focus:ring-2"
+								>
+								<button
+									type="button"
+									class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-orange-600 transition-colors"
+									aria-label="Tampilkan kata sandi saat ini"
+									aria-pressed="false"
+									data-password-toggle="current-password"
+								>
+									<svg class="w-5 h-5 pointer-events-none password-eye" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+									<svg class="w-5 h-5 pointer-events-none password-eye-off hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.584 10.587A2 2 0 0012 14a2 2 0 001.414-.586M9.88 5.08A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.03 10.03 0 01-2.168 3.412M6.61 6.61C4.684 7.84 3.196 9.734 2.458 12c.664 2.116 2.034 3.908 3.812 5.143A9.94 9.94 0 0012 19c.77 0 1.518-.087 2.236-.252" /></svg>
+								</button>
+							</div>
+							@error('current_password')
+								<p class="mt-2 text-xs font-medium text-rose-600">{{ $message }}</p>
+							@enderror
+						</div>
+
+						<div>
+							<label for="new-password" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Kata Sandi Baru</label>
+							<div class="relative">
+								<input
+									id="new-password"
+									type="password"
+									name="password"
+									required
+									minlength="8"
+									autocomplete="new-password"
+									aria-describedby="new-password-help"
+									class="w-full rounded-xl border {{ $errors->has('password') ? 'border-rose-300 focus:border-rose-400 focus:ring-rose-200' : 'border-gray-300 focus:border-orange-400 focus:ring-orange-200' }} bg-white px-3 py-2.5 pr-12 text-sm font-medium text-ink shadow-sm outline-none focus:ring-2"
+								>
+								<button
+									type="button"
+									class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-orange-600 transition-colors"
+									aria-label="Tampilkan kata sandi baru"
+									aria-pressed="false"
+									data-password-toggle="new-password"
+								>
+									<svg class="w-5 h-5 pointer-events-none password-eye" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+									<svg class="w-5 h-5 pointer-events-none password-eye-off hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.584 10.587A2 2 0 0012 14a2 2 0 001.414-.586M9.88 5.08A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.03 10.03 0 01-2.168 3.412M6.61 6.61C4.684 7.84 3.196 9.734 2.458 12c.664 2.116 2.034 3.908 3.812 5.143A9.94 9.94 0 0012 19c.77 0 1.518-.087 2.236-.252" /></svg>
+								</button>
+							</div>
+							<p id="new-password-help" class="mt-2 text-xs font-medium {{ $errors->has('password') ? 'text-rose-600' : 'text-gray-500' }}">
+								@error('password')
+									{{ $message }}
+								@else
+									Minimal 8 karakter.
+								@enderror
+							</p>
+						</div>
+
+						<div>
+							<label for="password-confirmation" class="block text-xs font-semibold uppercase tracking-widest text-ink/50 mb-2">Konfirmasi Kata Sandi Baru</label>
+							<div class="relative">
+								<input
+									id="password-confirmation"
+									type="password"
+									name="password_confirmation"
+									required
+									minlength="8"
+									autocomplete="new-password"
+									class="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 pr-12 text-sm font-medium text-ink shadow-sm outline-none focus:border-orange-400 focus:ring-2 focus:ring-orange-200"
+								>
+								<button
+									type="button"
+									class="absolute inset-y-0 right-0 px-3 text-gray-400 hover:text-orange-600 transition-colors"
+									aria-label="Tampilkan konfirmasi kata sandi"
+									aria-pressed="false"
+									data-password-toggle="password-confirmation"
+								>
+									<svg class="w-5 h-5 pointer-events-none password-eye" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+									<svg class="w-5 h-5 pointer-events-none password-eye-off hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 3l18 18M10.584 10.587A2 2 0 0012 14a2 2 0 001.414-.586M9.88 5.08A9.77 9.77 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.03 10.03 0 01-2.168 3.412M6.61 6.61C4.684 7.84 3.196 9.734 2.458 12c.664 2.116 2.034 3.908 3.812 5.143A9.94 9.94 0 0012 19c.77 0 1.518-.087 2.236-.252" /></svg>
+								</button>
+							</div>
+						</div>
+
+						<div class="flex flex-col sm:flex-row items-center gap-3 w-full">
+							<button type="button" onclick="document.getElementById('password-modal').classList.add('hidden')" class="w-full sm:w-auto flex-1 px-4 py-3 bg-gray-50 hover:bg-gray-100 text-ink text-sm font-semibold rounded-xl transition-colors border border-gray-200">
+								Batal
+							</button>
+							<button type="submit" class="w-full sm:w-auto flex-1 px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white text-sm font-semibold rounded-xl transition-colors shadow-sm">
+								Simpan Password
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	@endif
+
+	@if ($errors->has('phone_number'))
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				document.getElementById('phone-modal')?.classList.remove('hidden');
+			});
+		</script>
+	@endif
+
+	@if ($isAdminRole && ($errors->has('current_password') || $errors->has('password')))
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				document.getElementById('password-modal')?.classList.remove('hidden');
+			});
+		</script>
+	@endif
+
+	@if ($isAdminRole)
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+					button.addEventListener('click', () => {
+						const input = document.getElementById(button.dataset.passwordToggle);
+
+						if (!input) {
+							return;
+						}
+
+						const shouldShow = input.type === 'password';
+						input.type = shouldShow ? 'text' : 'password';
+						button.setAttribute('aria-pressed', shouldShow ? 'true' : 'false');
+						button.setAttribute('aria-label', shouldShow
+							? 'Sembunyikan kata sandi'
+							: 'Tampilkan kata sandi'
+						);
+						button.querySelector('.password-eye')?.classList.toggle('hidden', shouldShow);
+						button.querySelector('.password-eye-off')?.classList.toggle('hidden', !shouldShow);
+					});
+				});
+			});
+		</script>
+	@endif
 
 	@if ($isStudentRole)
 		<div id="claim-token-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -330,4 +552,3 @@
 	@endif
 
 @endsection
-
