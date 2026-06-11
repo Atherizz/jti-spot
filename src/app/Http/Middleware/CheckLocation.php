@@ -2,14 +2,19 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\AllowedIpService;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\IpUtils;
-use App\Helpers\LocationHelper; // Sesuaikan dengan namespace aslimu
+use App\Helpers\LocationHelper;
 
 class CheckLocation
 {
+    public function __construct(
+        private readonly AllowedIpService $allowedIpService
+    ) {}
+
     public function handle(Request $request, Closure $next): Response
     {
         // Resolve real client IP dengan prioritas:
@@ -23,8 +28,8 @@ class CheckLocation
 
         $clientIp = $cfConnectingIp ?? $xForwardedForFirst ?? $request->ip();
 
-        $rawAllowedIps = explode(',', env('ALLOWED_WIFI_IPS', '127.0.0.1'));
-        $allowedIps = array_map('trim', $rawAllowedIps);
+        // Ambil daftar IP yang diizinkan dari database (via cache 5 menit)
+        $allowedIps = $this->allowedIpService->getActiveIpList();
 
         $isIpValid = IpUtils::checkIp($clientIp, $allowedIps);
 
@@ -44,7 +49,7 @@ class CheckLocation
             }
         }
 
-        // 3. Keputusan Eksekusi: Harus memenuhi salah satu (WiFi ATAU GPS)
+        // Keputusan Eksekusi: Harus memenuhi salah satu (WiFi ATAU GPS)
         if (!$isIpValid && !$isGpsValid) {
             return redirect()->route('student.dashboard.home')
                 ->with('error', 'Akses ditolak. Anda berada di luar jangkauan gedung JTI atau tidak menggunakan WiFi kampus.');
