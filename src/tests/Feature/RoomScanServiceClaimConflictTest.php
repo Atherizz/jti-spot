@@ -119,6 +119,44 @@ function createOtherClassRoomClaim(array $fixture, array $overrides = []): RoomC
     ], $overrides));
 }
 
+function createActiveCheckInFixture(string $role = 'student'): array
+{
+    $classGroup = ClassGroup::create([
+        'name' => '2D',
+        'major' => 'TI',
+    ]);
+
+    $user = User::create([
+        'name' => 'Scan User',
+        'email' => "{$role}-scan@example.test",
+        'password' => Hash::make('password'),
+        'role' => $role,
+        'class_group_id' => $classGroup->id,
+    ]);
+
+    $room = Room::create([
+        'name' => 'Ruang Scan',
+        'current_status' => 'waiting',
+        'qr_token' => 'scan-room-token',
+    ]);
+
+    $schedule = Schedule::create([
+        'room_id' => $room->id,
+        'class_group_id' => $classGroup->id,
+        'day_of_week' => 1,
+        'start_time' => '10:00:00',
+        'end_time' => '12:00:00',
+        'course_name' => 'Algoritma',
+    ]);
+
+    return [
+        'user' => $user,
+        'classGroup' => $classGroup,
+        'room' => $room,
+        'schedule' => $schedule,
+    ];
+}
+
 it('blocks claim prompt when class has an active schedule conflict', function () {
     $fixture = createClassRepWithScheduleFixture();
 
@@ -266,4 +304,78 @@ it('allows claim prompt when another class room claim is not active or not overl
 
     expect($result['status'])->toBe('claim_prompt')
         ->and($result['room_id'])->toBe($fixture['targetRoom']->id);
+});
+
+it('allows scan for an active official schedule when it is not cancelled', function () {
+    $fixture = createActiveCheckInFixture();
+
+    $result = app(RoomScanService::class)->confirmScan(
+        $fixture['user'],
+        $fixture['room']->qr_token
+    );
+
+    expect($result['status'])->toBe('success');
+
+    $scan = \App\Models\QuorumScan::first();
+
+    expect($scan)->not->toBeNull()
+        ->and($scan->schedule_id)->toBe($fixture['schedule']->id)
+        ->and($scan->claim_id)->toBeNull();
+});
+
+it('rejects scan for a cancelled official schedule when there is no active claim', function () {
+    $fixture = createActiveCheckInFixture();
+
+    ScheduleCancellation::create([
+        'schedule_id' => $fixture['schedule']->id,
+        'cancelled_by' => $fixture['user']->id,
+        'cancellation_date' => Carbon::now()->toDateString(),
+        'cancellation_type' => 'lainnya',
+        'reason' => 'Jadwal kelas dibatalkan untuk hari ini.',
+    ]);
+
+    $result = app(RoomScanService::class)->confirmScan(
+        $fixture['user'],
+        $fixture['room']->qr_token
+    );
+
+    expect($result['status'])->toBe('error')
+        ->and($result['message'])->toBe('Tidak ada jadwal resmi atau kelas pengganti untuk kelas Anda saat ini.')
+        ->and(\App\Models\QuorumScan::count())->toBe(0);
+});
+
+it('routes scan to active claim when official schedule is cancelled', function () {
+    $fixture = createActiveCheckInFixture();
+
+    ScheduleCancellation::create([
+        'schedule_id' => $fixture['schedule']->id,
+        'cancelled_by' => $fixture['user']->id,
+        'cancellation_date' => Carbon::now()->toDateString(),
+        'cancellation_type' => 'lainnya',
+        'reason' => 'Jadwal kelas dibatalkan untuk hari ini.',
+    ]);
+
+    $claim = RoomClaim::create([
+        'room_id' => $fixture['room']->id,
+        'schedule_id' => $fixture['schedule']->id,
+        'claimer_group_id' => $fixture['classGroup']->id,
+        'claimed_by_user_id' => $fixture['user']->id,
+        'claim_date' => Carbon::now()->toDateString(),
+        'start_time' => '10:00:00',
+        'end_time' => '12:00:00',
+        'status' => 'pending_quorum',
+    ]);
+
+    $result = app(RoomScanService::class)->confirmScan(
+        $fixture['user'],
+        $fixture['room']->qr_token
+    );
+
+    expect($result['status'])->toBe('success');
+
+    $scan = \App\Models\QuorumScan::first();
+
+    expect($scan)->not->toBeNull()
+        ->and($scan->schedule_id)->toBeNull()
+        ->and($scan->claim_id)->toBe($claim->id);
 });

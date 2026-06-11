@@ -63,7 +63,9 @@ class RoomScanService
                 }
 
                 if ($schedule) {
-                    return $this->processAttendance($user, $qrToken, $room, $classGroup, $schedule);
+                    if (! $this->isScheduleCancelledOnDate($schedule->id, $currentDate)) {
+                        return $this->processAttendance($user, $qrToken, $room, $classGroup, $schedule);
+                    }
                 }
 
                 $activeClaimQuery = RoomClaim::where('room_id', $room->id)
@@ -380,6 +382,13 @@ class RoomScanService
         }
 
         return $claimQuery->first();
+    }
+
+    private function isScheduleCancelledOnDate($scheduleId, $date): bool
+    {
+        return ScheduleCancellation::where('schedule_id', $scheduleId)
+            ->where('cancellation_date', $date)
+            ->exists();
     }
 
     private function findActiveScheduleConflict($classGroupId, $date, $dayOfWeek, $startTime, $endTime): ?Schedule

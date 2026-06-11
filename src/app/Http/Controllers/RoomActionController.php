@@ -7,6 +7,7 @@ use App\Services\RoomScanService;
 use App\Models\Room;
 use App\Models\QuorumScan;
 use App\Models\Schedule;
+use App\Models\ScheduleCancellation;
 use Carbon\Carbon;
 
 class RoomActionController extends Controller
@@ -104,6 +105,10 @@ class RoomActionController extends Controller
             ->where('start_time', '<=', $now->format('H:i:s'))
             ->where('end_time', '>=', $now->format('H:i:s'))
             ->first();
+
+        if ($activeSchedule && ScheduleCancellation::where('schedule_id', $activeSchedule->id)->where('cancellation_date', $today)->exists()) {
+            $activeSchedule = null;
+        }
 
         $latestScan = QuorumScan::where('user_id', $user->id)
             ->where('room_id', $room->id)
