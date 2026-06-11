@@ -18,6 +18,7 @@ use App\Http\Controllers\AdminRoomController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\RoomQrPdfController;
 use App\Http\Controllers\ClassRepTokenController;
+use App\Http\Controllers\AdminAllowedIpController;
 
 Route::get('/debug/ip', [DebugController::class, 'showIpForm'])->name('debug.ip');
 Route::post('/debug/ip', [DebugController::class, 'inspectIp'])->name('debug.ip.check');
@@ -113,5 +114,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/schedules/import', [RoomImportController::class, 'import'])->name('admin.schedules.import');
 
         Route::resource('users', AdminUserController::class)->except(['show'])->names('admin.users');
+
+        Route::resource('allowed-ips', AdminAllowedIpController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->names('admin.allowed-ips');
+        Route::post('/allowed-ips/{allowedIp}/toggle', [AdminAllowedIpController::class, 'toggle'])
+            ->name('admin.allowed-ips.toggle');
     });
 });
