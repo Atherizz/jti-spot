@@ -30,12 +30,6 @@
                 </p>
             </div>
             
-            <button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold text-ink bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors shadow-sm shrink-0">
-                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                Perbarui Metadata
-            </button>
         </div>
     </div>
 
@@ -74,34 +68,6 @@
         {{-- Log & Data Section (Right) --}}
         <section class="xl:col-span-8 flex flex-col gap-6">
             
-            {{-- Mini Stats --}}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div class="editorial-panel bg-white p-5 flex flex-col justify-between">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Rate Utilisasi</span>
-                    <div class="flex items-end justify-between">
-                        <span class="font-display text-3xl font-bold text-ink leading-none">75%</span>
-                        <div class="flex items-center gap-1 text-emerald-500 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px] font-bold">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                            5%
-                        </div>
-                    </div>
-                </div>
-                <div class="editorial-panel bg-white p-5 flex flex-col justify-between">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Pemindaian Hari Ini</span>
-                    <div class="flex items-end justify-between">
-                        <span class="font-display text-3xl font-bold text-ink leading-none">120</span>
-                        <span class="text-[10px] font-bold text-gray-400">Entri</span>
-                    </div>
-                </div>
-                <div class="editorial-panel bg-white p-5 flex flex-col justify-between">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Anomali Sistem</span>
-                    <div class="flex items-end justify-between">
-                        <span class="font-display text-3xl font-bold text-orange-600 leading-none">2</span>
-                        <span class="text-[10px] font-bold text-orange-600/60 uppercase tracking-widest">Konflik</span>
-                    </div>
-                </div>
-            </div>
-
             {{-- Live Audit Log --}}
             <div class="editorial-panel bg-white flex-1 overflow-hidden flex flex-col">
                 <div class="p-6 border-b border-gray-100 flex items-center justify-between">
